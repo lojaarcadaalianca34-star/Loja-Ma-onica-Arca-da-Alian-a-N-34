@@ -1,0 +1,165 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) || 
+        (request.auth.token.email != null && 
+         request.auth.token.email.lower() == 'lojaarcadaalianca34@gmail.com' && 
+         request.auth.token.email_verified == true)
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- Collections ---
+
+    // Admins: Only admins can read/write this to prevent self-promotion
+    match /admins/{uid} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // Leads: Public can create, only Admins can read/manage
+    match /leads/{leadId} {
+      allow create: if isValidLead(incoming());
+      allow list, get, update, delete: if isAdmin();
+    }
+
+    function isValidLead(data) {
+      let hasCommon = data.keys().hasAll(['email', 'phone', 'createdAt']) &&
+                      data.email is string && data.email.size() > 0 && data.email.size() < 200 &&
+                      data.phone is string && data.phone.size() > 0 && data.phone.size() < 50 &&
+                      data.createdAt == request.time;
+      
+      let isBasic = data.keys().hasAll(['name']) && 
+                    data.name is string && data.name.size() > 0 && data.name.size() < 200 &&
+                    data.keys().size() <= 6;
+                    
+      let isQuest = data.keys().hasAll(['fullName', 'type']) && 
+                    data.fullName is string && data.fullName.size() > 0 && data.fullName.size() < 200 &&
+                    data.type == 'masonic_quest' &&
+                    data.keys().size() <= 25;
+
+      return hasCommon && (isBasic || isQuest);
+    }
+
+    // Content: Public can read, only Admins can update
+    match /content/{docId} {
+      allow get: if true;
+      allow list: if isAdmin(); // Admins can list if needed, but usually just 'get' main
+      allow write: if isAdmin() && docId == 'main' && isValidContent(incoming());
+    }
+
+    function isValidContent(data) {
+      return data.keys().hasAll(['hero', 'history', 'philanthropy']) &&
+             data.hero.title is string &&
+             data.history.text is string;
+    }
+
+    // --- Library ---
+
+    match /library_items/{itemId} {
+      allow read: if isSignedIn() || (resource != null && resource.data.isPublic == true);
+      allow create: if isSignedIn() && isValidLibraryItem(incoming());
+      allow update: if isSignedIn() && (existing().addedBy == request.auth.uid || isAdmin()) && isValidLibraryItem(incoming());
+      allow delete: if isSignedIn() && (existing().addedBy == request.auth.uid || isAdmin());
+    }
+
+    function isValidLibraryItem(data) {
+      return data.keys().hasAll(['title', 'addedBy', 'createdAt']) &&
+             data.title is string && data.title.size() > 0 &&
+             data.addedBy is string && 
+             (request.method == 'create' ? data.addedBy == request.auth.uid : data.addedBy == resource.data.addedBy) &&
+             data.createdAt == (request.method == 'create' ? request.time : resource.data.createdAt);
+    }
+
+    match /library_comments/{commentId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidComment(incoming());
+      allow update, delete: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+    }
+
+    function isValidComment(data) {
+      return data.keys().hasAll(['itemId', 'userId', 'text', 'createdAt']) &&
+             data.itemId is string &&
+             data.userId == request.auth.uid &&
+             data.text is string && data.text.size() > 0 &&
+             data.createdAt == request.time;
+    }
+
+    // --- Professional Board ---
+    match /professional_board/{boardId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidBoardItem(incoming());
+      allow update, delete: if isSignedIn() && (existing().authorId == request.auth.uid || isAdmin());
+    }
+
+    function isValidBoardItem(data) {
+      return data.keys().hasAll(['type', 'title', 'authorId', 'createdAt']) &&
+             data.type in ['JOB', 'RESUME', 'SERVICE'] &&
+             data.title is string && data.title.size() > 0 &&
+             data.authorId == request.auth.uid &&
+             data.createdAt == request.time;
+    }
+
+    // --- Membership Requests ---
+    match /membership_requests/{requestId} {
+      allow create: if isValidMembershipRequest(incoming());
+      allow read, update, delete: if isAdmin();
+    }
+
+    function isValidMembershipRequest(data) {
+      return data.keys().hasAll(['name', 'email', 'status', 'createdAt']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 200 &&
+             data.email is string && data.email.size() > 0 && data.email.size() < 200 &&
+             data.status == 'PENDING' &&
+             data.createdAt == request.time;
+    }
+
+    // --- Invitations ---
+    match /invitations/{email} {
+      // Allow read for everyone to check their own registration status (by document ID/email)
+      allow get: if true;
+      allow list, write: if isAdmin();
+    }
+
+    // --- Users ---
+    match /users/{uid} {
+      allow get: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isSignedIn() && (isAdmin() || (resource.data.isOnline == true));
+      allow create: if isSignedIn() && request.auth.uid == uid && isValidUser(incoming());
+      allow update: if isSignedIn() && (request.auth.uid == uid || isAdmin()) && isValidUser(incoming());
+      allow delete: if isAdmin();
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'role']) &&
+             data.uid == (request.method == 'create' ? request.auth.uid : resource.data.uid) &&
+             data.email == (request.method == 'create' ? request.auth.token.email : resource.data.email) &&
+             data.role in ['member', 'admin'];
+    }
+  }
+}

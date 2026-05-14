@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-gold-50: #fffdf2;
+  --color-gold-100: #fff9d9;
+  --color-gold-200: #fff3a6;
+  --color-gold-300: #ffec73;
+  --color-gold-400: #ffe540;
+  --color-gold-500: #ffd700;
+  --color-gold-600: #cca300;
+  --color-gold-700: #997a00;
+  --color-gold-800: #665200;
+  --color-gold-900: #332900;
+
+  --color-masonic-blue: #02028c;
+  --color-masonic-dark: #0303b5;
+
+  --font-serif: "Lora", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-masonic-dark);
+  color: white;
+}
+
+.masonic-gradient {
+  background: radial-gradient(circle at center, var(--color-masonic-blue) 0%, var(--color-masonic-dark) 100%);
+}
+
+.gold-text {
+  background: linear-gradient(to bottom, var(--color-gold-100), var(--color-gold-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gold-border {
+  border-image: linear-gradient(to bottom, var(--color-gold-100), var(--color-gold-400)) 1;
+}
+

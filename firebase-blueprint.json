@@ -1,0 +1,184 @@
+{
+  "entities": {
+    "Lead": {
+      "title": "Ingresso Lead",
+      "description": "Pessoas interessadas em ingressar na loja",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "fullName": { "type": "string" },
+        "age": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "message": { "type": "string" },
+        "civilStatus": { "type": "string" },
+        "children": { "type": "string" },
+        "profession": { "type": "string" },
+        "workplace": { "type": "string" },
+        "workAddress": { "type": "string" },
+        "homeAddress": { "type": "string" },
+        "income": { "type": "string" },
+        "q1": { "type": "string" },
+        "q2": { "type": "string" },
+        "q4": { "type": "string" },
+        "q5": { "type": "string" },
+        "q6": { "type": "string" },
+        "q7": { "type": "string" },
+        "q8": { "type": "string" },
+        "familyPhoto": { "type": "string" },
+        "type": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "phone", "createdAt"]
+    },
+    "SiteContent": {
+      "title": "Conteúdo do Site",
+      "description": "Textos editáveis do site",
+      "type": "object",
+      "properties": {
+        "hero": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "subTitle": { "type": "string" },
+            "tagline": { "type": "string" }
+          }
+        },
+        "history": {
+          "type": "object",
+          "properties": {
+            "text": { "type": "string" }
+          }
+        },
+        "philanthropy": {
+          "type": "object",
+          "properties": {
+            "description": { "type": "string" }
+          }
+        },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Admin": {
+      "title": "Administrador",
+      "description": "Usuários com permissão de edição",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" }
+      },
+      "required": ["email"]
+    },
+    "LibraryItem": {
+      "title": "Item da Biblioteca",
+      "description": "Livros, documentos, links ou trabalhos na área restrita",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "author": { "type": "string" },
+        "date": { "type": "string" },
+        "description": { "type": "string" },
+        "fileType": { "type": "string" },
+        "url": { "type": "string" },
+        "youtubeUrl": { "type": "string" },
+        "isPublic": { "type": "boolean" },
+        "isHighlightedInCircle": { "type": "boolean" },
+        "isFixedInCircle": { "type": "boolean" },
+        "isCuriosity": { "type": "boolean" },
+        "addedBy": { "type": "string" },
+        "addedByEmail": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "addedBy", "createdAt"]
+    },
+    "LibraryComment": {
+      "title": "Comentário da Biblioteca",
+      "description": "Comentários em itens da biblioteca",
+      "type": "object",
+      "properties": {
+        "itemId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["itemId", "userId", "text", "createdAt"]
+    },
+    "ProfessionalBoard": {
+      "title": "Quadro Profissional",
+      "description": "Vagas e Currículos na área restrita",
+      "type": "object",
+      "properties": {
+        "type": { "enum": ["JOB", "RESUME"] },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "company": { "type": "string" },
+        "location": { "type": "string" },
+        "contact": { "type": "string" },
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "title", "authorId", "createdAt"]
+    },
+    "Invitation": {
+      "title": "Convite",
+      "description": "Emails autorizados a criar conta de obreiro",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "invitedBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["PENDING", "ACCEPTED"] }
+      },
+      "required": ["email", "invitedBy", "createdAt"]
+    },
+    "User": {
+      "title": "Perfil de Usuário",
+      "description": "Dados do obreiro cadastrado",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["member", "admin"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    }
+  },
+  "firestore": {
+    "leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Leads de ingresso"
+    },
+    "content/main": {
+      "schema": "SiteContent",
+      "description": "Documento único para conteúdo do site"
+    },
+    "admins/{uid}": {
+      "schema": "Admin",
+      "description": "Lista de administradores"
+    },
+    "library_items/{itemId}": {
+      "schema": "LibraryItem",
+      "description": "Itens da biblioteca restrita"
+    },
+    "library_comments/{commentId}": {
+      "schema": "LibraryComment",
+      "description": "Comentários nos itens da biblioteca"
+    },
+    "professional_board/{boardId}": {
+      "schema": "ProfessionalBoard",
+      "description": "Quadro de vagas e currículos"
+    },
+    "invitations/{email}": {
+      "schema": "Invitation",
+      "description": "Convites para novos membros"
+    },
+    "users/{uid}": {
+      "schema": "User",
+      "description": "Perfis de usuários"
+    }
+  }
+}
