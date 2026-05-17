@@ -45,18 +45,18 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-masonic-dark p-6">
+    <div className="min-h-screen flex items-center justify-center bg-[#f4efe2] p-6">
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md bg-masonic-blue/80 p-12 rounded-3xl border border-gold-500/30 text-center"
+        className="w-full max-w-md bg-[#0b1d3a] p-12 rounded-3xl border border-[#c5a059]/30 text-center shadow-2xl"
       >
         <div className="w-24 h-24 mx-auto mb-8">
           <Logo className="w-full h-full" />
         </div>
         
-        <h1 className="font-serif text-3xl font-bold text-white mb-2 uppercase tracking-widest">Acesso Restrito</h1>
-        <p className="text-gold-200/50 text-sm mb-8">Somente OFICIAIS autorizados da Arca nº 34</p>
+        <h1 className="font-serif text-3xl font-bold text-[#f4efe2] mb-2 uppercase tracking-widest">Acesso Restrito</h1>
+        <p className="text-[#c5a059]/70 text-sm mb-8">Somente OFICIAIS autorizados da Arca nº 34</p>
         
         {error && (
           <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex flex-col gap-3 text-red-400 text-sm text-left">
@@ -80,7 +80,7 @@ export default function AdminLogin() {
                         setError('Erro ao auto-promover: ' + (e as Error).message);
                       }
                     }}
-                    className="mt-4 w-full bg-gold-500/20 text-gold-500 border border-gold-500/40 py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-gold-500 hover:text-masonic-dark transition-all"
+                    className="mt-4 w-full bg-[#c5a059]/20 text-[#c5a059] border border-[#c5a059]/40 py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-[#c5a059] hover:text-[#f4efe2] transition-all"
                   >
                     Ativar meu acesso Admin
                   </button>
@@ -93,7 +93,7 @@ export default function AdminLogin() {
         <button 
           onClick={handleLogin}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-4 bg-white text-masonic-dark font-sans font-bold py-5 rounded-2xl hover:bg-gold-50 transition-all disabled:opacity-50 shadow-[0_0_50px_rgba(255,255,255,0.3)] active:scale-[0.98] group border-2 border-gold-500"
+          className="w-full flex items-center justify-center gap-4 bg-[#0b1d3a] text-[#c5a059] border-2 border-[#c5a059] font-sans font-bold py-5 rounded-2xl hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all disabled:opacity-50 shadow-xl active:scale-[0.98] group"
         >
           {loading ? 'Verificando...' : (
             <>
@@ -105,8 +105,8 @@ export default function AdminLogin() {
           )}
         </button>
 
-        <div className="mt-4 p-4 bg-gold-500/5 rounded-xl border border-gold-500/10">
-          <p className="text-[10px] text-gold-200/40 uppercase tracking-widest leading-relaxed">
+        <div className="mt-4 p-4 bg-[#c5a059]/5 rounded-xl border border-[#c5a059]/10">
+          <p className="text-[10px] text-[#c5a059]/40 uppercase tracking-widest leading-relaxed">
             Se o login não abrir, verifique se o seu navegador bloqueou a janela pop-up. 
             Você deve permitir pop-ups para este site para completar a autenticação.
           </p>
@@ -114,12 +114,12 @@ export default function AdminLogin() {
 
         <button 
           onClick={() => navigate('/')}
-          className="w-full mt-6 flex items-center justify-center gap-2 text-gold-200/40 hover:text-gold-400 text-xs font-bold uppercase tracking-widest transition-all"
+          className="w-full mt-6 flex items-center justify-center gap-2 text-[#c5a059]/40 hover:text-[#c5a059] text-xs font-bold uppercase tracking-widest transition-all"
         >
           <ArrowLeft className="w-4 h-4" /> Voltar ao site
         </button>
 
-        <div className="mt-8 flex items-center justify-center gap-2 text-gold-500/30 text-[10px] uppercase tracking-widest">
+        <div className="mt-8 flex items-center justify-center gap-2 text-[#c5a059]/30 text-[10px] uppercase tracking-widest">
           <Lock className="w-3 h-3" /> Conexão Segura
         </div>
       </motion.div>

@@ -7,7 +7,8 @@ import {
   X, Link as LinkIcon, Globe, File as FileIcon,
   Briefcase, Handshake, Users, Circle, UserCircle, Save, Camera,
   Calendar, Award, BookOpen, Star, ExternalLink, ShieldCheck,
-  LayoutDashboard, Heart, Settings, AlertCircle, RefreshCw, Trash2
+  LayoutDashboard, Heart, Settings, AlertCircle, RefreshCw, Trash2,
+  Building, ChevronDown, Edit
 } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
@@ -61,8 +62,70 @@ export default function MemberDashboard() {
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
   const { content } = useContent();
 
+  const [recentProfessional, setRecentProfessional] = useState<any[]>([]);
+  const [discussedLibrary, setDiscussedLibrary] = useState<any[]>([]);
+
+  // Fetch Recent Professional Board
+  useEffect(() => {
+    const q = query(collection(db, 'professional_board'), orderBy('createdAt', 'desc'), limit(5));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setRecentProfessional(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Fetch Discussed Library Items (For simplicity, just take recent ones or we'd need more complex query)
+  // In a real app we'd query by hasComments: true if we had that field.
+  useEffect(() => {
+    const q = query(collection(db, 'library_items'), orderBy('createdAt', 'desc'), limit(5));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setDiscussedLibrary(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const RecentProfessionalFeed = () => (
+    <div className="space-y-4">
+      {recentProfessional.length === 0 && <p className="text-[10px] text-[#0b1d3a]/30 uppercase italic">Nenhuma atividade recente</p>}
+      {recentProfessional.map(item => (
+        <div key={item.id} className="p-4 bg-white/60 border border-[#0b1d3a]/5 rounded-2xl flex items-center gap-4 group cursor-pointer hover:border-[#c5a059]/30 transition-all" onClick={() => setActiveTab('professional')}>
+          <div className="w-10 h-10 rounded-xl bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059]">
+            {item.type === 'SERVICE' ? <Building className="w-5 h-5" /> : item.type === 'JOB' ? <Briefcase className="w-5 h-5" /> : <UserCircle className="w-5 h-5" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-xs font-bold text-[#0b1d3a] truncate">{item.title}</h4>
+            <p className="text-[8px] text-[#0b1d3a]/60 uppercase font-black tracking-widest">{item.company || item.authorName} • {item.type}</p>
+          </div>
+          <div className="text-[#c5a059]">
+            <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const LibraryDiscussionFeed = () => (
+    <div className="space-y-4">
+      {discussedLibrary.length === 0 && <p className="text-[10px] text-[#0b1d3a]/30 uppercase italic">Nenhum debate recente</p>}
+      {discussedLibrary.map(item => (
+        <div key={item.id} className="p-4 bg-white/60 border border-[#0b1d3a]/5 rounded-2xl flex items-center gap-4 group cursor-pointer hover:border-[#c5a059]/30 transition-all" onClick={() => setActiveTab('library')}>
+          <div className="w-10 h-10 rounded-xl bg-[#0b1d3a]/5 flex items-center justify-center text-[#0b1d3a]">
+            <MessageSquare className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-xs font-bold text-[#0b1d3a] truncate">{item.title}</h4>
+            <p className="text-[8px] text-[#c5a059] uppercase font-black tracking-widest">Debates abertos por: {item.author || 'Membro'}</p>
+          </div>
+          <div className="text-[#c5a059]">
+            <ChevronDown className="w-4 h-4 -rotate-90 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
   const isSuperAdmin = auth.currentUser?.email?.toLowerCase() === 'lojaarcadaalianca34@gmail.com' || 
     auth.currentUser?.email?.toLowerCase() === 'sophiabohn@gmail.com';
+
   const hasElevatedAccess = isSuperAdmin || 
     ['Venerável Mestre', 'Venerável', 'Tesoureiro', 'Secretário', 'Secretario'].some(role => 
       (userData?.currentRole || userData?.role || '').toLowerCase().includes(role.toLowerCase())
@@ -242,14 +305,17 @@ export default function MemberDashboard() {
           {/* Header */}
           <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-500">
-                <ShieldCheck className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-[#0b1d3a]/10 flex items-center justify-center text-[#c5a059]">
+                <BookMarked className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="font-serif text-2xl font-bold text-white uppercase tracking-tight">
-                  Templo <span className="gold-text">Restrito</span>
+                <p className="text-[#c5a059] font-sans tracking-[0.4em] uppercase text-[9px] font-black mb-1">
+                  CONHECIMENTO
+                </p>
+                <h1 className="font-serif text-3xl font-bold uppercase tracking-tight leading-none text-[#0b1d3a]">
+                  <span className="text-[#c5a059]">CÍRCULO</span> <span className="text-[#c5a059]">FECHADO</span>
                 </h1>
-                <p className="text-gold-200/40 font-sans tracking-[0.2em] uppercase text-[9px] font-bold">
+                <p className="text-[#0b1d3a]/60 font-sans tracking-[0.2em] uppercase text-[8px] font-bold mt-2">
                   Bem-vindo de volta, Ir. {userData?.displayName || auth.currentUser?.email?.split('@')[0]}
                 </p>
               </div>
@@ -258,23 +324,23 @@ export default function MemberDashboard() {
             <div className="flex items-center gap-4">
                <button 
                 onClick={() => setShowOnlineUsers(!showOnlineUsers)}
-                className="relative p-3 bg-white/5 border border-white/10 rounded-2xl text-gold-500 hover:bg-white/10 transition-all group"
+                className="relative p-3 bg-white/40 border border-[#0b1d3a]/10 rounded-2xl text-[#0b1d3a] hover:bg-white/60 transition-all group shadow-sm"
               >
                 <Users className="w-5 h-5" />
-                {onlineUsers.length > 0 && <span className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 text-masonic-dark text-[10px] flex items-center justify-center rounded-full font-black border-2 border-masonic-dark animate-pulse">{onlineUsers.length}</span>}
+                {onlineUsers.length > 0 && <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#0b1d3a] text-[#f4efe2] text-[10px] flex items-center justify-center rounded-full font-black border-2 border-white animate-pulse">{onlineUsers.length}</span>}
                 <AnimatePresence>
                   {showOnlineUsers && (
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute right-0 top-full mt-4 w-64 bg-masonic-blue/95 backdrop-blur-xl border border-gold-500/30 rounded-2xl shadow-2xl z-50 p-4">
-                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/5">
-                        <h4 className="text-[10px] uppercase font-black tracking-widest text-gold-500">Irmãos Online</h4>
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute right-0 top-full mt-4 w-64 bg-white/95 backdrop-blur-xl border border-[#0b1d3a]/10 rounded-2xl shadow-2xl z-50 p-4">
+                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#0b1d3a]/5">
+                        <h4 className="text-[10px] uppercase font-black tracking-widest text-[#0b1d3a]">Irmãos Online</h4>
                       </div>
                       <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar">
                         {onlineUsers.map(user => (
                           <div key={user.id} className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-gold-500/10 flex items-center justify-center text-gold-500 text-[10px] font-bold border border-gold-500/20">{user.displayName?.[0] || 'I'}</div>
+                            <div className="w-8 h-8 rounded-lg bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059] text-[10px] font-bold border border-[#c5a059]/20">{user.displayName?.[0] || 'I'}</div>
                             <div className="overflow-hidden">
-                              <p className="text-white text-[11px] font-bold truncate leading-tight">{user.displayName || 'Irmão'}</p>
-                              <span className="text-[8px] text-gold-500/50 uppercase font-black tracking-widest block">{user.currentRole || user.role}</span>
+                              <p className="text-[#0b1d3a] text-[11px] font-bold truncate leading-tight">{user.displayName || 'Irmão'}</p>
+                              <span className="text-[8px] text-[#c5a059] uppercase font-black tracking-widest block">{user.currentRole || user.role}</span>
                             </div>
                           </div>
                         ))}
@@ -284,11 +350,11 @@ export default function MemberDashboard() {
                 </AnimatePresence>
               </button>
               {isSuperAdmin && (
-                <button onClick={() => navigate('/admin')} className="hidden md:flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 text-gold-500 rounded-full font-black uppercase tracking-widest text-[10px] hover:bg-white/10">
+                <button onClick={() => navigate('/admin')} className="hidden md:flex items-center gap-2 px-6 py-3 bg-[#0b1d3a] border border-[#c5a059]/30 text-[#f4efe2] rounded-full font-black uppercase tracking-widest text-[10px] hover:bg-[#c5a059] transition-all shadow-md">
                   Painel Admin
                 </button>
               )}
-              <button onClick={handleLogout} className="flex items-center gap-2 text-gold-500 hover:text-gold-400 transition-colors uppercase tracking-[0.2em] text-[10px] font-black ml-4">
+              <button onClick={handleLogout} className="flex items-center gap-2 text-[#0b1d3a] hover:text-[#c5a059] transition-colors uppercase tracking-[0.2em] text-[10px] font-black ml-4">
                 <LogOut className="w-4 h-4" /> Sair
               </button>
             </div>
@@ -306,7 +372,7 @@ export default function MemberDashboard() {
                <button
                  key={tab.id}
                  onClick={() => setActiveTab(tab.id as any)}
-                 className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-gold-500 text-masonic-dark shadow-lg scale-105' : 'bg-white/5 text-gold-500/50 hover:bg-white/10 hover:text-gold-500'}`}
+                 className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-lg scale-105 border border-[#c5a059]/30' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] shadow-sm'}`}
                >
                  <tab.icon className="w-4 h-4" />
                  {tab.label}
@@ -327,34 +393,64 @@ export default function MemberDashboard() {
                        <h2 className="font-serif text-3xl md:text-5xl text-[#5d4037] font-bold italic tracking-tight">Saudações Fraternais, Ir. {userData?.displayName?.split(' ')[0]}</h2>
                        <div className="h-px w-32 bg-[#d4b068] mx-auto" />
                        <div className="font-serif text-[#5d4037]/90 text-lg md:text-xl leading-relaxed italic text-justify space-y-6">
-                          <p>Seja bem-vindo à Coluna de Estudos e Apoio da A.R.L.S. Arca da Aliança nº 34. Este ambiente digital foi erguido para que a nossa fraternidade não se limite apenas às nossas sessões físicas.</p>
-                          <p>Aqui, o polimento da Pedra Bruta continua. Use as ferramentas à sua disposição com sabedoria, retidão e, acima de tudo, o respeito mútuo que caracteriza um verdadeiro Obreiro da Arte Real.</p>
+                          <p>Seja bem-vindo ao Círculo Fechado da A.R.L.S. Arca da Aliança nº 34. Este ambiente digital foi erguido para que a nossa fraternidade não se limite apenas às nossas sessões físicas.</p>
+                          <p>Aqui, o polimento da Pedra Bruta continua. Acompanhe abaixo as movimentações profissionais e debates de nossa Coluna.</p>
                        </div>
                        <div className="pt-6 flex justify-center gap-8">
                           {['A', 'N', '34'].map(tag => (
-                            <div key={tag} className="w-10 h-10 rounded-full border-2 border-[#d4b068] flex items-center justify-center text-[#d4b068] font-serif font-bold text-sm">{tag}</div>
+                             <div key={tag} className="w-10 h-10 rounded-full border-2 border-[#d4b068] flex items-center justify-center text-[#d4b068] font-serif font-bold text-sm">{tag}</div>
                           ))}
                        </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                   <div className="bg-masonic-blue/40 p-8 rounded-[2rem] border border-white/5 hover:border-gold-500/30 transition-all cursor-pointer group" onClick={() => setActiveTab('library')}>
-                      <BookMarked className="w-10 h-10 text-gold-500 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-                      <h3 className="text-white font-serif text-xl font-bold mb-2">Instrução</h3>
-                      <p className="text-white/40 text-xs">Examine nossa biblioteca de rituais e trabalhos de pesquisa.</p>
-                   </div>
-                   <div className="bg-masonic-blue/40 p-8 rounded-[2rem] border border-white/5 hover:border-gold-500/30 transition-all cursor-pointer group" onClick={() => setActiveTab('professional')}>
-                      <Handshake className="w-10 h-10 text-gold-500 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-                      <h3 className="text-white font-serif text-xl font-bold mb-2">Solidariedade</h3>
-                      <p className="text-white/40 text-xs">Apoie o negócio dos irmãos e fortaleça nossa rede comercial.</p>
-                   </div>
-                   <div className="bg-masonic-blue/40 p-8 rounded-[2rem] border border-white/5 hover:border-gold-500/30 transition-all cursor-pointer group" onClick={() => setActiveTab('social')}>
-                      <Heart className="w-10 h-10 text-gold-500 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-                      <h3 className="text-white font-serif text-xl font-bold mb-2">Justiça Social</h3>
-                      <p className="text-white/40 text-xs">Participe das decisões sobre nossas ações de filantropia.</p>
-                   </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                  {/* Recent Professional Updates */}
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between border-b border-[#0b1d3a]/10 pb-4">
+                      <h3 className="font-serif text-xl font-bold text-[#0b1d3a] uppercase tracking-widest flex items-center gap-2">
+                        <Handshake className="w-5 h-5 text-[#c5a059]" /> O Forja Profissional
+                      </h3>
+                      <button onClick={() => setActiveTab('professional')} className="text-[10px] uppercase font-black tracking-widest text-[#c5a059] hover:underline">Ver Todos</button>
+                    </div>
+                    <div className="space-y-4">
+                       <RecentProfessionalFeed />
+                    </div>
+                  </div>
+
+                  {/* Active Discussions & Library */}
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between border-b border-[#0b1d3a]/10 pb-4">
+                      <h3 className="font-serif text-xl font-bold text-[#0b1d3a] uppercase tracking-widest flex items-center gap-2">
+                        <BookMarked className="w-5 h-5 text-[#c5a059]" /> Debates em Obra
+                      </h3>
+                      <button onClick={() => setActiveTab('library')} className="text-[10px] uppercase font-black tracking-widest text-[#c5a059] hover:underline">Ir para Biblioteca</button>
+                    </div>
+                    <div className="space-y-4">
+                       <LibraryDiscussionFeed />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Social Actions Summary */}
+                <div className="bg-white/40 p-8 rounded-[2.5rem] border border-[#0b1d3a]/10">
+                  <div className="flex items-center gap-3 mb-8">
+                    <Heart className="w-6 h-6 text-[#c5a059]" />
+                    <h3 className="font-serif text-xl font-bold text-[#0b1d3a] uppercase tracking-widest">Painel de Decisões</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {socialItems.slice(0, 2).map((action) => (
+                      <div key={action.id} className="p-6 bg-white/60 border border-[#0b1d3a]/5 rounded-2xl">
+                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest mb-2 inline-block ${action.type === 'poll' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'}`}>
+                          {action.type === 'poll' ? 'Enquete' : 'Arrecadação'}
+                        </span>
+                        <h4 className="font-serif font-bold text-[#0b1d3a] mb-1">{action.title}</h4>
+                        <p className="text-[10px] text-[#0b1d3a]/60 line-clamp-2 italic mb-4">{action.description}</p>
+                        <button onClick={() => setActiveTab('social')} className="text-[9px] font-black uppercase tracking-[0.2em] text-[#c5a059] hover:gap-3 transition-all flex items-center gap-1">Participar →</button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -363,28 +459,28 @@ export default function MemberDashboard() {
               <motion.div key="library" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <div className="flex flex-col md:flex-row gap-6 mb-8 items-center">
                   <div className="relative flex-1 group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gold-500/30 group-focus-within:text-gold-500 transition-colors" />
-                    <input type="text" placeholder="Buscar estudos, rituais..." className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 pl-12 text-white text-sm focus:border-gold-500/50" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0b1d3a]/30 group-focus-within:text-[#0b1d3a] transition-colors" />
+                    <input type="text" placeholder="Buscar estudos, rituais..." className="w-full bg-white/40 border border-[#0b1d3a]/10 rounded-2xl p-4 pl-12 text-[#0b1d3a] text-sm focus:border-[#c5a059]/50 shadow-sm" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
                   </div>
-                  <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-8 py-4 bg-gold-500 text-masonic-dark rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-gold-400">
+                  <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-8 py-4 bg-[#0b1d3a] text-[#f4efe2] border border-[#c5a059]/30 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-[#c5a059] transition-all shadow-md">
                     <Plus className="w-4 h-4" /> Adicionar Obra
                   </button>
                 </div>
 
                 {/* Bibliotecas Públicas */}
-                <div className="mb-10 p-6 bg-gold-500/5 border border-gold-500/20 rounded-3xl">
+                <div className="mb-10 p-6 bg-white/40 border border-[#0b1d3a]/10 rounded-3xl shadow-sm">
                    <div className="flex items-center gap-3 mb-4">
-                      <BookOpen className="text-gold-500 w-5 h-5" />
-                      <h4 className="text-white font-serif text-lg font-bold uppercase tracking-widest">Bibliotecas Digitais Públicas</h4>
+                      <BookOpen className="text-[#c5a059] w-5 h-5" />
+                      <h4 className="text-[#0b1d3a] font-serif text-lg font-bold uppercase tracking-widest">Bibliotecas Digitais Públicas</h4>
                    </div>
                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {(content.publicLibraries || [
                         { name: "Biblioteca Nacional Digital", url: "https://bndigital.bn.gov.br/" },
                         { name: "Domínio Público", url: "http://www.dominiopublico.gov.br/" }
                       ]).map((lib: any, i: number) => (
-                        <a key={i} href={lib.url} target="_blank" rel="noopener noreferrer" className="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group hover:border-gold-500/50 transition-all">
-                           <span className="text-white/70 text-xs font-bold">{lib.name}</span>
-                           <ExternalLink className="w-4 h-4 text-gold-500 opacity-30 group-hover:opacity-100 transition-opacity" />
+                        <a key={i} href={lib.url} target="_blank" rel="noopener noreferrer" className="p-4 bg-white/50 border border-[#0b1d3a]/5 rounded-xl flex items-center justify-between group hover:border-[#c5a059]/50 transition-all shadow-sm">
+                           <span className="text-[#0b1d3a]/70 text-xs font-bold">{lib.name}</span>
+                           <ExternalLink className="w-4 h-4 text-[#c5a059] opacity-30 group-hover:opacity-100 transition-opacity" />
                         </a>
                       ))}
                    </div>
@@ -403,7 +499,12 @@ export default function MemberDashboard() {
                         const message = `📚 *${item.title}*\n\nMeus irmãos, desejo compartilhar este estudo com vocês.\nLink: ${window.location.origin}/biblioteca-restrita?id=${item.id}`;
                         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
                       }}
-                      onDelete={isSuperAdmin ? () => handleDeleteItem(item.id) : undefined}
+                      onDelete={hasElevatedAccess ? () => handleDeleteItem(item.id) : undefined}
+                      onEdit={hasElevatedAccess ? () => {
+                        // For now we open add modal with a message or we could implement full edit.
+                        // Since user asked for the button, adding UI first.
+                        alert('Funcionalidade de edição em desenvolvimento. Por favor, remova e adicione novamente para alterações.');
+                      } : undefined}
                     />
                   ))}
                 </div>
@@ -418,44 +519,44 @@ export default function MemberDashboard() {
 
             {activeTab === 'social' && (
               <motion.div key="social" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-8">
-                 <div className="p-10 bg-masonic-blue/40 border border-white/5 rounded-[3.5rem] backdrop-blur-md">
+                 <div className="p-10 bg-white/40 border border-[#0b1d3a]/10 rounded-[3.5rem] backdrop-blur-md shadow-sm">
                     <div className="flex flex-col md:flex-row gap-10 items-center mb-10">
-                       <div className="w-24 h-24 rounded-3xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-500 flex-shrink-0">
+                       <div className="w-24 h-24 rounded-3xl bg-[#0b1d3a]/10 border border-[#0b1d3a]/20 flex items-center justify-center text-[#0b1d3a] flex-shrink-0">
                           <Heart className="w-12 h-12" />
                        </div>
                        <div className="flex-1">
-                          <h2 className="text-3xl font-serif text-white font-bold mb-2 uppercase tracking-widest">Painel de Decisões e <span className="gold-text">Ações Sociais</span></h2>
-                          <p className="text-gold-100/40 text-sm italic font-serif leading-relaxed">"Onde a luz da sabedoria guia o braço da caridade." • Este espaço é destinado à deliberação sobre nossas obras de assistência, suporte a instituições e auxílio a necessitados.</p>
+                          <h2 className="text-3xl font-serif text-[#0b1d3a] font-bold mb-2 uppercase tracking-widest">Painel de Decisões e <span className="text-[#c5a059]">Ações Sociais</span></h2>
+                          <p className="text-[#0b1d3a]/60 text-sm italic font-serif leading-relaxed">"Onde a luz da sabedoria guia o braço da caridade." • Este espaço é destinado à deliberação sobre nossas obras de assistência, suporte a instituições e auxílio a necessitados.</p>
                        </div>
                        {hasElevatedAccess && (
                          <div className="flex gap-2">
-                           <button onClick={() => { setSocialType('poll'); setShowSocialModal(true); }} className="px-6 py-3 bg-white/5 border border-white/10 text-gold-500 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-white/10 transition-all">Nova Enquete</button>
-                           <button onClick={() => { setSocialType('philanthropy'); setShowSocialModal(true); }} className="px-6 py-3 bg-gold-500 text-masonic-dark rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-gold-400 transition-all">Nova Filantropia</button>
+                           <button onClick={() => { setSocialType('poll'); setShowSocialModal(true); }} className="px-6 py-3 bg-white/60 border border-[#0b1d3a]/10 text-[#0b1d3a] rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-white/80 transition-all shadow-sm">Nova Enquete</button>
+                           <button onClick={() => { setSocialType('philanthropy'); setShowSocialModal(true); }} className="px-6 py-3 bg-[#0b1d3a] text-[#f4efe2] border border-[#c5a059]/30 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-[#c5a059] transition-all">Nova Filantropia</button>
                          </div>
                        )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                        {socialItems.map((action) => (
-                         <div key={action.id} className="p-8 bg-white/5 border border-white/10 rounded-[2.5rem] hover:border-gold-500/30 transition-all group relative overflow-hidden">
+                         <div key={action.id} className="p-8 bg-white/40 border border-[#0b1d3a]/10 rounded-[2.5rem] hover:border-[#c5a059]/30 transition-all group relative overflow-hidden">
                             <div className="flex justify-between items-start mb-6">
                                <div className="flex flex-col gap-1">
                                   <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.2em] w-fit ${
-                                    action.type === 'poll' ? 'bg-blue-500/20 text-blue-400' : 
-                                    action.type === 'philanthropy' ? 'bg-green-500/20 text-green-400' : 
-                                    'bg-gold-500/20 text-gold-500'
+                                    action.type === 'poll' ? 'bg-blue-500/10 text-blue-600' : 
+                                    action.type === 'philanthropy' ? 'bg-green-500/10 text-green-600' : 
+                                    'bg-[#c5a059]/10 text-[#c5a059]'
                                   }`}>
                                     {action.type === 'poll' ? 'Enquete' : action.type === 'philanthropy' ? 'Arrecadação' : 'Decisão'}
                                   </span>
-                                  <p className="text-[8px] text-white/30 uppercase font-black tracking-widest mt-1">Por: {action.creatorName}</p>
+                                  <p className="text-[8px] text-[#0b1d3a]/30 uppercase font-black tracking-widest mt-1">Por: {action.creatorName}</p>
                                </div>
                                {action.type === 'philanthropy' && (
-                                 <p className="text-gold-500 font-bold text-xs">Meta: R$ {action.goal?.toLocaleString()}</p>
+                                 <p className="text-[#c5a059] font-bold text-xs">Meta: R$ {action.goal?.toLocaleString()}</p>
                                )}
                             </div>
 
-                            <h3 className="text-white font-serif text-xl font-bold mb-3 group-hover:gold-text transition-colors">{action.title}</h3>
-                            <p className="text-white/40 text-[11px] mb-6 italic leading-relaxed">{action.description}</p>
+                            <h3 className="text-[#0b1d3a] font-serif text-xl font-bold mb-3 group-hover:text-[#c5a059] transition-colors">{action.title}</h3>
+                            <p className="text-[#0b1d3a]/60 text-[11px] mb-6 italic leading-relaxed">{action.description}</p>
 
                             {action.type === 'poll' && (
                               <div className="space-y-3 mb-6">
@@ -471,14 +572,14 @@ export default function MemberDashboard() {
                                       disabled={hasVoted}
                                       className={`w-full group/btn relative overflow-hidden p-3 rounded-xl border transition-all text-left ${
                                         hasVoted && action.votes![auth.currentUser!.uid] === i 
-                                          ? 'bg-gold-500/20 border-gold-500/50' 
-                                          : 'bg-white/5 border-white/10 hover:border-gold-500/30'
+                                          ? 'bg-[#c5a059]/20 border-[#c5a059]/50' 
+                                          : 'bg-white/40 border-[#0b1d3a]/10 hover:border-[#c5a059]/30'
                                       }`}
                                     >
-                                      <div className="absolute inset-y-0 left-0 bg-gold-500/10 transition-transform origin-left duration-700" style={{ transform: `scaleX(${percentage / 100})`, width: '100%' }} />
+                                      <div className="absolute inset-y-0 left-0 bg-[#c5a059]/10 transition-transform origin-left duration-700" style={{ transform: `scaleX(${percentage / 100})`, width: '100%' }} />
                                       <div className="relative flex justify-between items-center text-[11px]">
-                                        <span className="text-white font-bold">{opt.text}</span>
-                                        <span className="text-gold-500 font-black">{percentage}%</span>
+                                        <span className="text-[#0b1d3a] font-bold">{opt.text}</span>
+                                        <span className="text-[#c5a059] font-black">{percentage}%</span>
                                       </div>
                                     </button>
                                   );
@@ -488,16 +589,16 @@ export default function MemberDashboard() {
 
                             {action.type === 'philanthropy' && (
                               <div className="space-y-4 mb-6">
-                                <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-2 bg-[#0b1d3a]/5 rounded-full overflow-hidden">
                                   <motion.div 
-                                    className="h-full bg-gradient-to-r from-green-500 to-emerald-400" 
+                                    className="h-full bg-gradient-to-r from-green-600 to-emerald-500" 
                                     initial={{ width: 0 }}
                                     animate={{ width: `${Math.min(100, (action.current / action.goal) * 100)}%` }}
                                   />
                                 </div>
                                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                                  <span className="text-green-500">Arrecadado: R$ {action.current?.toLocaleString()}</span>
-                                  <span className="text-white/40">Faltam: R$ {Math.max(0, action.goal - (action.current || 0)).toLocaleString()}</span>
+                                  <span className="text-green-600">Arrecadado: R$ {action.current?.toLocaleString()}</span>
+                                  <span className="text-[#0b1d3a]/40">Faltam: R$ {Math.max(0, action.goal - (action.current || 0)).toLocaleString()}</span>
                                 </div>
                               </div>
                             )}
@@ -533,12 +634,12 @@ export default function MemberDashboard() {
                                        doc.save(`resultado-${action.id}.pdf`);
                                      });
                                    }}
-                                   className="flex-1 py-3 bg-white/5 border border-white/10 rounded-xl text-gold-500 font-black uppercase text-[9px] tracking-widest hover:bg-gold-500 hover:text-masonic-dark transition-all"
+                                   className="flex-1 py-3 bg-white/40 border border-[#0b1d3a]/10 rounded-xl text-[#0b1d3a] font-black uppercase text-[9px] tracking-widest hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all"
                                  >
-                                    Imprimir Resultados
+                                     Imprimir Resultados
                                  </button>
                                )}
-                               <button className="flex-1 py-3 bg-white/5 border border-white/10 rounded-xl text-white/40 font-black uppercase text-[9px] tracking-widest hover:text-white transition-all">Detalhes</button>
+                               <button className="flex-1 py-3 bg-white/40 border border-[#0b1d3a]/10 rounded-xl text-[#0b1d3a]/40 font-black uppercase text-[9px] tracking-widest hover:text-[#0b1d3a] transition-all">Detalhes</button>
                             </div>
                          </div>
                        ))}
@@ -549,7 +650,7 @@ export default function MemberDashboard() {
 
             {activeTab === 'profile' && (
               <motion.div key="profile" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="max-w-4xl mx-auto space-y-8">
-                 <div className="bg-masonic-blue/40 border border-white/5 rounded-[3rem] p-10 backdrop-blur-md shadow-2xl">
+                 <div className="bg-masonic-blue/40 border border-white/5 rounded-[3rem] p-10 backdrop-blur-md">
                     <div className="flex flex-col md:flex-row gap-10 items-start">
                       <div className="flex flex-col items-center gap-6 w-full md:w-64">
                          <div className="relative">
@@ -604,7 +705,7 @@ export default function MemberDashboard() {
                          </div>
 
                          <div className="space-y-2">
-                            <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-2">Histórico na Ordem (Graus, Iniciação, Elevação)</label>
+                            <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-2">Apresentação Pessoal</label>
                             <textarea className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:border-gold-500 outline-none text-sm resize-none" rows={4} placeholder="Conte sua história..." value={userData?.masonic_history || userData?.roles_history || ''} onChange={async e => await updateDoc(doc(db, 'users', auth.currentUser!.uid), { masonic_history: e.target.value })} />
                          </div>
 
@@ -627,8 +728,8 @@ export default function MemberDashboard() {
         {showAddModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowAddModal(false)} className="absolute inset-0 bg-masonic-dark/95 backdrop-blur-xl" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative w-full max-w-2xl bg-masonic-blue border border-gold-500/30 rounded-[2.5rem] shadow-2xl overflow-hidden p-8">
-               <h2 className="font-serif text-2xl font-bold text-white mb-8 border-b border-white/5 pb-4 uppercase tracking-widest">Adicionar <span className="gold-text">Nova Obra</span></h2>
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative w-full max-w-2xl bg-white border border-[#0b1d3a]/10 rounded-[2.5rem] overflow-hidden p-8 shadow-xl">
+               <h2 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-8 border-b border-[#0b1d3a]/10 pb-4 uppercase tracking-widest">Adicionar <span className="text-[#c5a059]">Nova Obra</span></h2>
                <form className="space-y-6" onSubmit={async e => {
                  e.preventDefault();
                  if (uploadProgress !== null) return;
@@ -680,26 +781,26 @@ export default function MemberDashboard() {
                }}>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-1">Título</label>
-                      <input name="title" required placeholder="Título da Obra" className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white outline-none focus:border-gold-500/50" />
+                      <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest ml-1">Título</label>
+                      <input name="title" required placeholder="Título da Obra" className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-3 rounded-lg text-[#0b1d3a] font-bold outline-none focus:border-[#c5a059]/50" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-1">Categoria</label>
-                      <select name="category" className="w-full bg-masonic-dark border border-white/10 p-3 rounded-lg text-white outline-none focus:border-gold-500/50">
+                      <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest ml-1">Categoria</label>
+                      <select name="category" className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-3 rounded-lg text-[#0b1d3a] font-bold outline-none focus:border-[#c5a059]/50">
                          {content.librarySections?.map(s => <option key={s} value={s}>{s}</option>)}
                       </select>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-1">Autor</label>
-                      <input name="author" placeholder="Autor" className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white outline-none focus:border-gold-500/50" />
+                      <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest ml-1">Autor</label>
+                      <input name="author" placeholder="Autor" className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-3 rounded-lg text-[#0b1d3a] font-bold outline-none focus:border-[#c5a059]/50" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-1">Tipo de Arquivo</label>
+                      <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest ml-1">Tipo de Arquivo</label>
                       <select 
                         name="fileType" 
-                        className="w-full bg-masonic-dark border border-white/10 p-3 rounded-lg text-white outline-none focus:border-gold-500/50"
+                        className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-3 rounded-lg text-[#0b1d3a] font-bold outline-none focus:border-[#c5a059]/50"
                         value={newItemType}
                         onChange={(e) => setNewItemType(e.target.value as any)}
                       >
@@ -711,24 +812,24 @@ export default function MemberDashboard() {
 
                   {newItemType === 'LINK' ? (
                     <div className="space-y-1">
-                      <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-1">Endereço (URL)</label>
+                      <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest ml-1">Endereço (URL)</label>
                       <div className="relative">
-                        <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                        <input name="url" placeholder="https://..." className="w-full bg-white/5 border border-white/10 p-3 pl-10 rounded-lg text-white outline-none focus:border-gold-500/50" />
+                        <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#0b1d3a]/20" />
+                        <input name="url" placeholder="https://..." className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-3 pl-10 rounded-lg text-[#0b1d3a] font-bold outline-none focus:border-[#c5a059]/50" />
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-1">
-                      <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-1">Documento PDF</label>
+                      <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest ml-1">Documento PDF</label>
                       <div className="relative">
                         <input 
                           type="file" 
                           accept=".pdf" 
-                          className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white outline-none focus:border-gold-500/50 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-gold-500 file:text-masonic-dark hover:file:bg-gold-400" 
+                          className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-3 rounded-lg text-[#0b1d3a] font-bold outline-none focus:border-[#c5a059]/50 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-[#c5a059] file:text-[#0b1d3a] hover:file:bg-[#c5a059]/80" 
                         />
                         {uploadProgress !== null && (
-                          <div className="absolute inset-0 bg-masonic-blue/80 flex items-center justify-center rounded-lg">
-                            <span className="text-gold-500 font-black">{Math.round(uploadProgress)}%</span>
+                          <div className="absolute inset-0 bg-[#0b1d3a]/80 flex items-center justify-center rounded-lg">
+                            <span className="text-[#c5a059] font-black">{Math.round(uploadProgress)}%</span>
                           </div>
                         )}
                       </div>
@@ -736,14 +837,14 @@ export default function MemberDashboard() {
                   )}
 
                   <div className="space-y-1">
-                    <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-1">Descrição</label>
-                    <textarea name="description" rows={3} placeholder="Breve descrição ou objetivo da obra" className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white resize-none outline-none focus:border-gold-500/50" />
+                    <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest ml-1">Descrição</label>
+                    <textarea name="description" rows={3} placeholder="Breve descrição ou objetivo da obra" className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-3 rounded-lg text-[#0b1d3a] resize-none outline-none focus:border-[#c5a059]/50" />
                   </div>
                   
                   <button 
                     type="submit" 
                     disabled={uploadProgress !== null}
-                    className="w-full py-4 bg-gold-500 text-masonic-dark rounded-xl font-black uppercase tracking-widest hover:bg-gold-400 disabled:opacity-50 shadow-xl transition-all"
+                    className="w-full py-4 bg-[#c5a059] text-[#0b1d3a] rounded-xl font-black uppercase tracking-widest hover:bg-[#c5a059]/80 disabled:opacity-50 shadow-xl transition-all"
                   >
                     {uploadProgress !== null ? 'Enviando Arquivo...' : 'Consolidar Obra'}
                   </button>
@@ -758,36 +859,36 @@ export default function MemberDashboard() {
         {showSocialModal && (
           <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowSocialModal(false)} className="absolute inset-0 bg-masonic-dark/95 backdrop-blur-xl" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative w-full max-w-xl bg-masonic-blue border border-gold-500/30 rounded-[2.5rem] shadow-2xl overflow-hidden p-8">
-               <h2 className="font-serif text-2xl font-bold text-white mb-8 border-b border-white/5 pb-4 uppercase tracking-widest">
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative w-full max-w-xl bg-white border border-[#0b1d3a]/10 rounded-[2.5rem] overflow-hidden p-8">
+               <h2 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-8 border-b border-[#0b1d3a]/10 pb-4 uppercase tracking-widest">
                  Nova {socialType === 'poll' ? 'Enquete' : socialType === 'philanthropy' ? 'Arrecadação' : 'Pauta'}
                </h2>
                <form className="space-y-6" onSubmit={handleCreateSocialAction}>
                   <div className="space-y-2">
-                    <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest">Título da Ação</label>
-                    <input name="title" required className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white" />
+                    <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest">Título da Ação</label>
+                    <input name="title" required className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-4 rounded-xl text-[#0b1d3a] font-bold" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest">Descrição / Objetivo</label>
-                    <textarea name="description" rows={3} required className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white resize-none" />
+                    <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest">Descrição / Objetivo</label>
+                    <textarea name="description" rows={3} required className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-4 rounded-xl text-[#0b1d3a] resize-none" />
                   </div>
                   
                   {socialType === 'poll' && (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-1">Opções da Votação</label>
-                        <span className="text-[8px] text-white/30 uppercase font-bold tracking-widest">Pressione Enter para nova opção</span>
+                        <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest ml-1">Opções da Votação</label>
+                        <span className="text-[8px] text-[#0b1d3a]/30 uppercase font-bold tracking-widest">Pressione Enter para nova opção</span>
                       </div>
                       <div className="space-y-3">
                         {pollOptions.map((option, index) => (
                           <div key={index} className="flex gap-2 group/opt">
-                            <div className="w-8 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl text-[10px] text-gold-500/30 font-black font-mono">
+                            <div className="w-8 h-10 flex items-center justify-center bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-xl text-[10px] text-[#c5a059] font-black font-mono">
                               {index + 1}
                             </div>
                             <input 
                               required
                               placeholder={`Ex: Opção ${index + 1}`}
-                              className="flex-1 bg-white/5 border border-white/10 rounded-xl p-3 text-white text-xs focus:outline-none focus:border-gold-500/50 transition-all"
+                              className="flex-1 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-xl p-3 text-[#0b1d3a] text-xs focus:outline-none focus:border-[#c5a059]/50 transition-all font-bold"
                               value={option}
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
@@ -822,7 +923,7 @@ export default function MemberDashboard() {
                         <button 
                           type="button"
                           onClick={() => setPollOptions([...pollOptions, ''])}
-                          className="w-full py-3 border-2 border-dashed border-white/5 rounded-2xl flex items-center justify-center gap-2 text-gold-500/40 hover:text-gold-500 hover:border-gold-500/20 hover:bg-gold-500/5 transition-all text-[10px] uppercase font-black tracking-widest"
+                          className="w-full py-3 border-2 border-dashed border-[#0b1d3a]/5 rounded-2xl flex items-center justify-center gap-2 text-[#c5a059]/40 hover:text-[#c5a059] hover:border-[#c5a059]/20 hover:bg-[#c5a059]/5 transition-all text-[10px] uppercase font-black tracking-widest"
                         >
                           <Plus className="w-4 h-4" /> Adicionar Outra Opção
                         </button>
@@ -833,17 +934,17 @@ export default function MemberDashboard() {
                   {socialType === 'philanthropy' && (
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest">Meta Financeira (R$)</label>
-                        <input name="goal" type="number" required className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white" />
+                        <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest">Meta Financeira (R$)</label>
+                        <input name="goal" type="number" required className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-4 rounded-xl text-[#0b1d3a] font-bold" />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest">Data Limite</label>
-                        <input name="deadline" type="date" className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white" />
+                        <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest">Data Limite</label>
+                        <input name="deadline" type="date" className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-4 rounded-xl text-[#0b1d3a] font-bold" />
                       </div>
                     </div>
                   )}
 
-                  <button type="submit" disabled={isSubmittingSocial} className="w-full py-4 bg-gold-500 text-masonic-dark rounded-xl font-black uppercase tracking-widest disabled:opacity-50">
+                  <button type="submit" disabled={isSubmittingSocial} className="w-full py-4 bg-[#c5a059] text-[#0b1d3a] rounded-xl font-black uppercase tracking-widest disabled:opacity-50 hover:bg-[#c5a059]/90 transition-all shadow-xl">
                     {isSubmittingSocial ? 'Processando...' : 'Publicar no Painel'}
                   </button>
                </form>
@@ -855,7 +956,7 @@ export default function MemberDashboard() {
   );
 }
 
-function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComments, onShare, onDelete }: any) {
+function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComments, onShare, onDelete, onEdit }: any) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -870,26 +971,41 @@ function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComme
   }, [isExpanded, item.id]);
 
   return (
-    <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`bg-masonic-blue p-8 rounded-[2rem] border ${isHighlighted ? 'border-gold-500' : 'border-white/5'} relative flex flex-col group transition-all hover:border-gold-500/30 shadow-2xl`}>
+    <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`bg-white/40 p-8 rounded-[2rem] border ${isHighlighted ? 'border-[#c5a059]' : 'border-[#0b1d3a]/10'} relative flex flex-col group transition-all hover:border-[#c5a059]/30 shadow-sm`}>
       {onDelete && (
-        <button onClick={onDelete} className="absolute top-4 right-4 text-red-500/40 hover:text-red-500 p-2"><Trash2 className="w-4 h-4" /></button>
+        <div className="absolute top-4 right-4 flex gap-2">
+           <button 
+             onClick={onEdit} 
+             className="p-2 bg-[#c5a059]/20 text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] rounded-lg transition-all"
+             title="Editar"
+           >
+             <Edit className="w-3.5 h-3.5" />
+           </button>
+           <button 
+             onClick={onDelete} 
+             className="p-2 bg-red-500/20 text-red-600 hover:bg-red-500 hover:text-white rounded-lg transition-all"
+             title="Excluir"
+           >
+             <Trash2 className="w-3.5 h-3.5" />
+           </button>
+        </div>
       )}
       <div className="flex items-start justify-between mb-6">
         <div className="p-3 bg-gold-500/10 rounded-xl text-gold-500 shadow-inner"><BookOpen className="w-6 h-6" /></div>
         <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-white/5 border border-white/10 rounded-full text-gold-500">{item.fileType}</span>
       </div>
-      <h3 className="font-serif text-xl font-bold text-white mb-2 leading-tight group-hover:gold-text transition-colors">{item.title}</h3>
-      <p className="text-gold-500/80 text-[10px] uppercase tracking-widest font-black mb-4">{item.category}</p>
-      <p className="text-white/40 text-xs italic leading-relaxed mb-8 flex-1">"{item.description || "Sem descrição disponível."}"</p>
+      <h3 className="font-serif text-xl font-bold text-[#0b1d3a] mb-2 leading-tight group-hover:text-[#c5a059] transition-colors">{item.title}</h3>
+      <p className="text-[#c5a059]/80 text-[10px] uppercase tracking-widest font-black mb-4">{item.category}</p>
+      <p className="text-[#0b1d3a]/60 text-xs italic leading-relaxed mb-8 flex-1">"{item.description || "Sem descrição disponível."}"</p>
       
-      <div className="pt-4 border-t border-white/5 flex items-center justify-between">
-         <span className="text-[9px] text-white/30 uppercase font-black uppercase tracking-widest">Por: {item.author || "Anônimo"}</span>
+      <div className="pt-4 border-t border-[#0b1d3a]/5 flex items-center justify-between">
+         <span className="text-[9px] text-[#0b1d3a]/30 uppercase font-black tracking-widest">Por: {item.author || "Anônimo"}</span>
          <div className="flex gap-2">
-            <button onClick={onToggleComments} className="p-2 bg-white/5 border border-white/10 rounded-lg text-gold-500 hover:bg-gold-500 hover:text-masonic-dark transition-all relative">
+            <button onClick={onToggleComments} className="p-2 bg-white/40 border border-[#0b1d3a]/10 rounded-lg text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all relative">
                <MessageSquare className="w-4 h-4" />
-               {comments.length > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-gold-500 text-masonic-dark text-[8px] flex items-center justify-center rounded-full font-black">{comments.length}</span>}
+               {comments.length > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#c5a059] text-[#0b1d3a] text-[8px] flex items-center justify-center rounded-full font-black">{comments.length}</span>}
             </button>
-            <a href={item.url} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 border border-white/10 rounded-lg text-gold-500 hover:bg-gold-500 hover:text-masonic-dark transition-all"><Eye className="w-4 h-4" /></a>
+            <a href={item.url} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/40 border border-[#0b1d3a]/10 rounded-lg text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all"><Eye className="w-4 h-4" /></a>
          </div>
       </div>
       <button onClick={onShare} className="mt-4 w-full flex items-center justify-center gap-2 py-4 bg-green-500/10 border border-green-500/30 text-green-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-green-500 hover:text-white transition-all"><MessageSquare className="w-4 h-4" /> Compartilhar Estudo</button>

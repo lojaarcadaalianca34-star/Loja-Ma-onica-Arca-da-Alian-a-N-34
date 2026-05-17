@@ -20,7 +20,7 @@ export default function Philanthropy() {
             <span className="text-[10px] font-sans font-bold uppercase tracking-[0.3em] text-[#c5a059]">{content.philanthropy?.smallTitle || 'Filantropia e Caridade'}</span>
           </div>
           <h2 className="font-serif text-3xl md:text-5xl font-bold text-[#0b1d3a] mb-6 uppercase tracking-wider">{content.philanthropy?.title || 'Nossas Obras Sociais'}</h2>
-          <p className="max-w-2xl mx-auto text-[#0b1d3a]/70 font-sans text-lg text-justify leading-relaxed">
+          <p className="max-w-2xl mx-auto text-[#0b1d3a]/70 font-sans text-lg text-center leading-relaxed">
             {content.philanthropy?.subTitle || content.philanthropy.description}
           </p>
         </div>
@@ -34,7 +34,7 @@ export default function Philanthropy() {
               transition={{ delay: i * 0.1 }}
               className="p-10 rounded-2xl bg-white/60 border border-[#c5a059]/20 text-center flex flex-col items-center justify-center group hover:bg-[#c5a059]/10 transition-all shadow-sm"
             >
-              <span className="text-4xl font-serif font-black gold-text mb-2 tracking-tight group-hover:scale-110 transition-transform">
+              <span className="text-4xl font-serif font-black text-[#0b1d3a] mb-2 tracking-tight group-hover:scale-110 transition-transform">
                 {stat.value}
               </span>
               <span className="text-[10px] uppercase tracking-[0.2em] text-[#c5a059] font-bold">{stat.label}</span>
@@ -57,7 +57,7 @@ export default function Philanthropy() {
                 <div className="inline-block px-3 py-1 rounded bg-[#c5a059]/10 border border-[#c5a059]/20 text-[#c5a059] text-[10px] font-bold uppercase tracking-widest mb-6">
                   {item.impact}
                 </div>
-                <p className="text-[#0b1d3a]/70 leading-relaxed font-sans text-sm text-justify">
+                <p className="text-[#0b1d3a]/70 leading-relaxed font-sans text-sm text-center">
                   {item.description}
                 </p>
               </div>

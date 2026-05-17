@@ -77,7 +77,7 @@ export default function Library({ isFullPage = false }: LibraryProps) {
           Conhecimento
         </div>
         <h2 className="font-serif text-3xl md:text-5xl font-bold text-[#0b1d3a] mb-6 uppercase tracking-wider leading-tight">
-          Círculo de <span className="gold-text">Estudos</span>
+          <span className="text-[#c5a059]">Círculo</span> de <span className="text-[#c5a059]">Estudos</span>
         </h2>
         <p className="text-[#0b1d3a]/70 text-lg mb-10 leading-relaxed font-sans text-justify">
           Um espaço dedicado à cultura, história e ao aprofundamento intelectual. Explore nossa seleção de materiais públicos sobre a Ordem e seus princípios fundamentais.

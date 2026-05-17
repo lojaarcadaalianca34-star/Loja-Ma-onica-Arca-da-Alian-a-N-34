@@ -58,7 +58,7 @@ export default function Hero() {
           className="relative mt-6 mb-10 group"
         >
           {/* Subtle glow behind the logo */}
-          <div className="absolute inset-0 bg-gold-500/5 blur-[80px] rounded-full animate-pulse" />
+          <div className="absolute inset-0 bg-[#c5a059]/5 blur-[80px] rounded-full animate-pulse" />
           
           <motion.div
             animate={{ 
@@ -76,7 +76,7 @@ export default function Hero() {
             
             {/* Divine Rays (CSS) */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none">
-              <div className="absolute inset-0 bg-gradient-radial from-gold-400/5 to-transparent opacity-40 animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-radial from-[#c5a059]/5 to-transparent opacity-40 animate-pulse" />
             </div>
           </motion.div>
         </motion.div>
@@ -87,7 +87,7 @@ export default function Hero() {
           transition={{ duration: 1, delay: 1.2 }}
           className="max-w-lg text-center"
         >
-          <p className="font-serif text-xs md:text-sm text-[#0b1d3a]/60 tracking-[0.15em] uppercase mb-8 leading-loose text-justify px-4">
+          <p className="font-serif text-xs md:text-sm text-[#0b1d3a]/60 tracking-[0.15em] uppercase mb-8 leading-loose text-center px-4">
             {content.hero.tagline}
           </p>
         </motion.div>

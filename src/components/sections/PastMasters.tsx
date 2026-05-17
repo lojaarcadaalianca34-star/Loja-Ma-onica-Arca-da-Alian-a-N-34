@@ -15,18 +15,18 @@ export default function PastMasters() {
       <div className="max-w-7xl mx-auto px-6">
         {/* Atual Gestão */}
         <div className="mb-24 px-4 lg:px-0">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div className="flex flex-col items-center justify-center text-center gap-6 mb-12">
             <div>
-              <div className="flex items-center gap-3 text-[#c5a059] mb-4 uppercase tracking-[0.4em] text-[10px] font-black">
+              <div className="flex items-center justify-center gap-3 text-[#c5a059] mb-4 uppercase tracking-[0.4em] text-[10px] font-black">
                 <User className="w-4 h-4" />
-                {content.managementSection?.smallTitle || 'Liderança'}
+                {content.managementSection?.smallTitle || 'LIDERANÇA'}
               </div>
-              <h2 className="font-serif text-3xl md:text-5xl font-bold text-[#0b1d3a] uppercase tracking-wider leading-tight">
+              <h2 className="font-serif text-3xl md:text-5xl font-bold text-[#0b1d3a] uppercase tracking-wider leading-tight text-center">
                 {content.managementSection?.title || 'Atual Gestão'}
               </h2>
             </div>
             {content.managementSection?.subTitle && (
-              <p className="max-w-md text-[#0b1d3a]/60 text-sm font-medium italic border-l-2 border-[#c5a059] pl-6 py-2">
+              <p className="max-w-md text-[#0b1d3a]/60 text-sm font-medium italic border-t-2 border-[#c5a059] pt-4 text-center">
                 {content.managementSection.subTitle}
               </p>
             )}

@@ -10,16 +10,16 @@ export default function History() {
   return (
     <section id="sobre" className="py-24 bg-aged-beige relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
-          <div className="max-w-2xl">
-            <div className="flex items-center gap-3 mb-4">
+        <div className="flex flex-col items-center justify-center text-center mb-16 gap-6">
+          <div className="max-w-3xl">
+            <div className="flex flex-col items-center justify-center gap-3 mb-4">
               <HistoryIcon className="text-[#c5a059] w-5 h-5" />
             <span className="uppercase tracking-[0.4em] text-[#c5a059] text-[10px] font-black">{content.history?.smallTitle || 'Nossa Jornada'}</span>
             </div>
             <h2 className="font-serif text-3xl md:text-5xl font-bold text-[#0b1d3a] mb-6 uppercase tracking-wider leading-tight">
               {content.history?.title || 'A Arca Através do Tempo'}
             </h2>
-            <p className="text-[#0b1d3a]/70 font-sans text-lg leading-relaxed text-justify max-w-xl">
+            <p className="text-[#0b1d3a]/70 font-sans text-lg leading-relaxed text-center mx-auto max-w-xl">
               {content.history?.subTitle || content.history.text}
             </p>
           </div>
@@ -42,7 +42,7 @@ export default function History() {
                 {item.year}
               </div>
               <h3 className="text-xl font-bold text-[#0b1d3a] mb-3 uppercase tracking-wider">{item.title}</h3>
-              <p className="text-[#0b1d3a]/60 text-sm leading-relaxed text-justify">
+              <p className="text-[#0b1d3a]/60 text-sm leading-relaxed text-center">
                 {item.description}
               </p>
               

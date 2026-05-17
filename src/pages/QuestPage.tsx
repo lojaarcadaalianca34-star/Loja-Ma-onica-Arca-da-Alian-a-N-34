@@ -16,13 +16,13 @@ export default function QuestPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-6"
           >
-            <h1 className="font-serif text-xl md:text-2xl font-bold text-white mb-2 uppercase tracking-widest">
-              Desejo Fazer Parte da <span className="gold-text">Ordem</span>
+            <h1 className="font-serif text-xl md:text-2xl font-bold text-[#0b1d3a] mb-2 uppercase tracking-widest">
+              Desejo Fazer Parte da <span className="text-[#c5a059]">Ordem</span>
             </h1>
           </motion.div>
 
           <div className="flex justify-center">
-             <div className="w-full max-w-2xl bg-masonic-blue/20 border border-gold-500/10 rounded-[1.5rem] overflow-hidden shadow-xl p-4 md:p-6">
+             <div className="w-full max-w-2xl bg-white border border-[#0b1d3a]/10 rounded-[1.5rem] overflow-hidden p-4 md:p-6">
                 <MasonicQuest isOpen={true} onClose={() => {}} isStatic={true} />
              </div>
           </div>

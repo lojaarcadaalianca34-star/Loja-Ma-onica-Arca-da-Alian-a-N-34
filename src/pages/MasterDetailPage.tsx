@@ -41,12 +41,12 @@ export default function MasterDetailPage() {
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-masonic-blue rounded-[2rem] p-8 border border-gold-500/10 text-center shadow-2xl relative overflow-hidden"
+                className="bg-masonic-blue rounded-[2rem] p-8 border border-gold-500/10 text-center relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 p-6 opacity-10">
                    <User className="w-24 h-24 text-gold-500" />
                 </div>
-                <div className="w-40 h-56 mx-auto rounded-2xl border-4 border-gold-500/20 mb-6 flex items-center justify-center bg-white/5 relative overflow-hidden shadow-2xl">
+                <div className="w-40 h-56 mx-auto rounded-2xl border-4 border-gold-500/20 mb-6 flex items-center justify-center bg-white/5 relative overflow-hidden">
                   {master.photo ? (
                     <img src={master.photo} alt={master.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   ) : (
@@ -87,7 +87,7 @@ export default function MasterDetailPage() {
                     <GraduationCap className="text-gold-500 w-6 h-6" />
                     <h2 className="text-gold-500 font-serif text-2xl uppercase tracking-widest font-bold">Biografia Maçônica</h2>
                  </div>
-                 <div className="p-8 bg-masonic-blue border border-white/5 rounded-[2rem] shadow-xl">
+                 <div className="p-8 bg-masonic-blue border border-white/5 rounded-[2rem]">
                    <p className="text-white/80 leading-relaxed text-lg font-sans italic">
                      "{master.biography}"
                    </p>
@@ -99,7 +99,7 @@ export default function MasterDetailPage() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="w-full bg-masonic-blue/80 border border-gold-500/10 rounded-[2.5rem] p-10 text-left shadow-2xl relative overflow-hidden"
+                    className="w-full bg-masonic-blue/80 border border-gold-500/10 rounded-[2.5rem] p-10 text-left relative overflow-hidden"
                  >
                     <div className="absolute -right-12 -top-12 opacity-5">
                        <Heart className="w-64 h-64 text-pink-500" />

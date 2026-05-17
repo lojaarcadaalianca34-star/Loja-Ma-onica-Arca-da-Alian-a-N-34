@@ -747,22 +747,22 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-masonic-dark text-[#0b1d3a] p-6 pt-24">
+    <div className="min-h-screen bg-[#f4efe2] text-[#0b1d3a] p-6 pt-24">
       <AnimatePresence>
         {isSaving && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-masonic-dark/60 backdrop-blur-sm flex items-center justify-center p-6"
+            className="fixed inset-0 z-[200] bg-[#0b1d3a]/60 backdrop-blur-sm flex items-center justify-center p-6"
           >
-            <div className="bg-masonic-blue/95 border border-gold-500/30 p-12 rounded-[3rem] shadow-2xl flex flex-col items-center gap-6 text-center max-w-sm w-full backdrop-blur-xl">
-              <div className="w-20 h-20 rounded-full border-4 border-gold-500 border-t-transparent animate-spin flex items-center justify-center">
-                <RefreshCw className="w-10 h-10 text-gold-500" />
+            <div className="bg-[#0b1d3a]/95 border border-[#c5a059]/30 p-12 rounded-[3rem] shadow-2xl flex flex-col items-center gap-6 text-center max-w-sm w-full backdrop-blur-xl">
+              <div className="w-20 h-20 rounded-full border-4 border-[#c5a059] border-t-transparent animate-spin flex items-center justify-center">
+                <RefreshCw className="w-10 h-10 text-[#c5a059]" />
               </div>
               <div>
-                <h3 className="gold-text font-serif text-2xl font-bold uppercase tracking-widest mb-2">Gravando...</h3>
-                <p className="text-gold-100/40 text-[10px] uppercase font-black tracking-[0.2em]">Salvando no Oriente Digital</p>
+                <h3 className="text-[#c5a059] font-serif text-2xl font-bold uppercase tracking-widest mb-2">Gravando...</h3>
+                <p className="text-[#c5a059]/40 text-[10px] uppercase font-black tracking-[0.2em]">Salvando no Oriente Digital</p>
               </div>
             </div>
           </motion.div>
@@ -777,7 +777,7 @@ export default function AdminDashboard() {
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
             className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200]"
           >
-            <div className="bg-green-500 text-masonic-dark px-10 py-5 rounded-2xl shadow-3xl flex items-center gap-4 font-black uppercase tracking-[0.2em] text-[11px] border-4 border-white/20">
+            <div className="bg-green-500 text-[#f4efe2] px-10 py-5 rounded-2xl shadow-3xl flex items-center gap-4 font-black uppercase tracking-[0.2em] text-[11px] border-4 border-white/20">
               <ShieldCheck className="w-6 h-6" />
               Obra Concluída com Sucesso!
             </div>
@@ -1208,42 +1208,42 @@ export default function AdminDashboard() {
 
                   <button 
                     onClick={() => setContentSubTab('family')}
-                    className="group bg-white/5 border border-white/10 p-8 rounded-[2.5rem] text-left hover:border-gold-500/40 transition-all hover:bg-gold-500/5"
+                    className="group bg-white/40 border border-[#0b1d3a]/5 p-8 rounded-[2.5rem] text-left hover:border-[#c5a059]/40 transition-all hover:bg-white/80 shadow-sm"
                   >
                     <div className="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center text-pink-500 mb-6 group-hover:scale-110 transition-transform">
                       <Star className="w-7 h-7" />
                     </div>
-                    <h3 className="font-serif text-2xl font-bold text-white mb-2 uppercase tracking-wider">Cunhadas e <span className="text-pink-500">Jovens</span></h3>
-                    <p className="text-gold-100/40 text-[10px] uppercase tracking-widest font-black">Fraternidade Feminina e Ordem DeMolay/Garotas do Arco Iris</p>
+                    <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-2 uppercase tracking-wider">Cunhadas e <span className="text-pink-500">Jovens</span></h3>
+                    <p className="text-[#0b1d3a]/40 text-[10px] uppercase tracking-widest font-black">Fraternidade Feminina e Ordem DeMolay/Garotas do Arco Iris</p>
                   </button>
 
                   <button 
                     onClick={() => setContentSubTab('social')}
-                    className="group bg-white/5 border border-white/10 p-8 rounded-[2.5rem] text-left hover:border-gold-500/40 transition-all hover:bg-gold-500/5"
+                    className="group bg-white/40 border border-[#0b1d3a]/5 p-8 rounded-[2.5rem] text-left hover:border-[#c5a059]/40 transition-all hover:bg-white/80 shadow-sm"
                   >
-                    <div className="w-14 h-14 rounded-2xl bg-gold-500/10 flex items-center justify-center text-gold-500 mb-6 group-hover:scale-110 transition-transform">
+                    <div className="w-14 h-14 rounded-2xl bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059] mb-6 group-hover:scale-110 transition-transform">
                       <Play className="w-7 h-7" />
                     </div>
-                    <h3 className="font-serif text-2xl font-bold text-white mb-2 uppercase tracking-wider">Álbum <span className="gold-text">Social</span></h3>
-                    <p className="text-gold-100/40 text-[10px] uppercase tracking-widest font-black">Vídeos e fotos da Galeria do Site</p>
+                    <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-2 uppercase tracking-wider">Álbum <span className="text-[#c5a059]">Social</span></h3>
+                    <p className="text-[#0b1d3a]/40 text-[10px] uppercase tracking-widest font-black">Vídeos e fotos da Galeria do Site</p>
                   </button>
 
                   <button 
                     onClick={() => setContentSubTab('contact')}
-                    className="group bg-white/5 border border-white/10 p-8 rounded-[2.5rem] text-left hover:border-gold-500/40 transition-all hover:bg-gold-500/5"
+                    className="group bg-white/40 border border-[#0b1d3a]/5 p-8 rounded-[2.5rem] text-left hover:border-[#c5a059]/40 transition-all hover:bg-white/80 shadow-sm"
                   >
-                    <div className="w-14 h-14 rounded-2xl bg-gold-500/10 flex items-center justify-center text-gold-500 mb-6 group-hover:scale-110 transition-transform">
+                    <div className="w-14 h-14 rounded-2xl bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059] mb-6 group-hover:scale-110 transition-transform">
                       <Globe className="w-7 h-7" />
                     </div>
-                    <h3 className="font-serif text-2xl font-bold text-white mb-2 uppercase tracking-wider">Dados de <span className="gold-text">Contato</span></h3>
-                    <p className="text-gold-100/40 text-[10px] uppercase tracking-widest font-black">Endereço, Emails e Mapa</p>
+                    <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-2 uppercase tracking-wider">Dados de <span className="text-[#c5a059]">Contato</span></h3>
+                    <p className="text-[#0b1d3a]/40 text-[10px] uppercase tracking-widest font-black">Endereço, Emails e Mapa</p>
                   </button>
                 </div>
               ) : (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <button 
                     onClick={() => setContentSubTab(null)}
-                    className="flex items-center gap-2 text-gold-500/60 hover:text-gold-500 transition-colors uppercase tracking-widest text-[10px] font-black pb-4 border-b border-white/5 w-full text-left"
+                    className="flex items-center gap-2 text-[#0b1d3a]/60 hover:text-[#0b1d3a] transition-colors uppercase tracking-widest text-[10px] font-black pb-4 border-b border-[#0b1d3a]/5 w-full text-left"
                   >
                     <ArrowLeft className="w-4 h-4" /> Voltar para Menu de Edição
                   </button>
@@ -1622,7 +1622,7 @@ export default function AdminDashboard() {
                           <button 
                             onClick={handleSaveContent}
                             disabled={isSaving}
-                            className="flex items-center gap-2 bg-gold-500 text-masonic-dark px-10 py-4 rounded-xl font-bold uppercase tracking-widest disabled:opacity-50 hover:bg-gold-400 transition-all font-sans shadow-2xl"
+                            className="flex items-center gap-2 bg-[#0b1d3a] text-[#f4efe2] px-10 py-4 rounded-xl font-bold uppercase tracking-widest disabled:opacity-50 hover:bg-[#c5a059] transition-all font-sans shadow-2xl"
                           >
                             {isSaving ? <RefreshCw className="animate-spin" /> : <Save />} Salvar Alterações do Site
                           </button>
@@ -1752,7 +1752,7 @@ export default function AdminDashboard() {
                           <button 
                             onClick={handleSaveContent}
                             disabled={isSaving}
-                            className="flex items-center gap-2 bg-gold-500 text-masonic-dark px-10 py-4 rounded-xl font-bold uppercase tracking-widest disabled:opacity-50 hover:bg-gold-400 transition-all font-sans"
+                            className="flex items-center gap-2 bg-[#0b1d3a] text-[#f4efe2] px-10 py-4 rounded-xl font-bold uppercase tracking-widest disabled:opacity-50 hover:bg-[#c5a059] transition-all font-sans"
                           >
                             {isSaving ? <RefreshCw className="animate-spin" /> : <Save />} Salvar Gestão
                           </button>
@@ -2158,7 +2158,7 @@ export default function AdminDashboard() {
                               <div className="space-y-4">
                                 <label className="block text-[10px] text-white/40 uppercase mb-1">Breve História</label>
                                 <textarea 
-                                  className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm min-h-[120px] focus:border-gold-500 outline-none"
+                                  className="w-full bg-white/40 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] text-sm min-h-[120px] focus:border-[#c5a059] outline-none"
                                   value={editContent.familyGroups?.[groupKey].history || ''}
                                   onChange={e => setEditContent({...editContent, familyGroups: {...editContent.familyGroups!, [groupKey]: {...editContent.familyGroups![groupKey], history: e.target.value}}})}
                                 />
@@ -2169,7 +2169,7 @@ export default function AdminDashboard() {
                                   <label className="block text-[10px] text-white/40 uppercase mb-1">Valores (Separados por vírgula)</label>
                                 </div>
                                 <input 
-                                  className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm focus:border-gold-500 outline-none"
+                                  className="w-full bg-white/40 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] text-sm focus:border-[#c5a059] outline-none"
                                   value={editContent.familyGroups?.[groupKey].values?.join(', ') || ''}
                                   placeholder="Amor, Caridade, Fraternidade..."
                                   onChange={e => {
@@ -2183,7 +2183,7 @@ export default function AdminDashboard() {
                                 <button 
                                   onClick={handleSaveContent}
                                   disabled={isSaving}
-                                  className="flex items-center gap-2 bg-gold-500/10 border border-gold-500/30 text-gold-500 px-6 py-2 rounded-lg text-[10px] uppercase font-black hover:bg-gold-500 hover:text-masonic-dark transition-all"
+                                  className="flex items-center gap-2 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 text-[#0b1d3a] px-6 py-2 rounded-lg text-[10px] uppercase font-black hover:bg-[#0b1d3a] hover:text-[#f4efe2] transition-all"
                                 >
                                   {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Salvar Alterações deste Grupo
                                 </button>
@@ -2196,7 +2196,7 @@ export default function AdminDashboard() {
                           <button 
                             onClick={handleSaveContent}
                             disabled={isSaving}
-                            className="flex items-center gap-2 bg-gold-500 text-masonic-dark px-10 py-4 rounded-xl font-bold uppercase tracking-widest disabled:opacity-50 hover:bg-gold-400 transition-all font-sans"
+                            className="flex items-center gap-2 bg-[#0b1d3a] text-[#f4efe2] px-10 py-4 rounded-xl font-bold uppercase tracking-widest disabled:opacity-50 hover:bg-[#c5a059] transition-all font-sans"
                           >
                             {isSaving ? <RefreshCw className="animate-spin" /> : <Save />} Salvar Tudo (Família)
                           </button>
@@ -2326,81 +2326,81 @@ export default function AdminDashboard() {
 
                     {contentSubTab === 'contact' && (
                       <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300">
-                        <div className="space-y-4 bg-white/5 p-6 rounded-2xl border border-white/10">
-                          <h3 className="font-serif text-xl border-l-4 border-gold-500 pl-4 uppercase tracking-widest font-bold mb-4">Cabeçalho de Contato</h3>
+                        <div className="space-y-4 bg-white/40 p-6 rounded-2xl border border-[#0b1d3a]/10 shadow-sm">
+                          <h3 className="font-serif text-xl border-l-4 border-[#c5a059] pl-4 uppercase tracking-widest font-bold mb-4 text-[#0b1d3a]">Cabeçalho de Contato</h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-[10px] uppercase tracking-widest text-gold-500 mb-2">Título Pequeno</label>
+                              <label className="block text-[10px] uppercase tracking-widest text-[#0b1d3a] mb-2 font-bold">Título Pequeno</label>
                               <input 
-                                className="w-full bg-masonic-dark border border-white/10 rounded-lg p-3 text-white focus:border-gold-500/50 outline-none"
+                                className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] focus:border-[#c5a059]/50 outline-none"
                                 value={editContent.contact?.smallTitle || ''}
                                 onChange={e => setEditContent({...editContent, contact: {...(editContent.contact || {}), smallTitle: e.target.value}})}
                               />
                             </div>
                             <div>
-                              <label className="block text-[10px] uppercase tracking-widest text-gold-500 mb-2">Título Principal</label>
+                              <label className="block text-[10px] uppercase tracking-widest text-[#0b1d3a] mb-2 font-bold">Título Principal</label>
                               <input 
-                                className="w-full bg-masonic-dark border border-white/10 rounded-lg p-3 text-white focus:border-gold-500/50 outline-none"
+                                className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] focus:border-[#c5a059]/50 outline-none"
                                 value={editContent.contact?.title || ''}
                                 onChange={e => setEditContent({...editContent, contact: {...(editContent.contact || {}), title: e.target.value}})}
                               />
                             </div>
                           </div>
                           <div>
-                            <label className="block text-[10px] uppercase tracking-widest text-gold-500 mb-2">Sub-título</label>
+                            <label className="block text-[10px] uppercase tracking-widest text-[#0b1d3a] mb-2 font-bold">Sub-título</label>
                             <input 
-                              className="w-full bg-masonic-dark border border-white/10 rounded-lg p-3 text-white focus:border-gold-500/50 outline-none"
+                              className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] focus:border-[#c5a059]/50 outline-none"
                               value={editContent.contact?.subTitle || ''}
                               onChange={e => setEditContent({...editContent, contact: {...(editContent.contact || {}), subTitle: e.target.value}})}
                             />
                           </div>
                         </div>
 
-                        <div className="bg-gold-500/10 p-6 rounded-2xl border border-gold-500/20">
-                          <h3 className="font-serif text-xl gold-text uppercase tracking-widest">Informações de Contato e Localização</h3>
+                        <div className="bg-[#c5a059]/10 p-6 rounded-2xl border border-[#c5a059]/20 shadow-sm">
+                          <h3 className="font-serif text-xl border-l-4 border-[#c5a059] pl-4 uppercase tracking-widest font-bold text-[#0b1d3a]">Informações de Contato e Localização</h3>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           <div className="space-y-6">
-                            <div className="bg-masonic-dark/50 p-6 rounded-3xl border border-white/5 space-y-4">
-                              <h4 className="text-gold-500 font-bold uppercase text-[11px] tracking-widest border-b border-gold-500/10 pb-2">Endereço Principal</h4>
+                            <div className="bg-white/40 p-6 rounded-3xl border border-[#0b1d3a]/5 space-y-4 shadow-sm">
+                              <h4 className="text-[#c5a059] font-bold uppercase text-[11px] tracking-widest border-b border-[#0b1d3a]/10 pb-2">Endereço Principal</h4>
                               <div className="space-y-4">
                                 <div>
-                                  <label className="block text-[9px] text-white/40 uppercase mb-1">Logradouro / Cidade</label>
+                                  <label className="block text-[9px] text-[#0b1d3a]/40 uppercase mb-1 font-bold">Logradouro / Cidade</label>
                                   <input 
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm"
+                                    className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] text-sm focus:border-[#c5a059]"
                                     value={editContent.contact?.address || ''}
-                                    onChange={e => setEditContent({...editContent, contact: {...editContent.contact, address: e.target.value}})}
+                                    onChange={e => setEditContent({...editContent, contact: {...(editContent.contact || {}), address: e.target.value}})}
                                   />
                                 </div>
                                 <div>
-                                  <label className="block text-[9px] text-white/40 uppercase mb-1">Complemento / Região</label>
+                                  <label className="block text-[9px] text-[#0b1d3a]/40 uppercase mb-1 font-bold">Complemento / Região</label>
                                   <input 
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm"
+                                    className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] text-sm focus:border-[#c5a059]"
                                     value={editContent.contact?.subAddress || ''}
-                                    onChange={e => setEditContent({...editContent, contact: {...editContent.contact, subAddress: e.target.value}})}
+                                    onChange={e => setEditContent({...editContent, contact: {...(editContent.contact || {}), subAddress: e.target.value}})}
                                   />
                                 </div>
                               </div>
                             </div>
 
-                            <div className="bg-masonic-dark/50 p-6 rounded-3xl border border-white/5 space-y-4">
-                              <h4 className="text-gold-500 font-bold uppercase text-[11px] tracking-widest border-b border-gold-500/10 pb-2">Horários de Reunião</h4>
+                            <div className="bg-white/40 p-6 rounded-3xl border border-[#0b1d3a]/5 space-y-4 shadow-sm">
+                              <h4 className="text-[#c5a059] font-bold uppercase text-[11px] tracking-widest border-b border-[#0b1d3a]/10 pb-2">Horários de Reunião</h4>
                               <div className="space-y-4">
                                 <div>
-                                  <label className="block text-[9px] text-white/40 uppercase mb-1">Dia e Hora</label>
+                                  <label className="block text-[9px] text-[#0b1d3a]/40 uppercase mb-1 font-bold">Dia e Hora</label>
                                   <input 
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm"
+                                    className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] text-sm focus:border-[#c5a059]"
                                     value={editContent.contact?.meetings || ''}
-                                    onChange={e => setEditContent({...editContent, contact: {...editContent.contact, meetings: e.target.value}})}
+                                    onChange={e => setEditContent({...editContent, contact: {...(editContent.contact || {}), meetings: e.target.value}})}
                                   />
                                 </div>
                                 <div>
-                                  <label className="block text-[9px] text-white/40 uppercase mb-1">Observação</label>
+                                  <label className="block text-[9px] text-[#0b1d3a]/40 uppercase mb-1 font-bold">Observação</label>
                                   <input 
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm"
+                                    className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] text-sm focus:border-[#c5a059]"
                                     value={editContent.contact?.subMeetings || ''}
-                                    onChange={e => setEditContent({...editContent, contact: {...editContent.contact, subMeetings: e.target.value}})}
+                                    onChange={e => setEditContent({...editContent, contact: {...(editContent.contact || {}), subMeetings: e.target.value}})}
                                   />
                                 </div>
                               </div>
@@ -2408,40 +2408,40 @@ export default function AdminDashboard() {
                           </div>
 
                           <div className="space-y-6">
-                            <div className="bg-masonic-dark/50 p-6 rounded-3xl border border-white/5 space-y-4">
-                              <h4 className="text-gold-500 font-bold uppercase text-[11px] tracking-widest border-b border-gold-500/10 pb-2">Canais de Comunicação</h4>
+                            <div className="bg-white/40 p-6 rounded-3xl border border-[#0b1d3a]/5 space-y-4 shadow-sm">
+                              <h4 className="text-[#c5a059] font-bold uppercase text-[11px] tracking-widest border-b border-[#0b1d3a]/10 pb-2">Canais de Comunicação</h4>
                               <div className="space-y-4">
                                 <div>
-                                  <label className="block text-[9px] text-white/40 uppercase mb-1">Email Principal</label>
+                                  <label className="block text-[9px] text-[#0b1d3a]/40 uppercase mb-1 font-bold">Email Principal</label>
                                   <input 
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm"
+                                    className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] text-sm focus:border-[#c5a059]"
                                     value={editContent.contact?.email || ''}
-                                    onChange={e => setEditContent({...editContent, contact: {...editContent.contact, email: e.target.value}})}
+                                    onChange={e => setEditContent({...editContent, contact: {...(editContent.contact || {}), email: e.target.value}})}
                                   />
                                 </div>
                                 <div>
-                                  <label className="block text-[9px] text-white/40 uppercase mb-1">Departamento / Nota</label>
+                                  <label className="block text-[9px] text-[#0b1d3a]/40 uppercase mb-1 font-bold">Departamento / Nota</label>
                                   <input 
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm"
+                                    className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] text-sm focus:border-[#c5a059]"
                                     value={editContent.contact?.subEmail || ''}
-                                    onChange={e => setEditContent({...editContent, contact: {...editContent.contact, subEmail: e.target.value}})}
+                                    onChange={e => setEditContent({...editContent, contact: {...(editContent.contact || {}), subEmail: e.target.value}})}
                                   />
                                 </div>
                               </div>
                             </div>
 
-                            <div className="bg-masonic-dark/50 p-6 rounded-3xl border border-white/5 space-y-4">
-                              <h4 className="text-gold-500 font-bold uppercase text-[11px] tracking-widest border-b border-gold-500/10 pb-2">Geolocalização (Google Maps)</h4>
+                            <div className="bg-white/40 p-6 rounded-3xl border border-[#0b1d3a]/5 space-y-4 shadow-sm">
+                              <h4 className="text-[#c5a059] font-bold uppercase text-[11px] tracking-widest border-b border-[#0b1d3a]/10 pb-2">Geolocalização (Google Maps)</h4>
                               <div>
-                                <label className="block text-[9px] text-white/40 uppercase mb-1">URL de Incorporação (Embed URL)</label>
+                                <label className="block text-[9px] text-[#0b1d3a]/40 uppercase mb-1 font-bold">URL de Incorporação (Embed URL)</label>
                                 <textarea 
-                                  className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-[10px] font-mono outline-none"
+                                  className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] text-[10px] font-mono outline-none focus:border-[#c5a059]"
                                   rows={4}
                                   placeholder="Copie o link do 'src' da tag <iframe> do Google Maps"
                                   value={editContent.contact?.mapEmbedUrl || ''}
-                                  onChange={e => setEditContent({...editContent, contact: {...editContent.contact, mapEmbedUrl: e.target.value}})}
+                                  onChange={e => setEditContent({...editContent, contact: {...(editContent.contact || {}), mapEmbedUrl: e.target.value}})}
                                 />
-                                <p className="text-[8px] text-gold-500/40 mt-2 italic">Dica: No Google Maps, clique em Compartilhar &gt; Incorporar um mapa e copie apenas o valor dentro de 'src="..."'</p>
+                                <p className="text-[8px] text-[#0b1d3a]/40 mt-2 italic font-bold">Dica: No Google Maps, clique em Compartilhar &gt; Incorporar um mapa e copie apenas o valor dentro de 'src="..."'</p>
                               </div>
                             </div>
                           </div>
@@ -2655,7 +2655,7 @@ export default function AdminDashboard() {
                 </form>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {invitations.map(invite => (
+                  {invitations.filter(inv => inv.status !== 'ACCEPTED').map(invite => (
                     <div key={invite.id} className="p-6 bg-white/40 rounded-2xl border border-[#0b1d3a]/5 relative group hover:border-[#c5a059]/20 transition-all shadow-sm">
                       <button 
                         onClick={() => handleRemoveInvite(invite.email)}
@@ -2764,7 +2764,7 @@ export default function AdminDashboard() {
 
                         <div className="flex items-center gap-2 mt-2">
                           <select 
-                            className="text-[8px] px-2 py-0.5 bg-white/5 border border-white/10 rounded text-gold-500/60 uppercase font-black tracking-widest outline-none cursor-pointer hover:bg-white/10"
+                            className="text-[8px] px-2 py-0.5 bg-white/40 border border-[#0b1d3a]/10 rounded text-[#0b1d3a]/60 uppercase font-black tracking-widest outline-none cursor-pointer hover:bg-white/60 shadow-sm"
                             value={user.role || 'member'}
                             onChange={async (e) => {
                               try {
