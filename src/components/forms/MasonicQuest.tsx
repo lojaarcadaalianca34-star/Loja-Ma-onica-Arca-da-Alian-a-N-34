@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { User, Mail, Phone, ChevronRight, Landmark, ShieldCheck } from 'lucide-react';
 import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { analyzeCandidate } from '@/src/services/masonicAnalysisService';
 
 interface MasonicQuestProps {
   isOpen: boolean;
@@ -239,13 +240,36 @@ export default function MasonicQuest({ isOpen, onClose, isStatic = false }: Maso
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      // 1. Analyze with AI
+      let analysis = null;
+      try {
+        analysis = await analyzeCandidate(formData);
+      } catch (aiError) {
+        console.error("AI Analysis failed:", aiError);
+      }
+
+      // 2. Save to Firestore with analysis
       await addDoc(collection(db, 'leads'), {
         ...formData,
+        analysis: analysis || null,
         type: 'masonic_quest',
         createdAt: serverTimestamp()
       });
+
+      // 3. Send Email
+      try {
+        await fetch('/api/send-lead-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ formData, analysis })
+        });
+      } catch (emailError) {
+        console.error('Falha ao enviar e-mail:', emailError);
+      }
+
       setIsFinished(true);
     } catch (error) {
+      console.error("Submission failed:", error);
       handleFirestoreError(error, OperationType.CREATE, 'leads');
     } finally {
       setLoading(false);
@@ -387,18 +411,7 @@ export default function MasonicQuest({ isOpen, onClose, isStatic = false }: Maso
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 2 }}
-                  onClick={async () => {
-                    try {
-                      await fetch('/api/send-lead-email', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ formData })
-                      });
-                    } catch (e) {
-                      console.error('Falha ao enviar e-mail:', e);
-                    }
-                    onClose();
-                  }}
+                  onClick={() => onClose()}
                   className="px-10 py-5 bg-gold-500 text-masonic-dark font-black uppercase tracking-[0.3em] text-xs md:text-sm hover:bg-gold-400 transition-all rounded-full shadow-2xl hover:scale-105 active:scale-95 shrink-0"
                 >
                   OK

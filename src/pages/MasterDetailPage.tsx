@@ -46,7 +46,7 @@ export default function MasterDetailPage() {
                 <div className="absolute top-0 right-0 p-6 opacity-10">
                    <User className="w-24 h-24 text-gold-500" />
                 </div>
-                <div className="w-36 h-36 mx-auto rounded-full border-4 border-gold-500/20 mb-6 flex items-center justify-center bg-white/5 relative overflow-hidden shadow-2xl">
+                <div className="w-40 h-56 mx-auto rounded-2xl border-4 border-gold-500/20 mb-6 flex items-center justify-center bg-white/5 relative overflow-hidden shadow-2xl">
                   {master.photo ? (
                     <img src={master.photo} alt={master.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   ) : (
@@ -111,7 +111,7 @@ export default function MasterDetailPage() {
                        <span className="text-pink-500 text-xs md:text-sm uppercase font-black tracking-[0.3em] font-sans">Cunhada / Primeira Dama</span>
                     </div>
                     <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-                       <div className="w-32 h-32 flex-shrink-0 rounded-2xl border-2 border-pink-500/20 overflow-hidden bg-white/5">
+                       <div className="w-32 h-44 flex-shrink-0 rounded-2xl border-2 border-pink-500/20 overflow-hidden bg-white/5">
                           {master.firstLady.photo ? (
                              <img src={master.firstLady.photo} alt={master.firstLady.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           ) : (

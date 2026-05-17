@@ -21,8 +21,8 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', href: isHomePage ? '#home' : '/', icon: Globe, isExternal: false },
     { name: 'Sobre Nós', href: '/sobre', icon: Landmark, isExternal: true },
-    { name: 'Ações Sociais', href: isHomePage ? '#social' : '/#social', icon: Heart, isExternal: false },
-    { name: 'Past Masters', href: isHomePage ? '#galeria' : '/#galeria', icon: Users, isExternal: false },
+    { name: 'Ações Sociais', href: isHomePage ? '#social' : '/acoes-sociais', icon: Heart, isExternal: !isHomePage },
+    { name: 'Past Masters', href: isHomePage ? '#galeria' : '/galeria-honra', icon: Users, isExternal: !isHomePage },
     { name: 'Eventos', href: '/eventos', icon: BookOpen, isExternal: true },
     { name: 'Galeria', href: isHomePage ? '#galeria-fotos' : '/#galeria-fotos', icon: BookOpen, isExternal: false },
   ];
@@ -44,22 +44,22 @@ export default function Navbar() {
   return (
     <nav 
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 md:px-6 py-3",
-        isScrolled || isMobileMenuOpen ? "bg-masonic-dark/95 backdrop-blur-md border-b border-gold-500/20 py-2" : "bg-transparent"
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 md:px-6 py-3 bg-masonic-blue/95 border-b border-gold-500/20 backdrop-blur-sm",
+        isScrolled || isMobileMenuOpen ? "py-2 shadow-2xl" : "py-3"
       )}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-3 group shrink-0" onClick={() => setIsMobileMenuOpen(false)}>
           <Logo className="w-8 h-8 md:w-10 md:h-10 group-hover:scale-110 transition-transform" />
           <div className="hidden sm:block">
-            <h1 className="font-serif text-sm md:text-lg font-bold gold-text leading-tight uppercase tracking-wider flex items-center gap-2">
+            <h1 className="font-serif text-sm md:text-lg font-bold text-[#c5a059] leading-tight uppercase tracking-wider flex items-center gap-2">
               Arca da Aliança Nº 34
             </h1>
-            <p className="text-[8px] md:text-[9px] text-gold-300/80 uppercase tracking-[0.4em] mt-0.5">Guará / DF</p>
+            <p className="text-[8px] md:text-[9px] text-[#c5a059]/70 uppercase tracking-[0.4em] mt-0.5">Guará / DF</p>
           </div>
           <div className="sm:hidden">
-            <h1 className="font-serif text-[10px] font-bold gold-text uppercase tracking-widest leading-none">Arca da Aliança</h1>
-            <p className="text-[7px] text-gold-300/80 uppercase tracking-[0.2em] mt-1">Guará / DF</p>
+            <h1 className="font-serif text-[10px] font-bold text-[#c5a059] uppercase tracking-widest leading-none">Arca da Aliança</h1>
+            <p className="text-[7px] text-[#c5a059]/70 uppercase tracking-[0.2em] mt-1">Guará / DF</p>
           </div>
         </Link>
 
@@ -70,7 +70,7 @@ export default function Navbar() {
               <Link 
                 key={link.name} 
                 to={link.href}
-                className="text-sm font-serif uppercase tracking-widest text-gold-100 hover:text-gold-400 transition-colors"
+                className="text-sm font-serif uppercase tracking-widest text-[#c5a059] hover:text-white transition-colors"
               >
                 {link.name}
               </Link>
@@ -78,7 +78,7 @@ export default function Navbar() {
               <a 
                 key={link.name} 
                 href={link.href}
-                className="text-sm font-serif uppercase tracking-widest text-gold-100 hover:text-gold-400 transition-colors"
+                className="text-sm font-serif uppercase tracking-widest text-[#c5a059] hover:text-white transition-colors"
               >
                 {link.name}
               </a>
@@ -86,7 +86,7 @@ export default function Navbar() {
           ))}
           <div className="flex items-center gap-3 ml-4">
             <Link 
-              to="/biblioteca-restrita"
+              to="/area-restrita"
               className="px-4 py-2 bg-gold-500/10 border border-gold-500/30 text-gold-500 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-gold-500 hover:text-masonic-dark transition-all"
             >
               Área Restrita
@@ -155,7 +155,7 @@ export default function Navbar() {
               ))}
               <div className="grid grid-cols-2 gap-3 mt-4">
                 <Link 
-                  to="/biblioteca-restrita"
+                  to="/area-restrita"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="bg-gold-500 text-masonic-dark font-black p-4 rounded-xl text-[10px] uppercase tracking-widest text-center flex items-center justify-center gap-2"
                 >

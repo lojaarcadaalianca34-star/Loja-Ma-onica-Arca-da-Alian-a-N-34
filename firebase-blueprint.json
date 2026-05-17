@@ -44,16 +44,96 @@
             "tagline": { "type": "string" }
           }
         },
+        "welcomeBanner": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "subTitle": { "type": "string" },
+            "backgroundImage": { "type": "string" }
+          }
+        },
         "history": {
           "type": "object",
           "properties": {
-            "text": { "type": "string" }
+            "smallTitle": { "type": "string" },
+            "title": { "type": "string" },
+            "subTitle": { "type": "string" },
+            "text": { "type": "string" },
+            "mission": { "type": "string" },
+            "vision": { "type": "string" },
+            "values": { "type": "array" },
+            "milestones": { "type": "array" }
           }
         },
         "philanthropy": {
           "type": "object",
           "properties": {
-            "description": { "type": "string" }
+            "smallTitle": { "type": "string" },
+            "title": { "type": "string" },
+            "subTitle": { "type": "string" },
+            "description": { "type": "string" },
+            "stats": { "type": "array" },
+            "initiatives": { "type": "array" }
+          }
+        },
+        "managementSection": {
+          "type": "object",
+          "properties": {
+            "smallTitle": { "type": "string" },
+            "title": { "type": "string" },
+            "subTitle": { "type": "string" },
+            "members": { "type": "array" }
+          }
+        },
+        "gallerySection": {
+          "type": "object",
+          "properties": {
+            "smallTitle": { "type": "string" },
+            "title": { "type": "string" },
+            "subTitle": { "type": "string" },
+            "items": { "type": "array" }
+          }
+        },
+        "mastersSection": {
+          "type": "object",
+          "properties": {
+            "smallTitle": { "type": "string" },
+            "title": { "type": "string" },
+            "subTitle": { "type": "string" },
+            "masters": { "type": "array" }
+          }
+        },
+        "familyGroups": {
+          "type": "object",
+          "properties": {
+            "smallTitle": { "type": "string" },
+            "title": { "type": "string" },
+            "subTitle": { "type": "string" },
+            "guardians": { "type": "object" },
+            "demolay": { "type": "object" },
+            "daughters": { "type": "object" }
+          }
+        },
+        "quest": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "subTitle": { "type": "string" }
+          }
+        },
+        "contact": {
+          "type": "object",
+          "properties": {
+            "smallTitle": { "type": "string" },
+            "title": { "type": "string" },
+            "subTitle": { "type": "string" },
+            "address": { "type": "string" },
+            "subAddress": { "type": "string" },
+            "meetings": { "type": "string" },
+            "subMeetings": { "type": "string" },
+            "email": { "type": "string" },
+            "subEmail": { "type": "string" },
+            "mapEmbedUrl": { "type": "string" }
           }
         },
         "updatedAt": { "type": "string", "format": "date-time" }
@@ -142,9 +222,29 @@
         "displayName": { "type": "string" },
         "email": { "type": "string" },
         "role": { "type": "string", "enum": ["member", "admin"] },
+        "currentRole": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["uid", "email", "role"]
+    },
+    "SocialAction": {
+      "title": "Ação Social / Decisão",
+      "description": "Enquetes, arrecadações e decisões da loja",
+      "type": "object",
+      "properties": {
+        "type": { "enum": ["decision", "poll", "philanthropy"] },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "createdBy": { "type": "string" },
+        "creatorName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "options": { "type": "array" },
+        "votes": { "type": "object" },
+        "goal": { "type": "number" },
+        "current": { "type": "number" },
+        "deadline": { "type": "string" }
+      },
+      "required": ["type", "title", "createdBy", "createdAt"]
     }
   },
   "firestore": {
@@ -179,6 +279,10 @@
     "users/{uid}": {
       "schema": "User",
       "description": "Perfis de usuários"
+    },
+    "social_actions/{actionId}": {
+      "schema": "SocialAction",
+      "description": "Enquetes e ações sociais"
     }
   }
 }

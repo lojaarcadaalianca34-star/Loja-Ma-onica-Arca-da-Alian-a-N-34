@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Book, Video, FileText, ChevronRight, Star } from 'lucide-react';
+import { Book, Video, FileText, ChevronRight, Star, Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { db } from '@/src/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
@@ -63,18 +63,24 @@ export default function Library({ isFullPage = false }: LibraryProps) {
 
   const getIcon = (item: any) => {
     if (item.isCuriosity) return Star;
-    if (item.youtubeUrl || item.category?.toLowerCase().includes('palestra')) return Video;
+    if (item.type === 'video' || item.youtubeUrl || item.category?.toLowerCase().includes('palestra')) return Video;
+    if (item.type === 'pdf') return FileText;
+    if (item.type === 'link') return Globe;
     return FileText;
   };
 
   const content = (
-    <div className="flex flex-col lg:flex-row gap-12 items-center">
+    <div className="flex flex-col lg:flex-row gap-16 items-center">
       <div className="lg:w-1/2">
-        <h2 className="font-serif text-3xl font-bold text-white mb-4">
+        <div className="flex items-center gap-3 text-[#c5a059] mb-4 uppercase tracking-[0.4em] text-[10px] font-black">
+          <Book className="w-4 h-4" />
+          Conhecimento
+        </div>
+        <h2 className="font-serif text-3xl md:text-5xl font-bold text-[#0b1d3a] mb-6 uppercase tracking-wider leading-tight">
           Círculo de <span className="gold-text">Estudos</span>
         </h2>
-        <p className="text-gold-50/70 text-base mb-6 leading-relaxed font-sans">
-          Um espaço dedicado à cultura, história e ao aprofundamento intelectual. Explore nossa seleção de materiais públicos sobre a Ordem e seus princípios.
+        <p className="text-[#0b1d3a]/70 text-lg mb-10 leading-relaxed font-sans text-justify">
+          Um espaço dedicado à cultura, história e ao aprofundamento intelectual. Explore nossa seleção de materiais públicos sobre a Ordem e seus princípios fundamentais.
         </p>
         <div className="flex flex-col gap-4">
           {displayItems.map((item, i) => {
@@ -85,21 +91,32 @@ export default function Library({ isFullPage = false }: LibraryProps) {
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-gold-500/5 hover:border-gold-500/20 transition-all cursor-pointer group"
+                className="flex items-center gap-4 p-5 rounded-2xl bg-white/50 border border-[#c5a059]/10 hover:bg-white hover:border-[#c5a059]/40 hover:shadow-lg transition-all cursor-pointer group shadow-sm"
                 onClick={() => {
-                  if (item.isCuriosity) window.location.href = item.path;
-                  else if (item.youtubeUrl) window.open(item.youtubeUrl, '_blank');
-                  else window.location.href = `/biblioteca?id=${item.id}`;
+                  if (item.isCuriosity) {
+                    window.location.href = item.path;
+                  } else if (item.type === 'video' && item.youtubeUrl) {
+                    window.open(item.youtubeUrl, '_blank');
+                  } else if (item.type === 'pdf' && item.url) {
+                    window.open(item.url, '_blank');
+                  } else if (item.type === 'link' && item.url) {
+                    window.open(item.url, '_blank');
+                  } else if (item.youtubeUrl) {
+                    // Fallback for old items
+                    window.open(item.youtubeUrl, '_blank');
+                  } else {
+                    window.location.href = `/biblioteca?id=${item.id}`;
+                  }
                 }}
               >
-                <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${item.isCuriosity ? 'bg-gold-500 shadow-[0_0_15px_rgba(230,176,0,0.3)]' : 'bg-gold-500/10'}`}>
-                  <Icon className={`${item.isCuriosity ? 'text-masonic-dark' : 'text-gold-500'} w-6 h-6`} />
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm ${item.isCuriosity ? 'bg-[#c5a059] text-white shadow-[#c5a059]/30' : 'bg-[#c5a059]/10 text-[#c5a059]'}`}>
+                  <Icon className="w-6 h-6" />
                 </div>
                 <div className="flex-1">
-                  <span className={`text-[10px] uppercase font-bold tracking-widest ${item.isCuriosity ? 'text-gold-500' : 'text-gold-500/60'}`}>{item.category || 'Sugestão'}</span>
-                  <h4 className="text-white font-bold text-sm tracking-tight">{item.title}</h4>
+                  <span className={`text-[10px] uppercase font-black tracking-widest ${item.isCuriosity ? 'text-[#c5a059]' : 'text-[#c5a059]/60'}`}>{item.category || 'Sugestão'}</span>
+                  <h4 className="text-[#0b1d3a] font-bold text-sm tracking-tight">{item.title}</h4>
                 </div>
-                <ChevronRight className={`w-4 h-4 ${item.isCuriosity ? 'text-gold-500' : 'text-gold-500/40 group-hover:text-gold-500'} transition-colors`} />
+                <ChevronRight className={`w-4 h-4 ${item.isCuriosity ? 'text-[#c5a059]' : 'text-[#c5a059]/40 group-hover:text-[#c5a059] group-hover:translate-x-1'} transition-all`} />
               </motion.div>
             );
           })}
@@ -107,22 +124,23 @@ export default function Library({ isFullPage = false }: LibraryProps) {
       </div>
       
       <div className="lg:w-1/2 relative">
-         <div className="aspect-square rounded-full border-2 border-gold-500/10 flex items-center justify-center p-12">
-            <div className="aspect-square w-full rounded-full border border-gold-500/20 bg-gradient-to-br from-gold-500/10 to-transparent flex items-center justify-center p-8">
-              <div className="text-center p-8 bg-masonic-dark/80 backdrop-blur rounded-3xl border border-gold-500/30 shadow-2xl relative group overflow-hidden">
+         <div className="aspect-square rounded-full border-2 border-[#c5a059]/10 flex items-center justify-center p-12 bg-[#c5a059]/5">
+            <div className="aspect-square w-full rounded-full border border-[#c5a059]/20 bg-white/40 flex items-center justify-center p-8 shadow-inner">
+              <div className="text-center p-12 bg-[#0b1d3a] rounded-[2.5rem] border border-[#c5a059]/30 shadow-2xl relative group overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#c5a059]/10 to-transparent opacity-50" />
                 <div className="relative z-10 transition-all duration-500">
-                  <Book className="w-16 h-16 text-gold-500 mx-auto mb-4" />
+                  <Book className="w-16 h-16 text-[#c5a059] mx-auto mb-6" />
                   <h3 className="font-serif text-2xl font-bold text-white mb-2">Biblioteca Arca 34</h3>
-                  <p className="text-gold-50/50 text-xs uppercase tracking-widest">Acesso Público ao Conhecimento</p>
+                  <p className="text-white/40 text-[10px] uppercase tracking-[0.3em] font-black">Acesso Público ao Conhecimento</p>
                   {!isFullPage ? (
                     <Link 
                       to="/biblioteca"
-                      className="mt-8 block w-full py-3 bg-gold-500 text-masonic-dark font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-gold-600 transition-colors text-center"
+                      className="mt-10 block w-full py-4 bg-[#c5a059] text-[#0b1d3a] font-black text-[10px] uppercase tracking-[0.2em] rounded-xl hover:bg-white hover:text-[#0b1d3a] transition-all text-center shadow-xl"
                     >
                       Explorar Acervo
                     </Link>
                   ) : (
-                    <button className="mt-8 w-full py-3 bg-gold-500 text-masonic-dark font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-gold-600 transition-colors">
+                    <button className="mt-10 w-full py-4 bg-[#c5a059] text-[#0b1d3a] font-black text-[10px] uppercase tracking-[0.2em] rounded-xl hover:bg-white transition-all shadow-xl">
                       Fazer Login
                     </button>
                   )}
@@ -137,7 +155,7 @@ export default function Library({ isFullPage = false }: LibraryProps) {
   if (isFullPage) return content;
 
   return (
-    <section id="biblioteca" className="py-12 bg-masonic-dark border-t border-white/5">
+    <section id="biblioteca" className="py-24 bg-aged-beige border-t border-[#0b1d3a]/5">
       <div className="max-w-7xl mx-auto px-6">
         {content}
       </div>

@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
+import WelcomeBanner from './components/sections/WelcomeBanner';
 import Hero from './components/sections/Hero';
 import History from './components/sections/History';
 import Philanthropy from './components/sections/Philanthropy';
@@ -28,8 +29,9 @@ import RegisterPage from './pages/RegisterPage';
 import AboutPage from './pages/AboutPage';
 import CuriositiesPage from './pages/CuriositiesPage';
 import InstructionsPage from './pages/InstructionsPage';
-import RestrictedLibraryPage from './pages/RestrictedLibraryPage';
+import MemberDashboard from './pages/MemberDashboard';
 import InstitutionDetailPage from './pages/InstitutionDetailPage';
+import SocialActionsPage from './pages/SocialActionsPage';
 import { ContentProvider, useContent } from './context/ContentContext';
 import { auth, db } from './lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -94,6 +96,7 @@ function LandingPage() {
     <div className="min-h-screen bg-masonic-dark selection:bg-gold-500/30 selection:text-gold-100">
       <Navbar />
       <main>
+        <WelcomeBanner />
         <Hero />
         <History />
         <Philanthropy />
@@ -144,7 +147,8 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
       setUser(u);
       if (u) {
         // Auto-admin for specific emails or check Firestore
-        const isMasterEmail = u.email?.toLowerCase() === 'lojaarcadaalianca34@gmail.com';
+        const masterEmails = ['lojaarcadaalianca34@gmail.com', 'sophiabohn@gmail.com'];
+        const isMasterEmail = masterEmails.includes(u.email?.toLowerCase() || '');
         const adminDoc = await getDoc(doc(db, 'admins', u.uid));
         setIsAdmin(isMasterEmail || adminDoc.exists());
       } else {
@@ -179,12 +183,14 @@ export default function App() {
           <Route path="/eventos" element={<EventsPage />} />
           <Route path="/login-membro" element={<MemberLoginPage />} />
           <Route path="/cadastro" element={<RegisterPage />} />
-          <Route path="/biblioteca-restrita" element={
+          <Route path="/area-restrita" element={
             <MemberRoute>
-              <RestrictedLibraryPage />
+              <MemberDashboard />
             </MemberRoute>
           } />
+          <Route path="/biblioteca-restrita" element={<Navigate to="/area-restrita" />} />
           <Route path="/instituicao/:id" element={<InstitutionDetailPage />} />
+          <Route path="/acoes-sociais" element={<SocialActionsPage />} />
           <Route path="/admin" element={
             <AdminRoute>
               <AdminDashboard />

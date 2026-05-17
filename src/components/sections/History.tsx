@@ -8,23 +8,23 @@ export default function History() {
   const milestones = content.history.milestones || [];
 
   return (
-    <section id="sobre" className="py-12 bg-masonic-dark relative overflow-hidden">
+    <section id="sobre" className="py-24 bg-aged-beige relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
+        <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
           <div className="max-w-2xl">
-            <div className="flex items-center gap-3 mb-3">
-              <HistoryIcon className="text-gold-500 w-5 h-5" />
-              <span className="uppercase tracking-[0.4em] text-gold-500 text-[10px] font-bold">Nossa Jornada</span>
+            <div className="flex items-center gap-3 mb-4">
+              <HistoryIcon className="text-[#c5a059] w-5 h-5" />
+            <span className="uppercase tracking-[0.4em] text-[#c5a059] text-[10px] font-black">{content.history?.smallTitle || 'Nossa Jornada'}</span>
             </div>
-            <h2 className="font-serif text-3xl md:text-4xl font-bold text-white mb-4">
-              A Arca Através <br/><span className="gold-text">do Tempo</span>
+            <h2 className="font-serif text-3xl md:text-5xl font-bold text-[#0b1d3a] mb-6 uppercase tracking-wider leading-tight">
+              {content.history?.title || 'A Arca Através do Tempo'}
             </h2>
-            <p className="text-gold-50/70 font-sans text-base leading-relaxed text-justify max-w-xl">
-              {content.history.text}
+            <p className="text-[#0b1d3a]/70 font-sans text-lg leading-relaxed text-justify max-w-xl">
+              {content.history?.subTitle || content.history.text}
             </p>
           </div>
           <div className="hidden lg:block text-right">
-            <div className="text-8xl font-serif font-black text-gold-500/20 italic">{milestones[0]?.year || '2009'}</div>
+            <div className="text-9xl font-serif font-black text-[#c5a059]/10 italic tracking-tighter">{milestones[0]?.year || '2009'}</div>
           </div>
         </div>
 
@@ -36,36 +36,36 @@ export default function History() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="relative p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-gold-500/30 transition-all group"
+              className="relative p-10 rounded-2xl bg-white/50 border border-[#c5a059]/20 hover:border-[#c5a059] transition-all group shadow-sm hover:shadow-xl"
             >
-              <div className="text-3xl font-serif font-bold text-gold-500 mb-4 group-hover:scale-110 transition-transform origin-left">
+              <div className="text-3xl font-serif font-bold text-[#c5a059] mb-4 group-hover:scale-110 transition-transform origin-left">
                 {item.year}
               </div>
-              <h3 className="text-xl font-bold text-white mb-3 uppercase tracking-wider">{item.title}</h3>
-              <p className="text-gold-100 text-sm leading-relaxed">
+              <h3 className="text-xl font-bold text-[#0b1d3a] mb-3 uppercase tracking-wider">{item.title}</h3>
+              <p className="text-[#0b1d3a]/60 text-sm leading-relaxed text-justify">
                 {item.description}
               </p>
               
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-100 transition-opacity">
-                <Star className="text-gold-500 w-4 h-4" />
+              <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity">
+                <Star className="text-[#c5a059] w-4 h-4" />
               </div>
             </motion.div>
           ))}
         </div>
 
         {/* Interactive Timeline Bar */}
-        <div className="mt-20 relative h-[2px] bg-white/10 w-full rounded-full hidden md:block">
+        <div className="mt-24 relative h-[3px] bg-[#0b1d3a]/10 w-full rounded-full hidden md:block">
           <motion.div 
             initial={{ width: 0 }}
             whileInView={{ width: '100%' }}
             transition={{ duration: 2 }}
-            className="absolute inset-0 bg-gradient-to-r from-gold-600 to-gold-400 shadow-[0_0_15px_rgba(230,176,0,0.5)]" 
+            className="absolute inset-0 bg-[#c5a059] shadow-sm" 
           />
-          <div className="absolute -top-3 left-0 w-8 h-8 rounded-full border-2 border-gold-500 bg-masonic-dark shadow-[0_0_10px_rgba(230,176,0,0.5)] flex items-center justify-center">
-            <span className="text-[10px] font-bold text-gold-400">{milestones[0]?.year || '2009'}</span>
+          <div className="absolute -top-4 left-0 w-10 h-10 rounded-full border-2 border-[#c5a059] bg-aged-beige flex items-center justify-center shadow-md">
+            <span className="text-[10px] font-bold text-[#0b1d3a]">{milestones[0]?.year || '2009'}</span>
           </div>
-          <div className="absolute -top-3 right-0 w-8 h-8 rounded-full border-2 border-gold-500 bg-masonic-dark shadow-[0_0_10px_rgba(230,176,0,0.5)] flex items-center justify-center">
-             <span className="text-[10px] font-bold text-gold-400">{milestones[milestones.length - 1]?.year || '20XX'}</span>
+          <div className="absolute -top-4 right-0 w-10 h-10 rounded-full border-2 border-[#c5a059] bg-aged-beige flex items-center justify-center shadow-md">
+             <span className="text-[10px] font-bold text-[#0b1d3a]">{milestones[milestones.length - 1]?.year || '20XX'}</span>
           </div>
         </div>
       </div>

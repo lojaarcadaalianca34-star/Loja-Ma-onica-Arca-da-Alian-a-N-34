@@ -3,10 +3,13 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { Resend } from "resend";
 import dotenv from "dotenv";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 async function startServer() {
   const app = express();
@@ -15,8 +18,55 @@ async function startServer() {
   app.use(express.json());
 
   // API Routes
-  app.post("/api/send-lead-email", async (req, res) => {
+  app.post("/api/analyze-candidate", async (req, res) => {
     const { formData } = req.body;
+    
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(200).json({ error: "Gemini Key missing" });
+    }
+
+    const prompt = `
+      Como um experiente Mestre Maçom e analista de perfis, analise o seguinte formulário de interesse de ingresso na Maçonaria.
+      Sua análise deve ser técnica, discreta e profunda, focando na compatibilidade do candidato com os valores da Ordem (Verdade, Honra, Filantropia, Família, Estabilidade).
+
+      REGRAS DE PERFIL:
+      - Perfil A (EXCELENTE): Respostas que demonstram alta integridade, liderança natural, estabilidade familiar total, apoio da esposa, e busca por aperfeiçoamento moral acima de curiosidade ou networking.
+      - Perfil B (BOM): Demonstra bons valores, mas pode precisar de mais instrução ou ter pequenas hesitações sobre o tempo de dedicação ou dinâmica familiar.
+      - Perfil C (RESERVADO): Respostas evasivas, foco excessivo em curiosidade, ou instabilidade familiar/financeira que pode ser prejudicada pela entrada na Ordem.
+      - Perfil D (NÃO RECOMENDADO): Falta de apoio familiar, mentiras detectadas, busca por benefícios financeiros ou networking puro, ou valores morais desalinhados.
+
+      DADOS DO CANDIDATO:
+      ${JSON.stringify(formData, null, 2)}
+
+      SAÍDA DA ANÁLISE (Responda APENAS em JSON com esta estrutura):
+      {
+        "synthesis": "Um parágrafo resumindo quem é o candidato e sua essência.",
+        "performanceTable": [
+          { "category": "Integridade & Verdade", "score": "A/B/C/D", "reason": "Motivo curto" },
+          { "category": "Estabilidade Familiar", "score": "A/B/C/D", "reason": "Motivo curto" },
+          { "category": "Motivação Real", "score": "A/B/C/D", "reason": "Motivo curto" },
+          { "category": "Disponibilidade & Compromisso", "score": "A/B/C/D", "reason": "Motivo curto" }
+        ],
+        "sindicanciaPoints": ["Ponto 1 para os sindicantes investigarem", "Ponto 2..."],
+        "finalParecer": "Parecer técnico final recomendando ou não o convite para sindicância.",
+        "profileType": "A/B/C/D"
+      }
+    `;
+
+    try {
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      const cleanJson = text.replace(/```json|```/g, "").trim();
+      res.status(200).json(JSON.parse(cleanJson));
+    } catch (error) {
+      console.error("AI Analysis failed:", error);
+      res.status(500).json({ error: String(error) });
+    }
+  });
+
+  app.post("/api/send-lead-email", async (req, res) => {
+    const { formData, analysis } = req.body;
     
     if (!process.env.RESEND_API_KEY) {
       console.warn("RESEND_API_KEY is not set. Email not sent.");
@@ -27,27 +77,68 @@ async function startServer() {
       const { data, error } = await resend.emails.send({
         from: "Maçonaria Arca da Aliança <onboarding@resend.dev>",
         to: ["lojaarcadaalianca34@gmail.com"],
-        subject: `Nova Candidatura: ${formData.fullName}`,
+        subject: `Nova Candidatura: ${formData.fullName} (Perfil ${analysis?.profileType || 'N/A'})`,
         html: `
           <div style="font-family: serif; padding: 20px; color: #1a1a1a;">
-            <h1 style="color: #e6b000;">Nova Candidatura de Ingresso</h1>
-            <p><strong>Nome:</strong> ${formData.fullName}</p>
-            <p><strong>E-mail:</strong> ${formData.email}</p>
-            <p><strong>Telefone:</strong> ${formData.phone}</p>
+            <h1 style="color: #0c1445; border-bottom: 2px solid #e6b000; padding-bottom: 10px;">REQUISITO DE INGRESSO</h1>
+            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+              <p><strong>Candidato:</strong> ${formData.fullName}</p>
+              <p><strong>E-mail:</strong> ${formData.email}</p>
+              <p><strong>Cidade:</strong> ${formData.city}</p>
+              <p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
+            </div>
+
+            ${analysis ? `
+              <div style="border: 2px solid #e6b000; border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+                <h2 style="color: #e6b000; margin-top: 0;">Parecer Técnico (IA)</h2>
+                <p><strong>Síntese:</strong> ${analysis.synthesis}</p>
+                
+                <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+                  <thead>
+                    <tr style="background-color: #0c1445; color: white;">
+                      <th style="padding: 10px; text-align: left;">Categoria</th>
+                      <th style="padding: 10px; text-align: center;">Score</th>
+                      <th style="padding: 10px; text-align: left;">Motivo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${analysis.performanceTable.map((row: any) => `
+                      <tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 10px;">${row.category}</td>
+                        <td style="padding: 10px; text-align: center; font-weight: bold;">${row.score}</td>
+                        <td style="padding: 10px;">${row.reason}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+
+                <p><strong>Paredes para Sindicância:</strong></p>
+                <ul>
+                  ${analysis.sindicanciaPoints.map((p: string) => `<li>${p}</li>`).join('')}
+                </ul>
+
+                <div style="background-color: #0c1445; color: white; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                  <p style="margin: 0;"><strong>Parecer Final:</strong> ${analysis.finalParecer}</p>
+                  <p style="margin: 5px 0 0 0; font-size: 20px; font-weight: bold; color: #e6b000;">Classificação: Perfil ${analysis.profileType}</p>
+                </div>
+              </div>
+            ` : ''}
+
+            <h3 style="color: #666;">Respostas Detalhadas</h3>
+            <p><strong>Motivação:</strong> ${formData.motivation}</p>
             <p><strong>Profissão:</strong> ${formData.profession}</p>
             <p><strong>Renda:</strong> ${formData.income}</p>
-            <hr />
-            <h3>Respostas do Formulário</h3>
-            <p><strong>Motivação:</strong> ${formData.motivation}</p>
-            <p><strong>Endereço Residencial:</strong> ${formData.residentialAddress}</p>
-            <p><strong>Endereço Profissional:</strong> ${formData.professionalAddress}</p>
-            <p><strong>Estado Civil:</strong> ${formData.civilStatus}</p>
-            <p><strong>Filhos:</strong> ${formData.childrenCount}</p>
+            <p><strong>Religião:</strong> ${formData.faith}</p>
+            <p><strong>Estado Civil:</strong> ${formData.civilStatus} ${formData.wifeName ? `(Cunhada: ${formData.wifeName} - ${formData.marriageTime})` : ''}</p>
             
             <h4 style="color: #666;">Questões de Perfil</h4>
-            <ul>
-              ${[1,2,3,4,5,6,7,8,9,10,11,12].map(n => formData[`q${n}`] ? `<li><strong>P${n}:</strong> ${formData[`q${n}`]}</li>` : '').join('')}
-            </ul>
+            <div style="background-color: #f0f0f0; padding: 15px; border-radius: 10px;">
+              ${[1,2,3,4,6,7,8,9,10,11,12].map(n => formData[`q${n}`] ? `<p><strong>Q${n}:</strong> ${formData[`q${n}`]}</p>` : '').join('')}
+            </div>
+            
+            <div style="margin-top: 30px; font-size: 10px; color: #999; text-align: center;">
+              Documento de uso exclusivo da Secretaria e Conselho de Mestres da A.R.L.S. Arca da Aliança nº 34.
+            </div>
           </div>
         `,
       });

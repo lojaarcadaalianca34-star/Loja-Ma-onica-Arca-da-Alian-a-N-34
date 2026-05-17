@@ -9,6 +9,9 @@ interface SiteContent {
     tagline: string;
   };
   history: {
+    smallTitle: string;
+    title: string;
+    subTitle: string;
     text: string;
     mission: string;
     vision: string;
@@ -20,9 +23,18 @@ interface SiteContent {
     }[];
   };
   philanthropy: {
+    smallTitle: string;
+    title: string;
+    subTitle: string;
     description: string;
     stats: { label: string; value: string }[];
     initiatives: { title: string; impact: string; description: string }[];
+  };
+  managementSection: {
+    smallTitle: string;
+    title: string;
+    subTitle: string;
+    members: { name: string; role: string; photo?: string }[];
   };
   management: { name: string; role: string; photo?: string }[];
   events: {
@@ -34,45 +46,109 @@ interface SiteContent {
     description: string;
   }[];
   librarySections?: string[];
+  gallerySection: {
+    smallTitle: string;
+    title: string;
+    subTitle: string;
+    items: {
+      url: string;
+      title: string;
+      category: string;
+    }[];
+  };
   gallery: {
     url: string;
     title: string;
     category: string;
   }[];
-  masters: {
-    id: string;
-    name: string;
-    period: string;
-    role: string;
-    degree?: string;
-    orderTime?: string;
-    ritualLegacy?: string;
-    agendaHighlights?: string;
-    columnGrowth?: string;
-    biography: string;
-    photo?: string;
-    firstLady?: {
+  mastersSection: {
+    smallTitle: string;
+    title: string;
+    subTitle: string;
+    masters: {
+      id: string;
       name: string;
-      photo?: string;
+      period: string;
+      role: string;
+      degree?: string;
+      orderTime?: string;
+      ritualLegacy?: string;
+      agendaHighlights?: string;
+      columnGrowth?: string;
       biography: string;
-    };
-  }[];
-  familyGroups?: {
-    guardians: {
-      title: string;
-      description: string;
       photo?: string;
+      firstLady?: {
+        name: string;
+        photo?: string;
+        biography: string;
+      };
+    }[];
+  };
+  masters: any[];
+  familyGroups: {
+    smallTitle: string;
+    title: string;
+    subTitle: string;
+    guardians: {
+      name: string;
+      title?: string; // Fallback
+      subTitle: string;
+      description: string;
+      mission: string;
+      vision: string;
+      values: string[];
+      history: string;
+      image: string;
+      photo?: string; // Fallback
+      logo?: string; // Fallback
     };
     demolay: {
-      title: string;
+      name: string;
+      title?: string; // Fallback
+      subTitle: string;
       description: string;
-      photo?: string;
+      mission: string;
+      vision: string;
+      values: string[];
+      history: string;
+      image: string;
+      photo?: string; // Fallback
+      logo?: string; // Fallback
     };
     daughters: {
-      title: string;
+      name: string;
+      title?: string; // Fallback
+      subTitle: string;
       description: string;
-      photo?: string;
+      mission: string;
+      vision: string;
+      values: string[];
+      history: string;
+      image: string;
+      photo?: string; // Fallback
+      logo?: string; // Fallback
     };
+  };
+  quest: {
+    title: string;
+    subTitle: string;
+  };
+  contact: {
+    smallTitle: string;
+    title: string;
+    subTitle: string;
+    address: string;
+    subAddress: string;
+    meetings: string;
+    subMeetings: string;
+    email: string;
+    subEmail: string;
+    mapEmbedUrl: string;
+  };
+  welcomeBanner?: {
+    backgroundImage?: string;
+    title?: string;
+    subTitle?: string;
   };
 }
 
@@ -83,6 +159,9 @@ const defaultContent: SiteContent = {
     tagline: "A Arca da Aliança: Um refúgio de Luz, Verdade e Fraternidade"
   },
   history: {
+    smallTitle: "Nossa Jornada",
+    title: "A Arca Através",
+    subTitle: "do Tempo",
     text: "Fundada em 2009, a Arca da Aliança nº 34 nasceu com o propósito de ser um repositório de virtudes e um farol de luz no Oriente de Vicente Pires - Brasília. Ao longo das décadas, nossas colunas se fortaleceram com homens que dedicaram suas vidas à busca da verdade.",
     mission: "Tornar feliz a humanidade pelo aperfeiçoamento dos costumes, pela tolerância, pela filantropia e pela busca incessante da verdade.",
     vision: "Ser uma oficina de referência na maçonaria do Distrito Federal, reconhecida pela excelência ritualística e pelo impacto transformador em nossa comunidade.",
@@ -106,11 +185,14 @@ const defaultContent: SiteContent = {
       {
         year: 'HOJE',
         title: 'Futuro Presente',
-        description: 'Nossas colunas se fortalecem com homens que dedicam suas vidas à busca incessante da verdade.'
+        description: 'Nossas colunas se fortaleceram com homens que dedicaram suas vidas à busca incessante da verdade.'
       }
     ]
   },
   philanthropy: {
+    smallTitle: "Ação Social",
+    title: "Solidariedade e",
+    subTitle: "Fraternidade",
     description: "A verdadeira maçonaria se manifesta através do serviço ao próximo. Nossa Loja mantém compromisso constante com o desenvolvimento social do Distrito Federal.",
     stats: [
       { label: "Anos de Ação", value: "17+" },
@@ -136,13 +218,19 @@ const defaultContent: SiteContent = {
       }
     ]
   },
-  management: [
-    { name: "Irmão Fulano de Tal", role: "Venerável Mestre" },
-    { name: "Irmão Ciclano de Tal", role: "1º Vigilante" },
-    { name: "Irmão Beltrano de Tal", role: "2º Vigilante" },
-    { name: "Irmão de Tal", role: "Secretário" },
-    { name: "Irmão Outro Tal", role: "Orador" }
-  ],
+  managementSection: {
+    smallTitle: "Liderança",
+    title: "Administração",
+    subTitle: "Gestão Atual",
+    members: [
+      { name: "Irmão Fulano de Tal", role: "Venerável Mestre" },
+      { name: "Irmão Ciclano de Tal", role: "1º Vigilante" },
+      { name: "Irmão Beltrano de Tal", role: "2º Vigilante" },
+      { name: "Irmão de Tal", role: "Secretário" },
+      { name: "Irmão Outro Tal", role: "Orador" }
+    ]
+  },
+  management: [],
   events: [
     {
       title: "Sessão Magna de Iniciação",
@@ -162,107 +250,103 @@ const defaultContent: SiteContent = {
     }
   ],
   librarySections: ["Gestão e Liderança", "Maçonaria", "Trabalhos Maçônicos", "Outros"],
-  gallery: [
-    {
-      url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80",
-      title: "Trabalhando na Pedra Bruta",
-      category: "Ritualística"
-    },
-    {
-      url: "https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&q=80",
-      title: "Encontro Fraternal",
-      category: "Social"
-    }
-  ],
-  masters: [
-    {
-      id: "1",
-      name: "Irmão Nome Sobrenome 1",
-      period: "2023 - 2025",
-      role: "Venerável Mestre Atual",
-      degree: "33º",
-      orderTime: "25+",
-      ritualLegacy: "O trabalho contínuo no desbaste da pedra bruta é a nossa maior missão. Durante esta gestão, buscamos polir não apenas o templo físico, mas o templo em cada um de nossos corações.",
-      agendaHighlights: "Mais de 48 sessões rituais conduzidas com excelência e rigor litúrgico.",
-      columnGrowth: "Integração de novos obreiros e fortalecimento da egrégora do oriente.",
-      biography: "A gestão atual foca no fortalecimento dos laços fraternais e na expansão das ações sociais no Guará.",
-      firstLady: {
-        name: "Cunhada Exemplo 1",
-        biography: "Dedicada ao apoio das famílias da loja e liderança das ações de caridade feminina."
+  gallerySection: {
+    smallTitle: "Nossos Momentos",
+    title: "Galeria de",
+    subTitle: "Imagens",
+    items: [
+      {
+        url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80",
+        title: "Trabalhando na Pedra Bruta",
+        category: "Ritualística"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&q=80",
+        title: "Encontro Fraternal",
+        category: "Social"
       }
-    },
-    {
-      id: "2",
-      name: "Irmão Nome Sobrenome 2",
-      period: "2021 - 2023",
-      role: "Past Venerável Mestre",
-      biography: "Período marcado pela resiliência e adaptação, mantendo as colunas fortalecidas durante grandes desafios.",
-      firstLady: {
-        name: "Cunhada Exemplo 2",
-        biography: "Liderança exemplar no trabalho com as Cunhadas."
+    ]
+  },
+  gallery: [],
+  welcomeBanner: {
+    backgroundImage: 'https://images.unsplash.com/photo-1516550893923-42d28e5677af?q=80&w=2672&auto=format&fit=crop',
+    title: 'ARCA DA ALIANÇA Nº 34',
+    subTitle: 'Bem vindo à Loja Maçônica'
+  },
+  mastersSection: {
+    smallTitle: "Eternos Veneráveis",
+    title: "Nossa Galeria de",
+    subTitle: "Past Masters",
+    masters: [
+      {
+        id: "1",
+        name: "Irmão Nome Sobrenome 1",
+        period: "2023 - 2025",
+        role: "Venerável Mestre Atual",
+        degree: "33º",
+        orderTime: "25+",
+        ritualLegacy: "O trabalho contínuo no desbaste da pedra bruta é a nossa maior missão. Durante esta gestão, buscamos polir não apenas o templo físico, mas o templo em cada um de nossos corações.",
+        agendaHighlights: "Mais de 48 sessões rituais conduzidas com excelência e rigor litúrgico.",
+        columnGrowth: "Integração de novos obreiros e fortalecimento da egrégora do oriente.",
+        biography: "A gestão atual foca no fortalecimento dos laços fraternais e na expansão das ações sociais no Guará.",
+        firstLady: {
+          name: "Cunhada Exemplo 1",
+          biography: "Dedicada ao apoio das famílias da loja e liderança das ações de caridade feminina."
+        }
       }
-    },
-    {
-      id: "3",
-      name: "Irmão Nome Sobrenome 3",
-      period: "2019 - 2021",
-      role: "Past Venerável Mestre",
-      biography: "Uma gestão dedicada à instrução maçônica profunda e à reforma ritualística primorosa.",
-      firstLady: {
-        name: "Cunhada Exemplo 3",
-        biography: "Apoio constante nas atividades filantrópicas da loja."
-      }
-    },
-    {
-      id: "4",
-      name: "Irmão Nome Sobrenome 4",
-      period: "2017 - 2019",
-      role: "Past Venerável Mestre",
-      biography: "Foco na modernização administrativa da loja e integração com a comunidade local.",
-      firstLady: {
-        name: "Cunhada Exemplo 4",
-        biography: "Fomentou o crescimento do grupo de apoio familiar."
-      }
-    },
-    {
-      id: "5",
-      name: "Irmão Nome Sobrenome 5",
-      period: "2015 - 2017",
-      role: "Past Venerável Mestre",
-      biography: "Destaque para o crescimento do quadro de obreiros e fortalecimento da biblioteca da Arca.",
-      firstLady: {
-        name: "Cunhada Exemplo 5",
-        biography: "Idealizadora de projetos literários na comunidade."
-      }
-    },
-    {
-      id: "6",
-      name: "Irmão Nome Sobrenome 6",
-      period: "2013 - 2015",
-      role: "Past Venerável Mestre",
-      biography: "Consolidação das tradições da loja e estabelecimento de parcerias sociais duradouras.",
-      firstLady: {
-        name: "Cunhada Exemplo 6",
-        biography: "Pioneira nas ações de integração social da loja."
-      }
-    }
-  ],
+    ]
+  },
+  masters: [],
   familyGroups: {
+    smallTitle: "União",
+    title: "Nossa Família",
+    subTitle: "e Ordens Auxiliares",
     guardians: {
-      title: "Guardiãs da Aliança",
-      description: "Grupo de apoio formado pelas Cunhadas da Arca da Aliança nº 34, dedicado ao fortalecimento familiar e caridade social.",
-      photo: "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&q=80"
+      name: "As Guardiãs da Aliança",
+      subTitle: "As Cunhadas",
+      description: "As Guardiãs da Aliança é a ala feminina que reúne as esposas, companheiras e familiares dos obreiros da Loja Arca da Aliança Nº 34.",
+      mission: "Promover a integração das famílias, organizar eventos beneficentes e oferecer suporte emocional e social à comunidade maçônica e regional.",
+      vision: "Ser reconhecida como um pilar de amor e caridade, fortalecendo a base familiar dos maçons e impactando positivamente a sociedade.",
+      values: ["Amor ao Próximo", "Fraternidade", "Dedicação", "Trabalho em Equipe"],
+      history: "Fundada junto com a consolidação da oficina, o grupo de cunhadas sempre foi o braço direito nas ações sociais, transformando reuniões em momentos de união familiar.",
+      image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=1200&auto=format&fit=crop"
     },
     demolay: {
-      title: "Ordem DeMolay",
-      description: "Fraternidade juvenil para jovens do sexo masculino de 12 a 21 anos, focada na liderança e valores morais.",
-      photo: "https://images.unsplash.com/photo-1523240715181-014b9f514d0d?auto=format&fit=crop&q=80"
+      name: "Ordem DeMolay",
+      subTitle: "Capítulo Local",
+      description: "A Ordem DeMolay é uma organização juvenil patrocinada pela Maçonaria para jovens do sexo masculino entre 12 e 21 anos.",
+      mission: "Construir o caráter dos jovens através das sete virtudes cardeais: Amor Filial, Reverência pelas Coisas Sagradas, Cortesia, Companheirismo, Fidelidade, Pureza e Patriotismo.",
+      vision: "Preparar jovens para serem cidadãos de bem e líderes exemplares em suas comunidades.",
+      values: ["Liderança", "Honestidade", "Respeito", "Responsabilidade"],
+      history: "O Capítulo Arca da Aliança da Ordem DeMolay foi instalado para guiar a juventude masculina do Guará, seguindo os preceitos de Jacques DeMolay.",
+      image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1200&auto=format&fit=crop"
     },
     daughters: {
-      title: "Filhas de Jó",
-      description: "Organização paramaçônica para jovens do sexo feminino, destacando a paciência e a caridade.",
-      photo: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&q=80"
+      name: "Garotas do Arco-Íris",
+      subTitle: "Assembleia Local",
+      description: "A Ordem Internacional das Filhas do Arco-Íris é uma organização para meninas entre 11 e 20 anos, focada no serviço e na liderança.",
+      mission: "Ensinar autoconfiança, liderança e serviço à comunidade através de lições baseadas no simbolismo das cores do arco-íris.",
+      vision: "Inspirar garotas a serem o melhor de si mesmas, agindo com bondade e coragem no mundo moderno.",
+      values: ["Amor", "Religião", "Natureza", "Imortalidade", "Fidelidade", "Patriotismo", "Serviço"],
+      history: "Nossa Assembleia acolhe jovens mulheres buscando o aperfeiçoamento pessoal e a criação de laços eternos de amizade e cooperação.",
+      image: "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?q=80&w=1200&auto=format&fit=crop"
     }
+  },
+  quest: {
+    title: "Desejo fazer parte da Ordem",
+    subTitle: "Clique acima para iniciar sua jornada"
+  },
+  contact: {
+    smallTitle: "Contato",
+    title: "Nossa Fraternidade à sua",
+    subTitle: "Disposição",
+    address: "Guará, Brasília - DF",
+    subAddress: "Oriente de Brasília",
+    meetings: "Terças-feiras às 20h00",
+    subMeetings: "Restrita apenas para membros regulares",
+    email: "lojaarcadaalianca34@gmail.com",
+    subEmail: "Secretaria da Loja",
+    mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d678.4843943654762!2d-47.96468114777279!3d-15.852006807419746!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x935a2f1a883953b9%3A0x5348e0050b629ac8!2sAugusta%20e%20Respeit%C3%A1vel%20Loja%20Simb%C3%B3lica%20Arca%20da%20Alian%C3%A7a%20N%2034!5e0!3m2!1sen!2sbr!4v1778678011777!5m2!1sen!2sbr"
   }
 };
 
