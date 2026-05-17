@@ -8,7 +8,9 @@ export default function PastMasters() {
   const { content } = useContent();
 
   const management = content.management || [];
-  const masters = [...(content.masters || [])].reverse();
+  const masters = [...(content.masters || []), ...(content.mastersSection?.masters || [])].filter((v, i, a) => a.findIndex(t => t.id === v.id) === i).reverse();
+
+  if (masters.length === 0 && !content.mastersSection?.masters) return null;
 
   return (
     <section id="galeria" className="py-24 bg-aged-beige overflow-hidden">

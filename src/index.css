@@ -7,14 +7,13 @@
   --color-gold-200: #fff3a6;
   --color-gold-300: #ffec73;
   --color-gold-400: #ffe540;
-  --color-gold-500: #ffd700;
-  --color-gold-600: #cca300;
-  --color-gold-700: #997a00;
-  --color-gold-800: #665200;
-  --color-gold-900: #332900;
+  --color-gold-500: #c5a059;
+  --color-gold-400: #d4b068;
+  --color-gold-300: #e3c077;
+  --color-gold-600: #b6904a;
 
   --color-masonic-blue: #0b1d3a;
-  --color-masonic-dark: #f4efe2;
+  --color-masonic-dark: #050c1a;
   --color-aged-beige: #f4efe2;
   --color-navy-blue: #0b1d3a;
   --color-masonic-gold: #c5a059;
@@ -50,13 +49,13 @@ body {
 }
 
 .gold-text {
-  background: linear-gradient(to bottom, var(--color-gold-100), var(--color-gold-400));
+  background: linear-gradient(to bottom, #f4efe2, var(--color-masonic-gold));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gold-border {
-  border-image: linear-gradient(to bottom, var(--color-gold-100), var(--color-gold-400)) 1;
+  border-image: linear-gradient(to bottom, #f4efe2, var(--color-masonic-gold)) 1;
 }
 

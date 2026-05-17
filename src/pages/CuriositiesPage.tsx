@@ -76,14 +76,14 @@ export default function CuriositiesPage() {
           >
             <button 
               onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-gold-500 hover:text-gold-400 transition-colors uppercase tracking-[0.2em] text-[10px] font-bold mb-8"
+              className="flex items-center gap-2 text-masonic-gold hover:text-masonic-gold/80 transition-colors uppercase tracking-[0.2em] text-[10px] font-bold mb-8"
             >
               <ChevronLeft className="w-3 h-3" />
               Voltar ao Início
             </button>
             
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-500 mb-6 shadow-[0_0_30px_rgba(230,176,0,0.2)]">
+              <div className="w-16 h-16 rounded-2xl bg-masonic-gold/10 border border-masonic-gold/30 flex items-center justify-center text-masonic-gold mb-6 shadow-[0_0_30px_rgba(197,160,89,0.2)]">
                 <Star className="w-8 h-8" />
               </div>
               <h1 className="font-serif text-4xl md:text-6xl font-bold text-white mb-4 uppercase tracking-wider">
@@ -97,7 +97,7 @@ export default function CuriositiesPage() {
 
           {loading ? (
             <div className="flex justify-center py-20">
-              <div className="w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-masonic-gold border-t-transparent rounded-full animate-spin" />
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -107,16 +107,16 @@ export default function CuriositiesPage() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}
-                  className="group relative p-[1px] bg-gradient-to-b from-gold-500/30 to-transparent rounded-[2.5rem]"
+                  className="group relative p-[1px] bg-gradient-to-b from-masonic-gold/30 to-transparent rounded-[2.5rem]"
                 >
-                  <div className="bg-masonic-blue/40 p-10 h-full rounded-[2.5rem] flex flex-col border border-white/5 group-hover:border-gold-500/30 transition-all shadow-2xl relative overflow-hidden backdrop-blur-sm">
-                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-gold-500/5 rounded-full blur-3xl" />
+                  <div className="bg-masonic-blue/40 p-10 h-full rounded-[2.5rem] flex flex-col border border-white/5 group-hover:border-masonic-gold/30 transition-all shadow-2xl relative overflow-hidden backdrop-blur-sm">
+                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-masonic-gold/5 rounded-full blur-3xl" />
                     
                     <div className="flex items-center gap-4 mb-6">
-                       <div className="w-12 h-12 rounded-xl bg-gold-500/10 flex items-center justify-center">
-                          {item.youtubeUrl ? <Play className="w-6 h-6 text-gold-500" /> : <FileText className="w-6 h-6 text-gold-500" />}
+                       <div className="w-12 h-12 rounded-xl bg-masonic-gold/10 flex items-center justify-center">
+                          {item.youtubeUrl ? <Play className="w-6 h-6 text-masonic-gold" /> : <FileText className="w-6 h-6 text-masonic-gold" />}
                        </div>
-                       <span className="text-[10px] uppercase font-black text-gold-500 tracking-[0.2em]">{item.category || 'Curiosidade'}</span>
+                       <span className="text-[10px] uppercase font-black text-masonic-gold tracking-[0.2em]">{item.category || 'Curiosidade'}</span>
                     </div>
 
                     <h3 className="font-serif text-2xl font-bold text-white mb-4 group-hover:gold-text transition-colors leading-tight">
@@ -132,7 +132,7 @@ export default function CuriositiesPage() {
                         href={item.youtubeUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-3 w-full py-4 bg-gold-500 text-masonic-dark font-black uppercase tracking-[0.2em] text-[10px] rounded-xl hover:bg-gold-400 transition-all shadow-lg"
+                        className="flex items-center justify-center gap-3 w-full py-4 bg-masonic-gold text-masonic-dark font-black uppercase tracking-[0.2em] text-[10px] rounded-xl hover:bg-masonic-gold/80 transition-all shadow-lg"
                       >
                          Assistir no Youtube <Play className="w-4 h-4 fill-current" />
                       </a>
@@ -145,7 +145,7 @@ export default function CuriositiesPage() {
           
           {!loading && items.length === 0 && (
             <div className="text-center py-20 bg-white/5 rounded-3xl border border-white/5">
-              <Globe className="w-12 h-12 text-gold-500/20 mx-auto mb-4" />
+              <Globe className="w-12 h-12 text-masonic-gold/20 mx-auto mb-4" />
               <p className="text-gold-200/40 uppercase tracking-[0.3em] font-bold text-xs italic">Nenhuma curiosidade registrada publicamente no momento.</p>
             </div>
           )}

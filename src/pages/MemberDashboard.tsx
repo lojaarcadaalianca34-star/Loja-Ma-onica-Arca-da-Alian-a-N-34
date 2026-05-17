@@ -298,83 +298,91 @@ export default function MemberDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-masonic-dark">
+    <div className="min-h-screen bg-aged-beige">
       <Navbar />
       <main className="pt-24 pb-12 px-6">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-[#0b1d3a]/10 flex items-center justify-center text-[#c5a059]">
-                <BookMarked className="w-6 h-6" />
+          {/* Header Card */}
+          <div className="bg-white rounded-[2.5rem] p-8 md:p-12 mb-10 shadow-sm border border-[#0b1d3a]/5">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="flex items-center gap-6">
+                <div className="w-16 h-16 rounded-2xl bg-[#0b1d3a]/5 flex items-center justify-center text-[#c5a059]">
+                  <BookMarked className="w-8 h-8" />
+                </div>
+                <div>
+                  <h1 className="font-cinzel text-3xl md:text-5xl font-bold uppercase tracking-tight text-[#0b1d3a]">
+                    Área do <span className="text-[#c5a059]">Membro</span>
+                  </h1>
+                  <p className="text-[#0b1d3a]/60 font-sans tracking-[0.2em] uppercase text-[10px] font-bold mt-2">
+                    Bem-vindo, {userData?.displayName || auth.currentUser?.email}
+                  </p>
+                  <div className="flex items-center gap-4 mt-6">
+                    <button onClick={() => navigate('/')} className="flex items-center gap-1 text-[10px] uppercase font-black tracking-widest text-[#c5a059] hover:text-[#0b1d3a] transition-colors">
+                       <Globe className="w-3.5 h-3.5" /> Ver Site
+                    </button>
+                    {isSuperAdmin && (
+                      <button onClick={() => navigate('/admin')} className="flex items-center gap-1 text-[10px] uppercase font-black tracking-widest text-[#c5a059] hover:text-[#0b1d3a] transition-colors">
+                         <ShieldCheck className="w-3.5 h-3.5" /> Painel Administrativo
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-[#c5a059] font-sans tracking-[0.4em] uppercase text-[9px] font-black mb-1">
-                  CONHECIMENTO
-                </p>
-                <h1 className="font-serif text-3xl font-bold uppercase tracking-tight leading-none text-[#0b1d3a]">
-                  <span className="text-[#c5a059]">CÍRCULO</span> <span className="text-[#c5a059]">FECHADO</span>
-                </h1>
-                <p className="text-[#0b1d3a]/60 font-sans tracking-[0.2em] uppercase text-[8px] font-bold mt-2">
-                  Bem-vindo de volta, Ir. {userData?.displayName || auth.currentUser?.email?.split('@')[0]}
-                </p>
-              </div>
-            </div>
 
-            <div className="flex items-center gap-4">
-               <button 
-                onClick={() => setShowOnlineUsers(!showOnlineUsers)}
-                className="relative p-3 bg-white/40 border border-[#0b1d3a]/10 rounded-2xl text-[#0b1d3a] hover:bg-white/60 transition-all group shadow-sm"
-              >
-                <Users className="w-5 h-5" />
-                {onlineUsers.length > 0 && <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#0b1d3a] text-[#f4efe2] text-[10px] flex items-center justify-center rounded-full font-black border-2 border-white animate-pulse">{onlineUsers.length}</span>}
-                <AnimatePresence>
-                  {showOnlineUsers && (
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute right-0 top-full mt-4 w-64 bg-white/95 backdrop-blur-xl border border-[#0b1d3a]/10 rounded-2xl shadow-2xl z-50 p-4">
-                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#0b1d3a]/5">
-                        <h4 className="text-[10px] uppercase font-black tracking-widest text-[#0b1d3a]">Irmãos Online</h4>
-                      </div>
-                      <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar">
-                        {onlineUsers.map(user => (
-                          <div key={user.id} className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059] text-[10px] font-bold border border-[#c5a059]/20">{user.displayName?.[0] || 'I'}</div>
-                            <div className="overflow-hidden">
-                              <p className="text-[#0b1d3a] text-[11px] font-bold truncate leading-tight">{user.displayName || 'Irmão'}</p>
-                              <span className="text-[8px] text-[#c5a059] uppercase font-black tracking-widest block">{user.currentRole || user.role}</span>
+              <div className="flex items-center gap-4">
+                 <button 
+                  onClick={() => setShowOnlineUsers(!showOnlineUsers)}
+                  className="relative p-4 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-2xl text-[#0b1d3a] hover:bg-[#0b1d3a]/10 transition-all group shadow-sm"
+                >
+                  <Users className="w-6 h-6" />
+                  {onlineUsers.length > 0 && <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#0b1d3a] text-[#f4efe2] text-[10px] flex items-center justify-center rounded-full font-black border-2 border-white animate-pulse">{onlineUsers.length}</span>}
+                  <AnimatePresence>
+                    {showOnlineUsers && (
+                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute right-0 top-full mt-4 w-64 bg-white border border-[#0b1d3a]/10 rounded-2xl shadow-2xl z-50 p-4">
+                        <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#0b1d3a]/5">
+                          <h4 className="text-[10px] uppercase font-black tracking-widest text-[#0b1d3a]">Irmãos Online</h4>
+                        </div>
+                        <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar text-left">
+                          {onlineUsers.map(user => (
+                            <div key={user.id} className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059] text-[10px] font-bold border border-[#c5a059]/20">{user.displayName?.[0] || 'I'}</div>
+                              <div className="overflow-hidden">
+                                <p className="text-[#0b1d3a] text-[11px] font-bold truncate leading-tight">{user.displayName || 'Irmão'}</p>
+                                <span className="text-[8px] text-[#c5a059] uppercase font-black tracking-widest block">{user.currentRole || user.role}</span>
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </button>
-              {isSuperAdmin && (
-                <button onClick={() => navigate('/admin')} className="hidden md:flex items-center gap-2 px-6 py-3 bg-[#0b1d3a] border border-[#c5a059]/30 text-[#f4efe2] rounded-full font-black uppercase tracking-widest text-[10px] hover:bg-[#c5a059] transition-all shadow-md">
-                  Painel Admin
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </button>
-              )}
-              <button onClick={handleLogout} className="flex items-center gap-2 text-[#0b1d3a] hover:text-[#c5a059] transition-colors uppercase tracking-[0.2em] text-[10px] font-black ml-4">
-                <LogOut className="w-4 h-4" /> Sair
-              </button>
+                <button onClick={handleLogout} className="flex items-center gap-2 p-4 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-2xl text-[#0b1d3a] hover:text-red-500 transition-colors uppercase tracking-[0.2em] text-[10px] font-black group">
+                  <LogOut className="w-5 h-5" /> <span className="hidden md:inline">Sair</span>
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Navigation */}
-          <div className="flex flex-wrap gap-2 mb-10 overflow-x-auto pb-4 scrollbar-hide">
+          {/* Navigation - Dark rounded bars */}
+          <div className="flex flex-col gap-3 mb-12">
              {[
-               { id: 'welcome', label: 'Início', icon: LayoutDashboard },
-               { id: 'library', label: 'Biblioteca', icon: BookMarked },
-               { id: 'professional', label: 'Vamos nos Ajudar?', icon: Handshake },
-               { id: 'social', label: 'Painel de Decisões', icon: Heart },
-               { id: 'profile', label: 'Meus Dados', icon: UserCircle }
+               { id: 'welcome', label: 'Escrutínio de Atividades', icon: LayoutDashboard },
+               { id: 'library', label: 'Biblioteca Ritualística', icon: BookMarked },
+               { id: 'professional', label: 'O Forja Profissional (B2B)', icon: Handshake },
+               { id: 'social', label: 'Painel de Decisões Sociais', icon: Heart },
+               { id: 'profile', label: 'Cadastro do Obreiro', icon: UserCircle }
              ].map((tab) => (
                <button
                  key={tab.id}
                  onClick={() => setActiveTab(tab.id as any)}
-                 className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-lg scale-105 border border-[#c5a059]/30' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] shadow-sm'}`}
+                 className={`flex items-center gap-4 px-8 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all w-full md:w-auto shadow-sm border ${
+                   activeTab === tab.id 
+                     ? 'bg-[#c5a059] text-[#0b1d3a] border-[#c5a059]' 
+                     : 'bg-[#0b1d3a] text-white border-[#c5a059]/30 hover:bg-[#c5a059]/10 hover:text-[#c5a059]'
+                 }`}
                >
-                 <tab.icon className="w-4 h-4" />
+                 <tab.icon className="w-5 h-5 flex-shrink-0" />
                  {tab.label}
                </button>
              ))}
@@ -434,20 +442,20 @@ export default function MemberDashboard() {
                 </div>
 
                 {/* Social Actions Summary */}
-                <div className="bg-white/40 p-8 rounded-[2.5rem] border border-[#0b1d3a]/10">
+                <div className="bg-white p-10 rounded-[2.5rem] border border-[#0b1d3a]/5 shadow-sm">
                   <div className="flex items-center gap-3 mb-8">
-                    <Heart className="w-6 h-6 text-[#c5a059]" />
-                    <h3 className="font-serif text-xl font-bold text-[#0b1d3a] uppercase tracking-widest">Painel de Decisões</h3>
+                    <Heart className="w-8 h-8 text-[#c5a059]" />
+                    <h3 className="font-cinzel text-2xl font-bold text-[#0b1d3a] uppercase tracking-widest">Painel de Decisões</h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {socialItems.slice(0, 2).map((action) => (
-                      <div key={action.id} className="p-6 bg-white/60 border border-[#0b1d3a]/5 rounded-2xl">
-                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest mb-2 inline-block ${action.type === 'poll' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'}`}>
+                      <div key={action.id} className="p-8 bg-[#0b1d3a]/5 border border-[#c5a059]/10 rounded-[2rem] hover:border-[#c5a059]/30 transition-all group">
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest mb-3 inline-block ${action.type === 'poll' ? 'bg-[#0b1d3a]/10 text-[#0b1d3a]' : 'bg-[#c5a059]/10 text-[#c5a059]'}`}>
                           {action.type === 'poll' ? 'Enquete' : 'Arrecadação'}
                         </span>
-                        <h4 className="font-serif font-bold text-[#0b1d3a] mb-1">{action.title}</h4>
-                        <p className="text-[10px] text-[#0b1d3a]/60 line-clamp-2 italic mb-4">{action.description}</p>
-                        <button onClick={() => setActiveTab('social')} className="text-[9px] font-black uppercase tracking-[0.2em] text-[#c5a059] hover:gap-3 transition-all flex items-center gap-1">Participar →</button>
+                        <h4 className="font-cinzel font-bold text-[#0b1d3a] text-lg mb-2">{action.title}</h4>
+                        <p className="text-[11px] text-[#0b1d3a]/70 line-clamp-2 italic mb-6 leading-relaxed">"{action.description}"</p>
+                        <button onClick={() => setActiveTab('social')} className="text-[10px] font-black uppercase tracking-[0.2em] text-[#c5a059] group-hover:gap-4 transition-all flex items-center gap-2">Participar agora <span>→</span></button>
                       </div>
                     ))}
                   </div>
@@ -460,7 +468,7 @@ export default function MemberDashboard() {
                 <div className="flex flex-col md:flex-row gap-6 mb-8 items-center">
                   <div className="relative flex-1 group">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0b1d3a]/30 group-focus-within:text-[#0b1d3a] transition-colors" />
-                    <input type="text" placeholder="Buscar estudos, rituais..." className="w-full bg-white/40 border border-[#0b1d3a]/10 rounded-2xl p-4 pl-12 text-[#0b1d3a] text-sm focus:border-[#c5a059]/50 shadow-sm" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                    <input type="text" placeholder="Buscar estudos, rituais..." className="w-full bg-white border border-[#0b1d3a]/10 rounded-2xl p-4 pl-12 text-[#0b1d3a] text-sm focus:border-[#c5a059]/50 shadow-sm" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
                   </div>
                   <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-8 py-4 bg-[#0b1d3a] text-[#f4efe2] border border-[#c5a059]/30 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-[#c5a059] transition-all shadow-md">
                     <Plus className="w-4 h-4" /> Adicionar Obra
@@ -468,7 +476,7 @@ export default function MemberDashboard() {
                 </div>
 
                 {/* Bibliotecas Públicas */}
-                <div className="mb-10 p-6 bg-white/40 border border-[#0b1d3a]/10 rounded-3xl shadow-sm">
+                <div className="mb-10 p-6 bg-white border border-[#0b1d3a]/10 rounded-3xl shadow-sm">
                    <div className="flex items-center gap-3 mb-4">
                       <BookOpen className="text-[#c5a059] w-5 h-5" />
                       <h4 className="text-[#0b1d3a] font-serif text-lg font-bold uppercase tracking-widest">Bibliotecas Digitais Públicas</h4>
@@ -478,7 +486,7 @@ export default function MemberDashboard() {
                         { name: "Biblioteca Nacional Digital", url: "https://bndigital.bn.gov.br/" },
                         { name: "Domínio Público", url: "http://www.dominiopublico.gov.br/" }
                       ]).map((lib: any, i: number) => (
-                        <a key={i} href={lib.url} target="_blank" rel="noopener noreferrer" className="p-4 bg-white/50 border border-[#0b1d3a]/5 rounded-xl flex items-center justify-between group hover:border-[#c5a059]/50 transition-all shadow-sm">
+                        <a key={i} href={lib.url} target="_blank" rel="noopener noreferrer" className="p-4 bg-[#0b1d3a]/5 border border-[#0b1d3a]/5 rounded-xl flex items-center justify-between group hover:border-[#c5a059]/50 transition-all shadow-sm">
                            <span className="text-[#0b1d3a]/70 text-xs font-bold">{lib.name}</span>
                            <ExternalLink className="w-4 h-4 text-[#c5a059] opacity-30 group-hover:opacity-100 transition-opacity" />
                         </a>
@@ -643,74 +651,74 @@ export default function MemberDashboard() {
                             </div>
                          </div>
                        ))}
-                    </div>
-                 </div>
-              </motion.div>
+                     </div>
+                  </div>
+               </motion.div>
             )}
 
             {activeTab === 'profile' && (
               <motion.div key="profile" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="max-w-4xl mx-auto space-y-8">
-                 <div className="bg-masonic-blue/40 border border-white/5 rounded-[3rem] p-10 backdrop-blur-md">
+                 <div className="bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-[3rem] p-10 shadow-sm">
                     <div className="flex flex-col md:flex-row gap-10 items-start">
                       <div className="flex flex-col items-center gap-6 w-full md:w-64">
                          <div className="relative">
-                            <div className="w-40 h-56 rounded-[2rem] bg-gold-500/10 border-4 border-gold-500/20 overflow-hidden shadow-2xl relative">
+                            <div className="w-40 h-56 rounded-[2rem] bg-[#c5a059]/10 border-4 border-[#c5a059]/20 overflow-hidden relative">
                                {userData?.photoURL ? (
                                  <img src={userData.photoURL} alt="Profile" className="w-full h-full object-cover" />
                                ) : (
-                                 <div className="w-full h-full flex items-center justify-center text-gold-500 text-6xl font-serif">
+                                 <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-6xl font-serif">
                                    {userData?.displayName?.[0] || 'I'}
                                  </div>
                                )}
-                               <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 text-center">
+                               <div className="absolute inset-x-0 bottom-0 bg-[#0b1d3a]/60 p-1 text-center">
                                  <p className="text-[7px] uppercase font-bold text-white/40">Aspecto 3x4</p>
                                </div>
                             </div>
-                            <button onClick={handleUpdatePhoto} className="absolute -bottom-2 -right-2 p-3 bg-gold-500 text-masonic-dark rounded-2xl cursor-pointer shadow-xl hover:scale-110 transition-transform">
+                            <button onClick={handleUpdatePhoto} className="absolute -bottom-2 -right-2 p-3 bg-[#c5a059] text-[#0b1d3a] rounded-2xl cursor-pointer shadow-lg hover:scale-110 transition-transform">
                                <Camera className="w-5 h-5" />
                             </button>
                          </div>
                          <div className="text-center">
-                            <h3 className="font-serif text-2xl font-bold gold-text uppercase tracking-widest">{userData?.displayName || 'Ir. Obreiro'}</h3>
-                            <p className="text-white font-black tracking-widest text-[10px] uppercase mt-1">{userData?.currentRole || userData?.role || 'Membro'}</p>
-                            <p className="text-white/40 text-[8px] uppercase font-bold tracking-widest">Arca da Aliança nº 34</p>
+                            <h3 className="font-serif text-2xl font-bold text-[#c5a059] uppercase tracking-widest">{userData?.displayName || 'Ir. Obreiro'}</h3>
+                            <p className="text-[#0b1d3a]/80 font-black tracking-widest text-[10px] uppercase mt-1">{userData?.currentRole || userData?.role || 'Membro'}</p>
+                            <p className="text-[#0b1d3a]/40 text-[8px] uppercase font-bold tracking-widest leading-tight">ARCA DA ALIANÇA N° 34</p>
                          </div>
                       </div>
 
                       <div className="flex-1 space-y-6 w-full">
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                               <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-2">Nome de Obreiro</label>
-                               <input className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:border-gold-500 outline-none" value={userData?.displayName || ''} onChange={async e => await updateDoc(doc(db, 'users', auth.currentUser!.uid), { displayName: e.target.value })} />
+                               <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Nome de Obreiro</label>
+                               <input className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none" value={userData?.displayName || ''} onChange={async e => await updateDoc(doc(db, 'users', auth.currentUser!.uid), { displayName: e.target.value })} />
                             </div>
                             <div className="space-y-2">
-                               <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-2">Cargo Atual (Oficial)</label>
-                               <div className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white/50 text-sm italic flex items-center gap-2">
-                                  <ShieldCheck className="w-4 h-4 text-gold-500" />
+                               <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Cargo Atual (Oficial)</label>
+                               <div className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a]/50 text-sm italic flex items-center gap-2">
+                                  <ShieldCheck className="w-4 h-4 text-[#c5a059]" />
                                   {userData?.currentRole || userData?.role || 'Membro'}
                                </div>
-                               <p className="text-[8px] text-gold-500/40 italic ml-2 mt-1">Apenas o Administrador Master pode alterar este cargo oficial.</p>
+                               <p className="text-[8px] text-[#c5a059]/60 italic ml-2 mt-1">Apenas o Administrador Master pode alterar este cargo oficial.</p>
                             </div>
                          </div>
                          
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                               <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-2">Profissão</label>
-                               <input className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:border-gold-500 outline-none" placeholder="Sua ocupação..." value={userData?.occupation || ''} onChange={async e => await updateDoc(doc(db, 'users', auth.currentUser!.uid), { occupation: e.target.value })} />
+                               <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Profissão</label>
+                               <input className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none" placeholder="Sua ocupação..." value={userData?.occupation || ''} onChange={async e => await updateDoc(doc(db, 'users', auth.currentUser!.uid), { occupation: e.target.value })} />
                             </div>
                             <div className="space-y-2">
-                               <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-2">Link MVU (GLMDF)</label>
-                               <input className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:border-gold-500 outline-none text-xs" placeholder="https://..." value={userData?.mvu_link || ''} onChange={async e => await updateDoc(doc(db, 'users', auth.currentUser!.uid), { mvu_link: e.target.value })} />
+                               <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Link MVU (GLMDF)</label>
+                               <input className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none text-xs" placeholder="https://..." value={userData?.mvu_link || ''} onChange={async e => await updateDoc(doc(db, 'users', auth.currentUser!.uid), { mvu_link: e.target.value })} />
                             </div>
                          </div>
 
                          <div className="space-y-2">
-                            <label className="text-[10px] text-gold-500 uppercase font-black tracking-widest ml-2">Apresentação Pessoal</label>
-                            <textarea className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:border-gold-500 outline-none text-sm resize-none" rows={4} placeholder="Conte sua história..." value={userData?.masonic_history || userData?.roles_history || ''} onChange={async e => await updateDoc(doc(db, 'users', auth.currentUser!.uid), { masonic_history: e.target.value })} />
+                            <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Apresentação Pessoal</label>
+                            <textarea className="w-full bg-white border border-[#0b1d3a]/10 rounded-2xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none text-sm resize-none" rows={4} placeholder="Conte sua história..." value={userData?.masonic_history || userData?.roles_history || ''} onChange={async e => await updateDoc(doc(db, 'users', auth.currentUser!.uid), { masonic_history: e.target.value })} />
                          </div>
 
                          <div className="pt-6 flex justify-end">
-                            <div className="flex items-center gap-2 text-[9px] text-gold-500 uppercase font-black">
+                            <div className="flex items-center gap-2 text-[9px] text-[#c5a059] uppercase font-black">
                                <ShieldCheck className="w-4 h-4" /> Auto-salvamento ativo
                             </div>
                          </div>
@@ -971,19 +979,19 @@ function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComme
   }, [isExpanded, item.id]);
 
   return (
-    <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`bg-white/40 p-8 rounded-[2rem] border ${isHighlighted ? 'border-[#c5a059]' : 'border-[#0b1d3a]/10'} relative flex flex-col group transition-all hover:border-[#c5a059]/30 shadow-sm`}>
+    <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`bg-white p-8 rounded-[2rem] border ${isHighlighted ? 'border-[#c5a059]' : 'border-[#0b1d3a]/10'} relative flex flex-col group transition-all hover:border-[#c5a059]/30 shadow-md`}>
       {onDelete && (
         <div className="absolute top-4 right-4 flex gap-2">
            <button 
              onClick={onEdit} 
-             className="p-2 bg-[#c5a059]/20 text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] rounded-lg transition-all"
+             className="p-2 bg-[#0b1d3a]/5 text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] rounded-lg transition-all"
              title="Editar"
            >
              <Edit className="w-3.5 h-3.5" />
            </button>
            <button 
              onClick={onDelete} 
-             className="p-2 bg-red-500/20 text-red-600 hover:bg-red-500 hover:text-white rounded-lg transition-all"
+             className="p-2 bg-red-500/5 text-red-600 hover:bg-red-500 hover:text-white rounded-lg transition-all"
              title="Excluir"
            >
              <Trash2 className="w-3.5 h-3.5" />
@@ -991,24 +999,24 @@ function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComme
         </div>
       )}
       <div className="flex items-start justify-between mb-6">
-        <div className="p-3 bg-gold-500/10 rounded-xl text-gold-500 shadow-inner"><BookOpen className="w-6 h-6" /></div>
-        <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-white/5 border border-white/10 rounded-full text-gold-500">{item.fileType}</span>
+        <div className="p-3 bg-[#c5a059]/10 rounded-xl text-[#c5a059] shadow-inner"><BookOpen className="w-6 h-6" /></div>
+        <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-full text-[#c5a059]">{item.fileType}</span>
       </div>
-      <h3 className="font-serif text-xl font-bold text-[#0b1d3a] mb-2 leading-tight group-hover:text-[#c5a059] transition-colors">{item.title}</h3>
+      <h3 className="font-cinzel text-xl font-bold text-[#0b1d3a] mb-2 leading-tight group-hover:text-[#c5a059] transition-colors">{item.title}</h3>
       <p className="text-[#c5a059]/80 text-[10px] uppercase tracking-widest font-black mb-4">{item.category}</p>
-      <p className="text-[#0b1d3a]/60 text-xs italic leading-relaxed mb-8 flex-1">"{item.description || "Sem descrição disponível."}"</p>
+      <p className="text-[#0b1d3a]/80 text-xs italic leading-relaxed mb-8 flex-1 font-serif">"{item.description || "Sem descrição disponível."}"</p>
       
       <div className="pt-4 border-t border-[#0b1d3a]/5 flex items-center justify-between">
          <span className="text-[9px] text-[#0b1d3a]/30 uppercase font-black tracking-widest">Por: {item.author || "Anônimo"}</span>
          <div className="flex gap-2">
-            <button onClick={onToggleComments} className="p-2 bg-white/40 border border-[#0b1d3a]/10 rounded-lg text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all relative">
+            <button onClick={onToggleComments} className="p-2 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-lg text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all relative">
                <MessageSquare className="w-4 h-4" />
                {comments.length > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#c5a059] text-[#0b1d3a] text-[8px] flex items-center justify-center rounded-full font-black">{comments.length}</span>}
             </button>
-            <a href={item.url} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/40 border border-[#0b1d3a]/10 rounded-lg text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all"><Eye className="w-4 h-4" /></a>
+            <a href={item.url} target="_blank" rel="noopener noreferrer" className="p-2 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-lg text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all"><Eye className="w-4 h-4" /></a>
          </div>
       </div>
-      <button onClick={onShare} className="mt-4 w-full flex items-center justify-center gap-2 py-4 bg-green-500/10 border border-green-500/30 text-green-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-green-500 hover:text-white transition-all"><MessageSquare className="w-4 h-4" /> Compartilhar Estudo</button>
+      <button onClick={onShare} className="mt-4 w-full flex items-center justify-center gap-2 py-4 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 text-[#0b1d3a] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all"><MessageSquare className="w-4 h-4" /> Compartilhar Estudo</button>
 
       <AnimatePresence>
         {isExpanded && (
@@ -1016,7 +1024,7 @@ function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComme
              <div className="space-y-4 max-h-64 overflow-y-auto custom-scrollbar mb-4">
                 {comments.map(c => (
                   <div key={c.id} className="p-3 bg-white/5 rounded-xl border border-white/5">
-                    <p className="text-[9px] font-black text-gold-500 uppercase tracking-tighter mb-1">{c.userName}</p>
+                    <p className="text-[9px] font-black text-[#c5a059] uppercase tracking-tighter mb-1">{c.userName}</p>
                     <p className="text-xs text-white/70">{c.text}</p>
                   </div>
                 ))}
@@ -1031,7 +1039,7 @@ function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComme
                } finally { setIsSubmitting(false); }
              }}>
                 <input className="w-full bg-masonic-dark border border-white/10 p-3 rounded-xl text-xs text-white" placeholder="Sua contribuição..." value={newComment} onChange={e => setNewComment(e.target.value)} />
-                <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-gold-500"><Send className="w-4 h-4" /></button>
+                <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-[#c5a059]"><Send className="w-4 h-4" /></button>
              </form>
           </motion.div>
         )}

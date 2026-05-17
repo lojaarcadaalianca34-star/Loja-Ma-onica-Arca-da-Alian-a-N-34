@@ -56,15 +56,15 @@ export default function InstructionsPage() {
                    className="flex flex-col md:flex-row gap-8 items-start relative"
                  >
                    {index !== steps.length - 1 && (
-                     <div className="hidden md:block absolute left-8 top-16 bottom-0 w-px bg-gold-500/20" />
+                     <div className="hidden md:block absolute left-8 top-16 bottom-0 w-px bg-masonic-gold/20" />
                    )}
-                   <div className="w-16 h-16 rounded-2xl bg-gold-500 flex items-center justify-center text-masonic-dark shadow-[0_0_20px_rgba(230,176,0,0.3)] shrink-0">
+                   <div className="w-16 h-16 rounded-2xl bg-masonic-gold flex items-center justify-center text-masonic-dark shadow-[0_0_20px_rgba(197,160,89,0.3)] shrink-0">
                      {step.icon}
                    </div>
                    <div className="space-y-4">
                      <h2 className="font-serif text-2xl text-white font-bold">{step.title}</h2>
                      <p className="text-white/60 leading-relaxed text-lg italic">"{step.description}"</p>
-                     <div className="h-px w-24 bg-gold-500/30" />
+                     <div className="h-px w-24 bg-masonic-gold/30" />
                    </div>
                  </motion.div>
                ))}
@@ -72,15 +72,15 @@ export default function InstructionsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-gold-500/10 border border-gold-500/20 p-8 rounded-3xl flex gap-6 items-center">
-              <ShieldCheck className="w-12 h-12 text-gold-500 shrink-0" />
+            <div className="bg-masonic-gold/10 border border-masonic-gold/20 p-8 rounded-3xl flex gap-6 items-center">
+              <ShieldCheck className="w-12 h-12 text-masonic-gold shrink-0" />
               <div>
                 <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-1">Segurança</h4>
                 <p className="text-white/40 text-[10px]">Seu acesso é criptografado e exclusivo para membros da A.R.L.S. Arca da Aliança nº 34.</p>
               </div>
             </div>
-            <div className="bg-gold-500/10 border border-gold-500/20 p-8 rounded-3xl flex gap-6 items-center">
-              <HelpCircle className="w-12 h-12 text-gold-500 shrink-0" />
+            <div className="bg-masonic-gold/10 border border-masonic-gold/20 p-8 rounded-3xl flex gap-6 items-center">
+              <HelpCircle className="w-12 h-12 text-masonic-gold shrink-0" />
               <div>
                 <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-1">Suporte</h4>
                 <p className="text-white/40 text-[10px]">Em caso de dúvida, procure o Secretário da Loja ou envie uma mensagem no grupo da Arca.</p>

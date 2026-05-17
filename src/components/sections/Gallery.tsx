@@ -5,9 +5,9 @@ import { useContent } from '@/src/context/ContentContext';
 
 export default function Gallery() {
   const { content } = useContent();
-  const photos = content.gallery || [];
+  const photos = [...(content.gallery || []), ...(content.gallerySection?.items || [])].filter((v, i, a) => a.findIndex(t => t.url === v.url) === i);
 
-  if (photos.length === 0) return null;
+  if (photos.length === 0 && !content.gallerySection?.items) return null;
 
   return (
     <section id="galeria-fotos" className="py-24 bg-aged-beige relative overflow-hidden">

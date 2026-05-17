@@ -16,7 +16,7 @@ export default function FamilySection() {
       subTitle: content.familyGroups.guardians.subTitle,
       description: content.familyGroups.guardians.description,
       icon: Heart,
-      logo: content.familyGroups.guardians.image || content.familyGroups.guardians.photo || content.familyGroups.guardians.logo
+      logo: content.familyGroups.guardians.image || content.familyGroups.guardians.photo || content.familyGroups.guardians.logo || "https://images.unsplash.com/photo-1511632765486-a01980e01a18?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
       id: "demolay",
@@ -24,7 +24,7 @@ export default function FamilySection() {
       subTitle: content.familyGroups.demolay.subTitle,
       description: content.familyGroups.demolay.description,
       icon: ShieldCheck,
-      logo: content.familyGroups.demolay.image || content.familyGroups.demolay.photo || content.familyGroups.demolay.logo
+      logo: content.familyGroups.demolay.image || content.familyGroups.demolay.photo || content.familyGroups.demolay.logo || "https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
       id: "rainbow-girls",
@@ -32,7 +32,7 @@ export default function FamilySection() {
       subTitle: content.familyGroups.daughters.subTitle,
       description: content.familyGroups.daughters.description,
       icon: Star,
-      logo: content.familyGroups.daughters.image || content.familyGroups.daughters.photo || content.familyGroups.daughters.logo
+      logo: content.familyGroups.daughters.image || content.familyGroups.daughters.photo || content.familyGroups.daughters.logo || "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
   ];
 

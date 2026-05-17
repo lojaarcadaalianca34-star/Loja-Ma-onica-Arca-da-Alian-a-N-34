@@ -31,17 +31,27 @@ export default function PastMastersPage() {
               <div className="w-12 h-12 rounded-xl bg-[#c5a059]/10 border border-[#c5a059]/50 flex items-center justify-center text-[#c5a059] mb-6 shadow-sm">
                 <User className="w-6 h-6" />
               </div>
-              <h1 className="font-serif text-3xl md:text-5xl font-bold text-[#0b1d3a] uppercase tracking-wider mb-2 leading-tight">
+              <h1 className="font-cinzel text-3xl md:text-5xl font-bold text-[#0b1d3a] uppercase tracking-wider mb-2 leading-tight">
                 Galeria de Honra
               </h1>
-              <p className="text-[#c5a059] font-serif text-lg md:text-2xl font-bold tracking-[0.1em] mb-4">
+              <p className="text-[#c5a059] font-playfair text-lg md:text-2xl font-bold tracking-[0.1em] mb-4">
                 Past Veneráveis Mestres da Loja Arca da Aliança Nº 34
               </p>
             </div>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...(content.masters || [])].reverse().map((master, index) => (
+            {(() => {
+              const mastersData = [...(content.masters || []), ...(content.mastersSection?.masters || [])];
+              // Map by ID but prioritize the one that has a photo
+              const map = new Map();
+              mastersData.forEach(m => {
+                if (!map.has(m.id) || (!map.get(m.id).photo && m.photo)) {
+                  map.set(m.id, m);
+                }
+              });
+              return Array.from(map.values()).reverse();
+            })().map((master: any, index: number) => (
               <motion.div
                 key={master.id}
                 initial={{ opacity: 0, y: 20 }}
