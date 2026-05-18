@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Shield, BookOpen, Target, History, CalendarDays, ExternalLink, Quote, TargetCircle } from 'lucide-react';
+import { Shield, BookOpen, Target, History, CalendarDays, ExternalLink, Quote, } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import { useContent } from '../context/ContentContext';
@@ -20,7 +20,7 @@ const institutionData = {
     text: 'Formar líderes do futuro através do desenvolvimento do caráter, do serviço ao próximo e do amor fraternal.'
   },
   vision: {
-    icon: TargetCircle,
+    icon: Target,
     text: 'Ser referência na formação moral e cívica, impactando positivamente a sociedade através de nossas ações.'
   },
   history: {
@@ -89,7 +89,7 @@ export default function AffiliatedOrgPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-12">
               {[
                 { type: 'mission', icon: Target, title: 'Nossa Missão', text: data.mission.text },
-                { type: 'vision', icon: TargetCircle, title: 'Nossa Visão', text: data.vision.text },
+                { type: 'vision', icon: Target, title: 'Nossa Visão', text: data.vision.text },
                 { type: 'history', icon: History, title: data.history.title, text: data.history.text }
               ].map((card) => {
                   const CardIcon = card.icon;
