@@ -58,13 +58,3 @@ body {
 .gold-border {
   border-image: linear-gradient(to bottom, #f4efe2, var(--color-masonic-gold)) 1;
 }
-/* Correções para o Celular */
-@media (max-width: 639px) {
-  /* Fix para o logotipo ficar maior no celular */
-  .logo-container {
-    min-height: 5rem; /* Aumenta a altura mínima para o logotipo ter espaço */
-  }
-
-  
-  }
-}
