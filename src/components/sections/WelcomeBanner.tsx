@@ -5,32 +5,34 @@ import { useContent } from '@/src/context/ContentContext';
 export default function WelcomeBanner() {
   const { content } = useContent();
   const banner = content.welcomeBanner || {
-    backgroundImage: 'https://images.unsplash.com/photo-1516550893923-42d28e5677af?q=80&w=2672&auto=format&fit=crop',
+    backgroundImage: '',
     title: 'ARCA DA ALIANÇA Nº 34',
     subTitle: 'Bem-vindo à Loja Maçônica'
   };
 
   return (
-    <section className="relative h-[80vh] min-h-[600px] flex flex-col items-center justify-center overflow-hidden border-b border-[#c5a059]/20">
+    <section className="relative h-[80vh] min-h-[600px] flex flex-col items-center justify-center overflow-hidden border-b border-[#c5a059]/20 bg-masonic-dark">
       {/* Background with Animation */}
       <div className="absolute inset-0 z-0">
-        <motion.div 
-          initial={{ scale: 1.1 }}
-          animate={{ 
-            scale: [1, 1.1, 1],
-            rotate: [0, 1, 0]
-          }}
-          transition={{ 
-            duration: 20, 
-            repeat: Infinity, 
-            ease: "easeInOut" 
-          }}
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ 
-            backgroundImage: `url("${banner.backgroundImage}")`,
-            filter: 'brightness(0.9) contrast(1.1)'
-          }}
-        />
+        {banner.backgroundImage && (
+          <motion.div 
+            initial={{ scale: 1.1 }}
+            animate={{ 
+              scale: [1, 1.1, 1],
+              rotate: [0, 1, 0]
+            }}
+            transition={{ 
+              duration: 20, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ 
+              backgroundImage: `url("${banner.backgroundImage}")`,
+              filter: 'brightness(0.9) contrast(1.1)'
+            }}
+          />
+        )}
         {/* Subtle vignette */}
         <div className="absolute inset-0 bg-radial-gradient from-transparent via-black/10 to-black/30" />
       </div>

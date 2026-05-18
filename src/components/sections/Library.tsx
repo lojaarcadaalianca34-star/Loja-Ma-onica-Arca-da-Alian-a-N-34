@@ -9,8 +9,22 @@ interface LibraryProps {
   isFullPage?: boolean;
 }
 
+const DEFAULT_ITEMS = [
+  { 
+    id: 'fixed-curiosidades', 
+    title: 'Curiosidades sobre a Arca e sobre a Loja', 
+    category: 'Destaque Fixo', 
+    isCuriosity: true, 
+    path: '/curiosidades' 
+  },
+  { id: 'def1', type: 'Livro', title: 'A História da Maçonaria Universal', category: 'Livro', isFixedInCircle: true },
+  { id: 'def2', type: 'Artigo', title: 'O Simbolismo da Arca no Rito Escocês', category: 'Artigo', isFixedInCircle: true },
+  { id: 'def3', type: 'Palestra', title: 'Maçonaria e Ética na Sociedade Moderna', category: 'Palestra', isFixedInCircle: true },
+  { id: 'def4', type: 'Artigo', title: 'As Colunas J e B: Significados Profundos', category: 'Artigo', isFixedInCircle: true },
+];
+
 export default function Library({ isFullPage = false }: LibraryProps) {
-  const [displayItems, setDisplayItems] = useState<any[]>([]);
+  const [displayItems, setDisplayItems] = useState<any[]>(DEFAULT_ITEMS);
 
   useEffect(() => {
     const q = query(
@@ -19,14 +33,9 @@ export default function Library({ isFullPage = false }: LibraryProps) {
       where('isHighlightedInCircle', '==', true)
     );
 
-    const defaultItems = [
-      { id: 'def1', type: 'Livro', title: 'A História da Maçonaria Universal', category: 'Livro', isFixedInCircle: true },
-      { id: 'def2', type: 'Artigo', title: 'O Simbolismo da Arca no Rito Escocês', category: 'Artigo', isFixedInCircle: true },
-      { id: 'def3', type: 'Palestra', title: 'Maçonaria e Ética na Sociedade Moderna', category: 'Palestra', isFixedInCircle: true },
-      { id: 'def4', type: 'Artigo', title: 'As Colunas J e B: Significados Profundos', category: 'Artigo', isFixedInCircle: true },
-    ];
-
     const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (snapshot.empty) return;
+
       const dbItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
       
       const fixed = dbItems.filter((item: any) => item.isFixedInCircle);
@@ -37,25 +46,14 @@ export default function Library({ isFullPage = false }: LibraryProps) {
       
       if (selectedDynamic.length < 4) {
         const remainingCount = 4 - selectedDynamic.length;
-        const availableDefaults = defaultItems.filter(def => !selectedDynamic.some(sel => sel.title === def.title));
+        const availableDefaults = DEFAULT_ITEMS.slice(1).filter(def => !selectedDynamic.some(sel => sel.title === def.title));
         selectedDynamic = [...selectedDynamic, ...availableDefaults.slice(0, remainingCount)];
       }
 
-      const curiosidadesItem = {
-        id: 'fixed-curiosidades',
-        title: 'Curiosidades sobre a Arca e sobre a Loja',
-        category: 'Destaque Fixo',
-        isCuriosity: true,
-        path: '/curiosidades'
-      };
-
+      const curiosidadesItem = DEFAULT_ITEMS[0];
       setDisplayItems([curiosidadesItem, ...selectedDynamic.slice(0, 4)]);
     }, (error) => {
       console.error("Library highlights error:", error);
-      setDisplayItems([
-        { id: 'fixed-curiosidades', title: 'Curiosidades sobre a Arca e sobre a Loja', category: 'Destaque Fixo', isCuriosity: true, path: '/curiosidades' },
-        ...defaultItems
-      ]);
     });
 
     return () => unsubscribe();

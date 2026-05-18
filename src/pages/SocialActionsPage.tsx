@@ -244,7 +244,7 @@ export default function SocialActionsPage() {
         <section className="py-24 bg-aged-beige">
           <div className="max-w-5xl mx-auto px-6">
             <div className="relative p-16 rounded-[4rem] bg-[#0b1d3a] overflow-hidden text-center shadow-2xl">
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 hidden md:block" />
               <div className="relative z-10">
                 <h2 className="font-serif text-3xl md:text-5xl font-bold text-[#c5a059] mb-6 uppercase tracking-wider">Como Você Pode <span className="text-white">Ajudar?</span></h2>
                 <p className="max-w-2xl mx-auto text-white/80 font-sans text-lg mb-10">

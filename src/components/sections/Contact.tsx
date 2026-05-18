@@ -14,7 +14,7 @@ export default function Contact() {
 
   return (
     <section id="contato" className="py-24 bg-aged-beige relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-5 pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-5 pointer-events-none hidden md:block" />
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <motion.div 

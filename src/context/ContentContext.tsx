@@ -254,22 +254,11 @@ const defaultContent: SiteContent = {
     smallTitle: "Nossos Momentos",
     title: "Galeria de",
     subTitle: "Imagens",
-    items: [
-      {
-        url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80",
-        title: "Trabalhando na Pedra Bruta",
-        category: "Ritualística"
-      },
-      {
-        url: "https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&q=80",
-        title: "Encontro Fraternal",
-        category: "Social"
-      }
-    ]
+    items: []
   },
   gallery: [],
   welcomeBanner: {
-    backgroundImage: 'https://images.unsplash.com/photo-1516550893923-42d28e5677af?q=80&w=2672&auto=format&fit=crop',
+    backgroundImage: '',
     title: 'ARCA DA ALIANÇA Nº 34',
     subTitle: 'Bem vindo à Loja Maçônica'
   },
@@ -309,7 +298,7 @@ const defaultContent: SiteContent = {
       vision: "Ser reconhecida como um pilar de amor e caridade, fortalecendo a base familiar dos maçons e impactando positivamente a sociedade.",
       values: ["Amor ao Próximo", "Fraternidade", "Dedicação", "Trabalho em Equipe"],
       history: "Fundada junto com a consolidação da oficina, o grupo de cunhadas sempre foi o braço direito nas ações sociais, transformando reuniões em momentos de união familiar.",
-      image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=1200&auto=format&fit=crop"
+      image: ""
     },
     demolay: {
       name: "Ordem DeMolay",
@@ -319,7 +308,7 @@ const defaultContent: SiteContent = {
       vision: "Preparar jovens para serem cidadãos de bem e líderes exemplares em suas comunidades.",
       values: ["Liderança", "Honestidade", "Respeito", "Responsabilidade"],
       history: "O Capítulo Arca da Aliança da Ordem DeMolay foi instalado para guiar a juventude masculina do Guará, seguindo os preceitos de Jacques DeMolay.",
-      image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1200&auto=format&fit=crop"
+      image: ""
     },
     daughters: {
       name: "Garotas do Arco-Íris",
@@ -329,7 +318,7 @@ const defaultContent: SiteContent = {
       vision: "Inspirar garotas a serem o melhor de si mesmas, agindo com bondade e coragem no mundo moderno.",
       values: ["Amor", "Religião", "Natureza", "Imortalidade", "Fidelidade", "Patriotismo", "Serviço"],
       history: "Nossa Assembleia acolhe jovens mulheres buscando o aperfeiçoamento pessoal e a criação de laços eternos de amizade e cooperação.",
-      image: "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?q=80&w=1200&auto=format&fit=crop"
+      image: ""
     }
   },
   quest: {

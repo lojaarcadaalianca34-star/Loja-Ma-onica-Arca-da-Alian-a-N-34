@@ -83,9 +83,18 @@ export default function InstitutionDetailPage() {
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="relative aspect-video rounded-[2.5rem] overflow-hidden border border-masonic-gold/20"
+              className="relative aspect-video rounded-[2.5rem] overflow-hidden border border-masonic-gold/20 flex items-center justify-center bg-white/5"
             >
-              <img src={institution.image || institution.photo || institution.logo} alt={institution.name || institution.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+              {(institution.image || institution.photo || institution.logo) ? (
+                <img 
+                  src={institution.image || institution.photo || institution.logo} 
+                  alt={institution.name || institution.title} 
+                  className="w-full h-full object-cover" 
+                  referrerPolicy="no-referrer" 
+                />
+              ) : (
+                <Landmark className="w-16 h-16 text-masonic-gold/20" />
+              )}
             </motion.div>
           </div>
 

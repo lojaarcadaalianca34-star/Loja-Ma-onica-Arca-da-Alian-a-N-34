@@ -280,11 +280,7 @@ export default function MasonicQuest({ isOpen, onClose, isStatic = false }: Maso
     <div className={`${isStatic ? 'w-full h-auto' : 'relative w-full max-w-3xl h-[85vh] md:h-[650px] overflow-hidden rounded-[2rem] border-4 border-[#0b1d3a]/10 bg-white flex flex-col md:flex-row'}`}>
       <div className={`${isStatic ? 'hidden' : 'md:w-1/3 bg-[#0b1d3a] border-r border-[#c5a059]/20 p-8 relative overflow-hidden flex flex-col'}`}>
         <div 
-          className="absolute inset-0 opacity-40 mix-blend-overlay"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?q=80&w=1200&auto=format&fit=crop')`,
-            backgroundSize: 'cover'
-          }}
+          className="absolute inset-0 bg-[#c5a059]/10"
         />
         <div className="relative z-10">
           <Landmark className="w-12 h-12 text-[#c5a059] mb-6" />
@@ -317,12 +313,7 @@ export default function MasonicQuest({ isOpen, onClose, isStatic = false }: Maso
       <div className={`flex-1 p-8 md:p-12 relative overflow-y-auto custom-scrollbar flex flex-col min-h-0 ${isStatic ? 'rounded-[2rem]' : ''}`}>
         {/* Background Image for Form */}
         {!isFinished && !showIntro && (
-          <div className="absolute inset-0 z-0 opacity-20 pointer-events-none transition-opacity duration-1000">
-          <img 
-            src="https://images.unsplash.com/photo-1598124838120-e6669931818d?q=80&w=2000&auto=format&fit=crop" 
-            className="w-full h-full object-cover grayscale mix-blend-luminosity scale-110 group-hover:scale-100 transition-transform duration-[10s]"
-            alt="Homem esculpindo a pedra bruta"
-          />
+          <div className="absolute inset-0 z-0 bg-[#0b1d3a]/5 pointer-events-none transition-opacity duration-1000">
           <div className="absolute inset-0 bg-masonic-dark/90 bg-gradient-to-t from-masonic-dark via-transparent to-masonic-dark" />
         </div>
         )}
@@ -369,20 +360,9 @@ export default function MasonicQuest({ isOpen, onClose, isStatic = false }: Maso
               >
                 <div className="absolute inset-0 bg-[#c5a059]/10 blur-[120px] rounded-full animate-pulse" />
                 <div className="absolute inset-0 bg-[#c5a059]/5 blur-[60px] rounded-full group-hover:blur-[80px] transition-all" />
-                <motion.img 
-                  src="https://images.unsplash.com/photo-1614741366141-9457816bb1d7?q=80&w=1200&auto=format&fit=crop" 
-                  alt="Relíquia Sagrada"
-                  className="w-56 md:w-80 relative z-10 drop-shadow-[0_0_50px_rgba(197,160,89,0.5)] filter contrast-125 brightness-110"
-                  animate={{ 
-                    y: [0, -15, 0],
-                    rotateZ: [0, 1, -1, 0]
-                  }}
-                  transition={{
-                    duration: 6,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                />
+                <div className="w-56 md:w-80 h-40 relative z-10 flex items-center justify-center">
+                  <Landmark className="w-32 h-32 text-[#c5a059] drop-shadow-[0_0_50px_rgba(197,160,89,0.5)]" />
+                </div>
                 <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-48 h-8 bg-[#c5a059]/5 blur-xl rounded-full" />
               </motion.div>
 

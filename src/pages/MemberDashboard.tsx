@@ -54,6 +54,15 @@ export default function MemberDashboard() {
   const [activeTab, setActiveTab] = useState<'welcome' | 'library' | 'professional' | 'profile' | 'social'>('welcome');
   const [searchTerm, setSearchTerm] = useState('');
   const [userData, setUserData] = useState<any>(null);
+  const [targetMemberData, setTargetMemberData] = useState<any>(null);
+  const [editProfileData, setEditProfileData] = useState({
+    displayName: '',
+    occupation: '',
+    mvu_link: '',
+    masonic_history: '',
+    photoURL: ''
+  });
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [items, setItems] = useState<LibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -272,12 +281,77 @@ export default function MemberDashboard() {
     navigate('/login-membro');
   };
 
-  const handleUpdatePhoto = () => {
-    const url = prompt('Cole aqui o link direto da sua foto (Ex: ImgBB):', userData?.photoURL || '');
-    if (url !== null) {
-      updateDoc(doc(db, 'users', auth.currentUser!.uid), { photoURL: url }).catch(e => {
-        handleFirestoreError(e, OperationType.UPDATE, 'users');
+  const targetUid = searchParams.get('uid');
+  const isEditingSomeoneElse = !!targetUid && isSuperAdmin && targetUid !== auth.currentUser?.uid;
+
+  useEffect(() => {
+    const initialTab = searchParams.get('tab');
+    if (initialTab) {
+      setActiveTab(initialTab as any);
+    }
+  }, [searchParams]);
+
+  const fetchTargetUser = async () => {
+    if (isEditingSomeoneElse && targetUid) {
+      try {
+        const docSnap = await getDoc(doc(db, 'users', targetUid));
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const memberData = { id: docSnap.id, ...data };
+          setTargetMemberData(memberData);
+          setEditProfileData({
+            displayName: data.displayName || '',
+            occupation: data.occupation || '',
+            mvu_link: data.mvu_link || '',
+            masonic_history: data.masonic_history || data.roles_history || '',
+            photoURL: data.photoURL || ''
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching target user:", err);
+      }
+    } else if (userData) {
+      setTargetMemberData(userData);
+      setEditProfileData({
+        displayName: userData.displayName || '',
+        occupation: userData.occupation || '',
+        mvu_link: userData.mvu_link || '',
+        masonic_history: userData.masonic_history || userData.roles_history || '',
+        photoURL: userData.photoURL || ''
       });
+    }
+  };
+
+  useEffect(() => {
+    fetchTargetUser();
+  }, [targetUid, isSuperAdmin, userData]);
+
+  const handleUpdatePhoto = () => {
+    const url = prompt('Cole aqui o link direto da foto (Ex: ImgBB):', editProfileData.photoURL || '');
+    if (url !== null) {
+      setEditProfileData(prev => ({ ...prev, photoURL: url }));
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    const uid = isEditingSomeoneElse ? targetUid : auth.currentUser?.uid;
+    if (!uid) return;
+
+    setIsSavingProfile(true);
+    try {
+      await updateDoc(doc(db, 'users', uid), {
+        ...editProfileData,
+        updatedAt: serverTimestamp()
+      });
+      alert('Perfil atualizado com sucesso!');
+      if (isEditingSomeoneElse) {
+        // Refresh target data
+        await fetchTargetUser();
+      }
+    } catch (err) {
+      handleFirestoreError(err, OperationType.UPDATE, `users/${uid}`);
+    } finally {
+      setIsSavingProfile(false);
     }
   };
 
@@ -658,29 +732,49 @@ export default function MemberDashboard() {
 
             {activeTab === 'profile' && (
               <motion.div key="profile" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="max-w-4xl mx-auto space-y-8">
+                 {isEditingSomeoneElse && (
+                   <div className="bg-[#c5a059] p-4 rounded-2xl flex items-center justify-between shadow-xl">
+                     <p className="text-[#0b1d3a] font-black uppercase tracking-widest text-[10px]">
+                       Modo Administrativo: Editando perfil de <span className="underline">{targetMemberData?.displayName || targetMemberData?.email}</span>
+                     </p>
+                     <button onClick={() => navigate('/admin')} className="text-[#0b1d3a] hover:scale-105 transition-transform">
+                       <X className="w-5 h-5" />
+                     </button>
+                   </div>
+                 )}
+
                  <div className="bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-[3rem] p-10 shadow-sm">
                     <div className="flex flex-col md:flex-row gap-10 items-start">
                       <div className="flex flex-col items-center gap-6 w-full md:w-64">
                          <div className="relative">
                             <div className="w-40 h-56 rounded-[2rem] bg-[#c5a059]/10 border-4 border-[#c5a059]/20 overflow-hidden relative">
-                               {userData?.photoURL ? (
-                                 <img src={userData.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                               {editProfileData.photoURL ? (
+                                 <img src={editProfileData.photoURL} alt="Profile" className="w-full h-full object-cover" />
                                ) : (
                                  <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-6xl font-serif">
-                                   {userData?.displayName?.[0] || 'I'}
+                                   {editProfileData.displayName?.[0] || 'I'}
                                  </div>
                                )}
                                <div className="absolute inset-x-0 bottom-0 bg-[#0b1d3a]/60 p-1 text-center">
                                  <p className="text-[7px] uppercase font-bold text-white/40">Aspecto 3x4</p>
                                </div>
                             </div>
-                            <button onClick={handleUpdatePhoto} className="absolute -bottom-2 -right-2 p-3 bg-[#c5a059] text-[#0b1d3a] rounded-2xl cursor-pointer shadow-lg hover:scale-110 transition-transform">
+                            <button 
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleUpdatePhoto();
+                              }} 
+                              className="absolute -bottom-2 -right-2 p-3 bg-[#c5a059] text-[#0b1d3a] rounded-2xl cursor-pointer shadow-2xl hover:scale-110 active:scale-95 transition-all z-50 pointer-events-auto"
+                              title="Alterar Foto"
+                            >
                                <Camera className="w-5 h-5" />
                             </button>
                          </div>
                          <div className="text-center">
-                            <h3 className="font-serif text-2xl font-bold text-[#c5a059] uppercase tracking-widest">{userData?.displayName || 'Ir. Obreiro'}</h3>
-                            <p className="text-[#0b1d3a]/80 font-black tracking-widest text-[10px] uppercase mt-1">{userData?.currentRole || userData?.role || 'Membro'}</p>
+                            <h3 className="font-serif text-2xl font-bold text-[#c5a059] uppercase tracking-widest">{editProfileData.displayName || 'Ir. Obreiro'}</h3>
+                            <p className="text-[#0b1d3a]/80 font-black tracking-widest text-[10px] uppercase mt-1">{targetMemberData?.currentRole || targetMemberData?.role || 'Membro'}</p>
                             <p className="text-[#0b1d3a]/40 text-[8px] uppercase font-bold tracking-widest leading-tight">ARCA DA ALIANÇA N° 34</p>
                          </div>
                       </div>
@@ -689,13 +783,17 @@ export default function MemberDashboard() {
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Nome de Obreiro</label>
-                               <input className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none" value={userData?.displayName || ''} onChange={async e => await updateDoc(doc(db, 'users', auth.currentUser!.uid), { displayName: e.target.value })} />
+                               <input 
+                                className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none" 
+                                value={editProfileData.displayName} 
+                                onChange={e => setEditProfileData(prev => ({ ...prev, displayName: e.target.value }))} 
+                               />
                             </div>
                             <div className="space-y-2">
                                <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Cargo Atual (Oficial)</label>
                                <div className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a]/50 text-sm italic flex items-center gap-2">
                                   <ShieldCheck className="w-4 h-4 text-[#c5a059]" />
-                                  {userData?.currentRole || userData?.role || 'Membro'}
+                                  {targetMemberData?.currentRole || targetMemberData?.role || 'Membro'}
                                </div>
                                <p className="text-[8px] text-[#c5a059]/60 italic ml-2 mt-1">Apenas o Administrador Master pode alterar este cargo oficial.</p>
                             </div>
@@ -704,23 +802,48 @@ export default function MemberDashboard() {
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Profissão</label>
-                               <input className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none" placeholder="Sua ocupação..." value={userData?.occupation || ''} onChange={async e => await updateDoc(doc(db, 'users', auth.currentUser!.uid), { occupation: e.target.value })} />
+                               <input 
+                                className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none" 
+                                placeholder="Sua ocupação..." 
+                                value={editProfileData.occupation} 
+                                onChange={e => setEditProfileData(prev => ({ ...prev, occupation: e.target.value }))} 
+                               />
                             </div>
                             <div className="space-y-2">
                                <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Link MVU (GLMDF)</label>
-                               <input className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none text-xs" placeholder="https://..." value={userData?.mvu_link || ''} onChange={async e => await updateDoc(doc(db, 'users', auth.currentUser!.uid), { mvu_link: e.target.value })} />
+                               <input 
+                                className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none text-xs" 
+                                placeholder="https://..." 
+                                value={editProfileData.mvu_link} 
+                                onChange={e => setEditProfileData(prev => ({ ...prev, mvu_link: e.target.value }))} 
+                               />
                             </div>
                          </div>
 
                          <div className="space-y-2">
                             <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Apresentação Pessoal</label>
-                            <textarea className="w-full bg-white border border-[#0b1d3a]/10 rounded-2xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none text-sm resize-none" rows={4} placeholder="Conte sua história..." value={userData?.masonic_history || userData?.roles_history || ''} onChange={async e => await updateDoc(doc(db, 'users', auth.currentUser!.uid), { masonic_history: e.target.value })} />
+                            <textarea 
+                              className="w-full bg-white border border-[#0b1d3a]/10 rounded-2xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none text-sm resize-none" 
+                              rows={4} 
+                              placeholder="Conte sua história..." 
+                              value={editProfileData.masonic_history} 
+                              onChange={e => setEditProfileData(prev => ({ ...prev, masonic_history: e.target.value }))} 
+                            />
                          </div>
 
-                         <div className="pt-6 flex justify-end">
-                            <div className="flex items-center gap-2 text-[9px] text-[#c5a059] uppercase font-black">
-                               <ShieldCheck className="w-4 h-4" /> Auto-salvamento ativo
+                         <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div className="flex items-center gap-2 text-[9px] text-[#c5a059] uppercase font-black font-bold">
+                               <ShieldCheck className="w-4 h-4" /> 
+                               {isEditingSomeoneElse ? 'Alterações Administrativas' : 'Auto-salvamento desativado - Clique em salvar'}
                             </div>
+                            <button 
+                              onClick={handleSaveProfile}
+                              disabled={isSavingProfile}
+                              className="w-full md:w-auto px-8 py-4 bg-[#0b1d3a] text-[#f4efe2] border border-[#c5a059]/30 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-[#c5a059] transition-all flex items-center justify-center gap-2"
+                            >
+                              {isSavingProfile ? <RefreshCw className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4" />}
+                              SALVAR ALTERAÇÕES DO PERFIL
+                            </button>
                          </div>
                       </div>
                     </div>

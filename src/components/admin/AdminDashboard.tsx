@@ -4,7 +4,7 @@ import { db, auth, logout, handleFirestoreError, OperationType, storage } from '
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, getDoc, setDoc, deleteDoc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { useContent } from '@/src/context/ContentContext';
-import { LogOut, Users, FileText, Save, Check, RefreshCw, X, Brain, Printer, ChevronDown, ChevronUp, Book, Video, Globe, Star, Play, Download, LayoutDashboard, ExternalLink, ArrowLeft, ShieldCheck, Clock, Eye, EyeOff, Plus, Upload, Link as LinkIcon, Trash2, MessageSquare } from 'lucide-react';
+import { LogOut, Users, FileText, Save, Check, RefreshCw, X, Brain, Printer, ChevronDown, ChevronUp, Book, Video, Globe, Star, Play, Download, LayoutDashboard, ExternalLink, ArrowLeft, ShieldCheck, Clock, Eye, EyeOff, Plus, Upload, Link as LinkIcon, Trash2, MessageSquare, Edit } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { analyzeCandidate } from '@/src/services/masonicAnalysisService';
 import { jsPDF } from 'jspdf';
@@ -2710,21 +2710,30 @@ export default function AdminDashboard() {
                       <div className="flex-1 overflow-hidden">
                         <div className="flex items-center justify-between">
                           <h4 className="text-[#0b1d3a] font-bold text-sm truncate">{user.displayName || 'Irmão'}</h4>
-                          <button 
-                            onClick={async () => {
-                              if(confirm(`Desativar e excluir acesso do irmão ${user.displayName || user.email}?`)) {
-                                try {
-                                  await deleteDoc(doc(db, 'users', user.id));
-                                  alert('Irmão excluído da base de dados.');
-                                } catch(e) {
-                                  handleFirestoreError(e, OperationType.DELETE, `users/${user.id}`);
+                          <div className="flex items-center gap-1">
+                            <button 
+                              onClick={() => navigate(`/area-restrita?uid=${user.id}&tab=profile`)}
+                              className="text-[#c5a059] hover:text-[#0b1d3a] transition-colors p-1"
+                              title="Editar Perfil Completo"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={async () => {
+                                if(confirm(`Desativar e excluir acesso do irmão ${user.displayName || user.email}?`)) {
+                                  try {
+                                    await deleteDoc(doc(db, 'users', user.id));
+                                    alert('Irmão excluído da base de dados.');
+                                  } catch(e) {
+                                    handleFirestoreError(e, OperationType.DELETE, `users/${user.id}`);
+                                  }
                                 }
-                              }
-                            }}
-                            className="text-red-500/30 hover:text-red-500 transition-colors p-1"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
+                              }}
+                              className="text-red-500/30 hover:text-red-500 transition-colors p-1"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
                         <p className="text-[#0b1d3a]/40 text-xs truncate">{user.email}</p>
                         

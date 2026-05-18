@@ -23,7 +23,7 @@ export default function Gallery() {
 
         <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
           {photos.map((photo, index) => (
-            <motion.div
+             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -31,12 +31,18 @@ export default function Gallery() {
               transition={{ delay: index * 0.1 }}
               className="relative group rounded-xl overflow-hidden border border-[#c5a059]/20 break-inside-avoid shadow-lg"
             >
-              <img 
-                src={photo.url} 
-                alt={photo.title}
-                className="w-full h-auto object-cover group-hover:scale-110 transition-transform duration-700"
-                referrerPolicy="no-referrer"
-              />
+              {photo.url ? (
+                <img 
+                  src={photo.url} 
+                  alt={photo.title}
+                  className="w-full h-auto object-cover group-hover:scale-110 transition-transform duration-700"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="w-full aspect-video bg-[#0b1d3a]/5 flex items-center justify-center">
+                  <ImageIcon className="w-12 h-12 text-[#c5a059]/30" />
+                </div>
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-[#0b1d3a] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
                 <span className="text-[#c5a059] text-[9px] uppercase font-black tracking-widest mb-1">{photo.category}</span>
                 <h3 className="text-white font-serif font-bold text-lg">{photo.title}</h3>

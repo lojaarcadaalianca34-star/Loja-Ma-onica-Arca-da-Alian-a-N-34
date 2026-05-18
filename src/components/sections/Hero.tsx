@@ -24,12 +24,12 @@ export default function Hero() {
              style={{ backgroundImage: 'radial-gradient(circle, #c5a059 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
         
         {/* Architectural Pillars (Stylized) */}
-        <div className="absolute left-6 lg:left-12 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4 hidden lg:flex">
+        <div className="absolute left-6 lg:left-12 top-1/2 -translate-y-1/2 hidden lg:flex flex-col items-center gap-4 pointer-events-none">
           <div className="w-px h-64 bg-gradient-to-b from-transparent via-[#c5a059]/40 to-transparent" />
           <div className="font-serif text-8xl text-[#c5a059]/40 select-none">J</div>
           <div className="w-px h-64 bg-gradient-to-b from-transparent via-[#c5a059]/40 to-transparent" />
         </div>
-        <div className="absolute right-6 lg:right-12 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4 hidden lg:flex">
+        <div className="absolute right-6 lg:right-12 top-1/2 -translate-y-1/2 hidden lg:flex flex-col items-center gap-4 pointer-events-none">
           <div className="w-px h-64 bg-gradient-to-b from-transparent via-[#c5a059]/40 to-transparent" />
           <div className="font-serif text-8xl text-[#c5a059]/40 select-none">B</div>
           <div className="w-px h-64 bg-gradient-to-b from-transparent via-[#c5a059]/40 to-transparent" />
