@@ -42,94 +42,98 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav 
-      className={cn(
-        "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 px-4 md:px-6 py-3 bg-[#0b1d3a]/95 border-b border-[#c5a059]/20 backdrop-blur-sm",
-        isScrolled || isMobileMenuOpen ? "py-2 shadow-2xl" : "py-3"
-      )}
-    >
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-        <Link to="/" className="flex items-center gap-3 group shrink-0" onClick={() => setIsMobileMenuOpen(false)}>
-          <Logo className="w-8 h-8 md:w-10 md:h-10 group-hover:scale-110 transition-transform" />
-          <div className="hidden sm:block">
-            <h1 className="font-serif text-sm md:text-lg font-bold text-[#c5a059] leading-tight uppercase tracking-wider flex items-center gap-2">
-              Arca da Aliança Nº 34
-            </h1>
-            <p className="text-[8px] md:text-[9px] text-[#c5a059]/70 uppercase tracking-[0.4em] mt-0.5">Guará / DF</p>
-          </div>
-          <div className="sm:hidden">
-            <h1 className="font-serif text-[10px] font-bold text-[#c5a059] uppercase tracking-widest leading-none">Arca da Aliança Nº 34</h1>
-            <p className="text-[7px] text-[#c5a059]/70 uppercase tracking-[0.2em] mt-1">Guará / DF</p>
-          </div>
-        </Link>
+    <>
+      {/* BARRA DO TOPO FIXA - NUNCA MUDA DE TAMANHO PARA EVITAR GLITCH DE EXPANSÃO */}
+      <nav 
+        className={cn(
+          "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 px-4 md:px-6 bg-[#0b1d3a]/95 border-b border-[#c5a059]/20 backdrop-blur-sm",
+          isScrolled ? "py-2 shadow-2xl" : "py-3"
+        )}
+      >
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <Link to="/" className="flex items-center gap-3 group shrink-0" onClick={() => setIsMobileMenuOpen(false)}>
+            <Logo className="w-8 h-8 md:w-10 md:h-10 group-hover:scale-110 transition-transform" />
+            <div className="hidden sm:block">
+              <h1 className="font-serif text-sm md:text-lg font-bold text-[#c5a059] leading-tight uppercase tracking-wider flex items-center gap-2">
+                Arca da Aliança Nº 34
+              </h1>
+              <p className="text-[8px] md:text-[9px] text-[#c5a059]/70 uppercase tracking-[0.4em] mt-0.5">Guará / DF</p>
+            </div>
+            <div className="sm:hidden">
+              <h1 className="font-serif text-[10px] font-bold text-[#c5a059] uppercase tracking-widest leading-none">Arca da Aliança Nº 34</h1>
+              <p className="text-[7px] text-[#c5a059]/70 uppercase tracking-[0.2em] mt-1">Guará / DF</p>
+            </div>
+          </Link>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-6 lg:gap-8 ml-auto">
-          {navLinks.map((link) => (
-            link.isExternal ? (
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-6 lg:gap-8 ml-auto">
+            {navLinks.map((link) => (
+              link.isExternal ? (
+                <Link 
+                  key={link.name} 
+                  to={link.href}
+                  className="text-sm font-serif uppercase tracking-widest text-[#c5a059] hover:text-white transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ) : (
+                <a 
+                  key={link.name} 
+                  href={link.href}
+                  className="text-sm font-serif uppercase tracking-widest text-[#c5a059] hover:text-white transition-colors"
+                >
+                  {link.name}
+                </a>
+              )
+            ))}
+            <div className="flex items-center gap-3 ml-4">
               <Link 
-                key={link.name} 
-                to={link.href}
-                className="text-sm font-serif uppercase tracking-widest text-[#c5a059] hover:text-white transition-colors"
+                to="/area-restrita"
+                className="px-5 py-2.5 bg-[#c5a059] text-[#0b1d3a] rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-[#c5a059]/90 transition-all shadow-md"
               >
-                {link.name}
+                Área Restrita
               </Link>
-            ) : (
-              <a 
-                key={link.name} 
-                href={link.href}
-                className="text-sm font-serif uppercase tracking-widest text-[#c5a059] hover:text-white transition-colors"
+              <Link 
+                to="/admin"
+                className="p-2 text-white/20 hover:text-[#c5a059] transition-colors"
+                title="Administração"
               >
-                {link.name}
-              </a>
-            )
-          ))}
-          <div className="flex items-center gap-3 ml-4">
-            <Link 
-              to="/area-restrita"
-              className="px-5 py-2.5 bg-[#c5a059] text-[#0b1d3a] rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-[#c5a059]/90 transition-all shadow-md"
+                <Shield className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Mobile Toggle */}
+          <div className="flex items-center gap-3 md:hidden z-[110]">
+            {user && (
+              <button 
+                onClick={handleLogout}
+                className="p-2 text-[#c5a059]/50 hover:text-[#c5a059] transition-colors"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+            )}
+            <button 
+              className="p-2 text-[#c5a059] bg-white/5 rounded-lg border border-white/10"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              Área Restrita
-            </Link>
-            <Link 
-              to="/admin"
-              className="p-2 text-white/20 hover:text-[#c5a059] transition-colors"
-              title="Administração"
-            >
-              <Shield className="w-4 h-4" />
-            </Link>
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
+      </nav>
 
-        {/* Mobile Toggle */}
-        <div className="flex items-center gap-3 md:hidden">
-          {user && (
-            <button 
-              onClick={handleLogout}
-              className="p-2 text-[#c5a059]/50 hover:text-[#c5a059] transition-colors"
-            >
-              <LogOut className="w-5 h-5" />
-            </button>
-          )}
-          <button 
-            className="p-2 text-[#c5a059] bg-white/5 rounded-lg border border-white/10"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
+      {/* MENU MOBILE - COMPLETAMENTE ISOLADO PARA EVITAR TRAVAMENTOS E TARJAS ESCURAS */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden bg-[#0b1d3a] border-b border-[#c5a059]/20 md:hidden"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-[#0b1d3a] z-[90] md:hidden flex flex-col pt-24 px-6 overflow-y-auto"
           >
-            <div className="p-6 flex flex-col gap-2">
+            <div className="flex flex-col gap-3 pb-8">
               {navLinks.map((link) => (
                 link.isExternal ? (
                   <Link 
@@ -153,6 +157,7 @@ export default function Navbar() {
                   </a>
                 )
               ))}
+              
               <div className="grid grid-cols-2 gap-3 mt-4">
                 <Link 
                   to="/area-restrita"
@@ -174,6 +179,6 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   );
 }
