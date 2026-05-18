@@ -35,23 +35,27 @@
   animation: kenburns 30s ease-in-out infinite;
 }
 
-html, body {
-  min-height: 100%;
-  overflow-x: hidden;
-  width: 100%;
-  position: relative;
+/* 🛡️ RENDERIZAÇÃO LIMPA E SEM RASGOS */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  /* Removemos a trava global de overflow que estava engasgando o Android */
 }
 
-#root {
-  min-height: 100%;
-  overflow-x: hidden;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
 body {
   background-color: var(--color-aged-beige);
   color: var(--color-navy-blue);
+  /* Aceleração de Hardware: Força o celular a desenhar a tela sem "rasgar" */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translateZ(0); 
+}
+
+/* Garante que imagens e backgrounds não criem rastros fantasmas */
+* {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .masonic-gradient {
@@ -67,4 +71,13 @@ body {
 
 .gold-border {
   border-image: linear-gradient(to bottom, #f4efe2, var(--color-masonic-gold)) 1;
+}
+
+/* 🛡️ PREVENÇÃO DE QUEBRA VISUAL EM CELULARES */
+@media (max-width: 768px) {
+  /* Impede que itens vazem a tela para o lado sem fritar a renderização do eixo Y */
+  #root {
+    overflow-x: hidden;
+    position: relative;
+  }
 }
