@@ -51,10 +51,11 @@ export default function MemberDashboard() {
   const [searchParams] = useSearchParams();
   const highlightId = searchParams.get('id');
   
-  const [activeTab, setActiveTab] = useState<'welcome' | 'library' | 'professional' | 'profile' | 'social'>('welcome');
+  const [activeTab, setActiveTab] = useState<'welcome' | 'library' | 'professional' | 'profile' | 'social' | 'members'>('welcome');
   const [searchTerm, setSearchTerm] = useState('');
   const [userData, setUserData] = useState<any>(null);
   const [targetMemberData, setTargetMemberData] = useState<any>(null);
+  const [isReadOnly, setIsReadOnly] = useState(false);
   const [editProfileData, setEditProfileData] = useState({
     displayName: '',
     occupation: '',
@@ -69,6 +70,7 @@ export default function MemberDashboard() {
   const [expandedComments, setExpandedComments] = useState<string | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
+  const [registeredUsers, setRegisteredUsers] = useState<any[]>([]);
   const { content } = useContent();
 
   const [recentProfessional, setRecentProfessional] = useState<any[]>([]);
@@ -123,7 +125,20 @@ export default function MemberDashboard() {
           </div>
           <div className="flex-1 min-w-0">
             <h4 className="text-xs font-bold text-[#0b1d3a] truncate">{item.title}</h4>
-            <p className="text-[8px] text-[#c5a059] uppercase font-black tracking-widest">Debates abertos por: {item.author || 'Membro'}</p>
+            <div className="flex items-center gap-1">
+              <p className="text-[8px] text-[#c5a059] uppercase font-black tracking-widest">Debates abertos por:</p>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (item.addedBy) {
+                    navigate(`/area-restrita?uid=${item.addedBy}&tab=profile`);
+                  }
+                }}
+                className="text-[8px] text-[#0b1d3a] uppercase font-black tracking-widest hover:underline hover:text-[#c5a059] transition-all"
+              >
+                {item.author || 'Membro'}
+              </button>
+            </div>
           </div>
           <div className="text-[#c5a059]">
             <ChevronDown className="w-4 h-4 -rotate-90 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -136,7 +151,7 @@ export default function MemberDashboard() {
     auth.currentUser?.email?.toLowerCase() === 'sophiabohn@gmail.com';
 
   const hasElevatedAccess = isSuperAdmin || 
-    ['Venerável Mestre', 'Venerável', 'Tesoureiro', 'Secretário', 'Secretario'].some(role => 
+    ['Venerável Mestre', 'Venerável', 'Tesoureiro', 'Secretário', 'Secretario', 'Hospitaleiro'].some(role => 
       (userData?.currentRole || userData?.role || '').toLowerCase().includes(role.toLowerCase())
     );
 
@@ -171,6 +186,17 @@ export default function MemberDashboard() {
       setOnlineUsers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     }, (error) => {
       console.error("Error fetching online users:", error);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Fetch All Registered Users for Quadro de Obreiros
+  useEffect(() => {
+    const q = query(collection(db, 'users'), orderBy('displayName', 'asc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setRegisteredUsers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("Error fetching registered users:", error);
     });
     return () => unsubscribe();
   }, []);
@@ -245,9 +271,12 @@ export default function MemberDashboard() {
         type: socialType,
         title: formData.get('title'),
         description: formData.get('description'),
+        openingDate: formData.get('openingDate'),
+        closingDate: formData.get('closingDate'),
         createdBy: auth.currentUser?.uid,
         creatorName: userData?.displayName || 'Irmão',
         createdAt: serverTimestamp(),
+        status: 'ACTIVE'
       };
 
       if (socialType === 'poll') {
@@ -292,33 +321,28 @@ export default function MemberDashboard() {
   }, [searchParams]);
 
   const fetchTargetUser = async () => {
-    if (isEditingSomeoneElse && targetUid) {
-      try {
-        const docSnap = await getDoc(doc(db, 'users', targetUid));
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          const memberData = { id: docSnap.id, ...data };
-          setTargetMemberData(memberData);
-          setEditProfileData({
-            displayName: data.displayName || '',
-            occupation: data.occupation || '',
-            mvu_link: data.mvu_link || '',
-            masonic_history: data.masonic_history || data.roles_history || '',
-            photoURL: data.photoURL || ''
-          });
-        }
-      } catch (err) {
-        console.error("Error fetching target user:", err);
+    const uidToFetch = targetUid || auth.currentUser?.uid;
+    if (!uidToFetch) return;
+
+    const isOwner = uidToFetch === auth.currentUser?.uid;
+    setIsReadOnly(!isOwner && !isSuperAdmin);
+
+    try {
+      const docSnap = await getDoc(doc(db, 'users', uidToFetch));
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const memberData = { id: docSnap.id, ...data };
+        setTargetMemberData(memberData);
+        setEditProfileData({
+          displayName: data.displayName || '',
+          occupation: data.occupation || '',
+          mvu_link: data.mvu_link || '',
+          masonic_history: data.masonic_history || data.roles_history || '',
+          photoURL: data.photoURL || ''
+        });
       }
-    } else if (userData) {
-      setTargetMemberData(userData);
-      setEditProfileData({
-        displayName: userData.displayName || '',
-        occupation: userData.occupation || '',
-        mvu_link: userData.mvu_link || '',
-        masonic_history: userData.masonic_history || userData.roles_history || '',
-        photoURL: userData.photoURL || ''
-      });
+    } catch (err) {
+      console.error("Error fetching target user:", err);
     }
   };
 
@@ -439,17 +463,24 @@ export default function MemberDashboard() {
           </div>
 
           {/* Navigation - Dark rounded bars */}
-          <div className="flex flex-col gap-3 mb-12">
+          <div className="flex flex-col gap-3 mb-6">
              {[
                { id: 'welcome', label: 'Escrutínio de Atividades', icon: LayoutDashboard },
                { id: 'library', label: 'Biblioteca Ritualística', icon: BookMarked },
                { id: 'professional', label: 'O Forja Profissional (B2B)', icon: Handshake },
                { id: 'social', label: 'Painel de Decisões Sociais', icon: Heart },
+               { id: 'members', label: 'Quadro de Obreiros', icon: Users },
                { id: 'profile', label: 'Cadastro do Obreiro', icon: UserCircle }
              ].map((tab) => (
                <button
                  key={tab.id}
-                 onClick={() => setActiveTab(tab.id as any)}
+                 onClick={() => {
+                   if (tab.id === 'profile' && !targetUid) {
+                     navigate('/area-restrita?tab=profile');
+                   } else {
+                     setActiveTab(tab.id as any);
+                   }
+                 }}
                  className={`flex items-center gap-4 px-8 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all w-full md:w-auto shadow-sm border ${
                    activeTab === tab.id 
                      ? 'bg-[#c5a059] text-[#0b1d3a] border-[#c5a059]' 
@@ -464,23 +495,23 @@ export default function MemberDashboard() {
 
           <AnimatePresence mode="wait">
             {activeTab === 'welcome' && (
-              <motion.div key="welcome" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-10">
+              <motion.div key="welcome" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-6">
                 <div className="relative">
                   <div className="absolute inset-0 bg-[#fdf6e3] rounded-[2rem] shadow-2xl rotate-[-0.5deg]" />
-                  <div className="relative p-10 md:p-16 bg-[#f4e4bc] rounded-[2rem] border-2 border-[#d4b068] overflow-hidden text-center">
+                  <div className="relative p-6 md:p-8 bg-[#f4e4bc] rounded-[2rem] border-2 border-[#d4b068] overflow-hidden text-center">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none">
                       <Shield className="w-[400px] h-[400px] text-[#8b5e34]" />
                     </div>
-                    <div className="relative z-10 max-w-3xl mx-auto space-y-8">
-                       <h2 className="font-serif text-3xl md:text-5xl text-[#5d4037] font-bold italic tracking-tight">Saudações Fraternais, Ir. {userData?.displayName?.split(' ')[0]}</h2>
-                       <div className="h-px w-32 bg-[#d4b068] mx-auto" />
-                       <div className="font-serif text-[#5d4037]/90 text-lg md:text-xl leading-relaxed italic text-justify space-y-6">
+                    <div className="relative z-10 max-w-3xl mx-auto space-y-4">
+                       <h2 className="font-serif text-2xl md:text-4xl text-[#5d4037] font-bold italic tracking-tight uppercase">Saudações Fraternais, Ir. {userData?.displayName?.split(' ')[0]}</h2>
+                       <div className="h-0.5 w-16 bg-[#d4b068] mx-auto" />
+                       <div className="font-serif text-[#5d4037]/90 text-base md:text-lg leading-relaxed italic text-justify space-y-4">
                           <p>Seja bem-vindo ao Círculo Fechado da A.R.L.S. Arca da Aliança nº 34. Este ambiente digital foi erguido para que a nossa fraternidade não se limite apenas às nossas sessões físicas.</p>
                           <p>Aqui, o polimento da Pedra Bruta continua. Acompanhe abaixo as movimentações profissionais e debates de nossa Coluna.</p>
                        </div>
-                       <div className="pt-6 flex justify-center gap-8">
+                       <div className="pt-2 flex justify-center gap-6">
                           {['A', 'N', '34'].map(tag => (
-                             <div key={tag} className="w-10 h-10 rounded-full border-2 border-[#d4b068] flex items-center justify-center text-[#d4b068] font-serif font-bold text-sm">{tag}</div>
+                             <div key={tag} className="w-8 h-8 rounded-full border-2 border-[#d4b068] flex items-center justify-center text-[#d4b068] font-serif font-bold text-xs">{tag}</div>
                           ))}
                        </div>
                     </div>
@@ -632,9 +663,23 @@ export default function MemberDashboard() {
                                   </span>
                                   <p className="text-[8px] text-[#0b1d3a]/30 uppercase font-black tracking-widest mt-1">Por: {action.creatorName}</p>
                                </div>
-                               {action.type === 'philanthropy' && (
-                                 <p className="text-[#c5a059] font-bold text-xs">Meta: R$ {action.goal?.toLocaleString()}</p>
-                               )}
+                               <div className="flex flex-col items-end gap-1">
+                                 {action.type === 'philanthropy' && (
+                                   <p className="text-[#c5a059] font-bold text-xs">Meta: R$ {action.goal?.toLocaleString()}</p>
+                                 )}
+                                 <div className="flex items-center gap-2">
+                                   {new Date(action.openingDate) > new Date() && (
+                                     <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-600 rounded text-[7px] font-black uppercase tracking-widest border border-yellow-500/20">Agendado</span>
+                                   )}
+                                   {new Date(action.closingDate) < new Date() && (
+                                     <span className="px-2 py-0.5 bg-red-500/10 text-red-600 rounded text-[7px] font-black uppercase tracking-widest border border-red-500/20">Encerrado</span>
+                                   )}
+                                   {new Date(action.openingDate) <= new Date() && new Date(action.closingDate) >= new Date() && (
+                                     <span className="px-2 py-0.5 bg-green-500/10 text-green-600 rounded text-[7px] font-black uppercase tracking-widest border border-green-500/20">Em Andamento</span>
+                                   )}
+                                 </div>
+                                 <p className="text-[7px] text-[#0b1d3a]/40 uppercase font-bold tracking-tighter">Fim: {new Date(action.closingDate).toLocaleString('pt-BR')}</p>
+                               </div>
                             </div>
 
                             <h3 className="text-[#0b1d3a] font-serif text-xl font-bold mb-3 group-hover:text-[#c5a059] transition-colors">{action.title}</h3>
@@ -689,36 +734,86 @@ export default function MemberDashboard() {
                                {hasElevatedAccess && (
                                  <button 
                                    onClick={() => {
-                                     import('jspdf').then(({ jsPDF }) => {
-                                       const doc = new jsPDF();
+                                     const newDate = prompt('Nova Data e Hora de Encerramento (YYYY-MM-DDTHH:MM):', action.closingDate);
+                                     if (newDate) {
+                                       updateDoc(doc(db, 'social_actions', action.id), { closingDate: newDate });
+                                     }
+                                   }}
+                                   className="px-4 py-3 bg-white/40 border border-[#0b1d3a]/10 rounded-xl text-[#0b1d3a] font-black uppercase text-[9px] tracking-widest hover:bg-[#c5a059] transition-all"
+                                   title="Editar Encerramento"
+                                 >
+                                   <Calendar className="w-4 h-4" />
+                                 </button>
+                               )}
+                               {hasElevatedAccess && (
+                                 <button 
+                                   onClick={async () => {
+                                     const { jsPDF } = await import('jspdf');
+                                     const { default: autoTable } = await import('jspdf-autotable');
+                                     const doc = new jsPDF();
+                                     
+                                     // Header
+                                     doc.setFont('helvetica', 'bold');
+                                     doc.setFontSize(16);
+                                     doc.text('ARLS ARCA DA ALIANÇA Nº 34', 105, 20, { align: 'center' });
+                                     doc.setFontSize(10);
+                                     doc.text('Relatório Oficial de Atividades', 105, 28, { align: 'center' });
+                                     doc.line(20, 32, 190, 32);
+
+                                     if (action.type === 'poll') {
+                                       const totalVotes = action.options.reduce((acc: number, cur: any) => acc + (cur.count || 0), 0);
+                                       const winner = action.options.reduce((prev: any, current: any) => (prev.count > current.count) ? prev : current);
+                                       
+                                       doc.setFont('times', 'italic');
+                                       doc.setFontSize(12);
+                                       const ritualText = `ARLS Arca da Aliança Nº 34 — Relatório de Deliberação Digital. Certifico que, em consulta ao Soberano Quadro de Obreiros acerca do tema "${action.title}", que tinha por escopo "${action.description}", e após a justa manifestação dos Irmãos via sufrágio digital, restou deliberado e aprovado que: "${winner.text}". Este documento registra a vontade soberana da Oficina, devendo ser lido em Plenário na próxima Sessão Regular exclusivamente para fins de traçado e inserção na Ata dos Trabalhos, dando-se a matéria por definitivamente julgada e encerrada.`;
+                                       
+                                       const splitText = doc.splitTextToSize(ritualText, 170);
+                                       doc.text(splitText, 20, 45, { align: 'justify' });
+
+                                       // Table of votes
+                                       const tableRows = Object.entries(action.votes || {}).map(([uid, optIdx]: [string, any]) => [
+                                          registeredUsers.find(u => u.id === uid)?.displayName || 'Ir. Obreiro',
+                                          action.options[optIdx]?.text || 'N/A'
+                                       ]);
+
+                                       autoTable(doc, {
+                                         startY: 120,
+                                         head: [['Irmão', 'Manifestação (Voto)']],
+                                         body: tableRows,
+                                         headStyles: { fillColor: [11, 29, 58], textColor: [197, 160, 89] },
+                                         theme: 'striped',
+                                       });
+                                     } else if (action.type === 'philanthropy') {
                                        doc.setFont('helvetica', 'bold');
-                                       doc.text(`RESULTADOS: ${action.title}`, 20, 20);
+                                       doc.setFontSize(14);
+                                       doc.text(`AÇÃO BENEFICENTE: ${action.title}`, 20, 45);
+                                       
                                        doc.setFont('helvetica', 'normal');
-                                       doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 30);
-                                       doc.text(`Descrição: ${action.description}`, 20, 40);
+                                       doc.setFontSize(12);
+                                       doc.text(`Objetivo: ${action.description}`, 20, 55);
                                        
-                                       let y = 60;
-                                       if (action.type === 'poll') {
-                                         doc.text('VOTACAO:', 20, y);
-                                         y += 10;
-                                         action.options.forEach((opt: any) => {
-                                           doc.text(`${opt.text}: ${opt.count} votos`, 20, y);
-                                           y += 10;
-                                         });
-                                       } else if (action.type === 'philanthropy') {
-                                         doc.text('FINANCEIRO:', 20, y);
-                                         y += 10;
-                                         doc.text(`Meta: R$ ${action.goal}`, 20, y);
-                                         y += 10;
-                                         doc.text(`Arrecadado: R$ ${action.current}`, 20, y);
-                                       }
-                                       
-                                       doc.save(`resultado-${action.id}.pdf`);
-                                     });
+                                       const goal = action.goal || 0;
+                                       const current = action.current || 0;
+                                       const remaining = Math.max(0, goal - current);
+
+                                       autoTable(doc, {
+                                         startY: 70,
+                                         head: [['Métrica', 'Valor (R$)']],
+                                         body: [
+                                           ['Meta Financeira Estipulada', goal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })],
+                                           ['Valor Total Alcançado', current.toLocaleString('pt-BR', { minimumFractionDigits: 2 })],
+                                           ['Saldo Restante', remaining.toLocaleString('pt-BR', { minimumFractionDigits: 2 })]
+                                         ],
+                                         headStyles: { fillColor: [11, 29, 58], textColor: [197, 160, 89] },
+                                       });
+                                     }
+                                     
+                                     doc.save(`relatorio-${action.title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
                                    }}
                                    className="flex-1 py-3 bg-white/40 border border-[#0b1d3a]/10 rounded-xl text-[#0b1d3a] font-black uppercase text-[9px] tracking-widest hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all"
                                  >
-                                     Imprimir Resultados
+                                     PDF Oficial
                                  </button>
                                )}
                                <button className="flex-1 py-3 bg-white/40 border border-[#0b1d3a]/10 rounded-xl text-[#0b1d3a]/40 font-black uppercase text-[9px] tracking-widest hover:text-[#0b1d3a] transition-all">Detalhes</button>
@@ -730,14 +825,62 @@ export default function MemberDashboard() {
                </motion.div>
             )}
 
+            {activeTab === 'members' && (
+              <motion.div key="members" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8">
+                <div className="flex items-center justify-between border-b border-[#0b1d3a]/10 pb-6">
+                  <div>
+                    <h2 className="font-serif text-3xl font-bold text-[#0b1d3a] uppercase tracking-widest">Quadro de Obreiros</h2>
+                    <p className="text-[#0b1d3a]/60 text-xs italic font-serif">"Eis quão bom e quão suave é que os irmãos vivam em união."</p>
+                  </div>
+                  <div className="text-[10px] uppercase font-black tracking-widest text-[#c5a059] bg-[#c5a059]/10 px-4 py-2 rounded-full border border-[#c5a059]/20">
+                    {registeredUsers.length} Irmãos Cadastrados
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {registeredUsers.filter(u => u.status !== 'PENDING').map((member) => (
+                    <motion.div 
+                      key={member.id}
+                      whileHover={{ y: -5 }}
+                      onClick={() => navigate(`/area-restrita?uid=${member.id}&tab=profile`)}
+                      className="bg-white p-6 rounded-[2rem] border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 transition-all cursor-pointer shadow-sm group text-center"
+                    >
+                      <div className="relative w-24 h-24 mx-auto mb-4">
+                        <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden shadow-inner">
+                          {member.photoURL ? (
+                            <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-3xl font-serif">
+                              {member.displayName?.[0] || 'I'}
+                            </div>
+                          )}
+                        </div>
+                        {member.isOnline && (
+                          <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                        )}
+                      </div>
+                      <h3 className="font-serif text-lg font-bold text-[#0b1d3a] group-hover:text-[#c5a059] transition-colors line-clamp-1">{member.displayName || 'Ir. Obreiro'}</h3>
+                      <p className="text-[9px] text-[#c5a059] font-black uppercase tracking-[0.2em] mb-2">{member.currentRole || member.role || 'Membro'}</p>
+                      <p className="text-[10px] text-[#0b1d3a]/50 italic line-clamp-1 font-serif px-2">
+                        {member.occupation || 'Avental a Postos'}
+                      </p>
+                      <div className="mt-4 pt-4 border-t border-[#0b1d3a]/5 flex items-center justify-center gap-2 text-[8px] font-black uppercase tracking-widest text-[#0b1d3a]/30 group-hover:text-[#c5a059] transition-colors">
+                        Ver Perfil Completo <span>→</span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {activeTab === 'profile' && (
               <motion.div key="profile" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="max-w-4xl mx-auto space-y-8">
-                 {isEditingSomeoneElse && (
-                   <div className="bg-[#c5a059] p-4 rounded-2xl flex items-center justify-between shadow-xl">
-                     <p className="text-[#0b1d3a] font-black uppercase tracking-widest text-[10px]">
-                       Modo Administrativo: Editando perfil de <span className="underline">{targetMemberData?.displayName || targetMemberData?.email}</span>
+                 {(isEditingSomeoneElse || (targetUid && targetUid !== auth.currentUser?.uid)) && (
+                   <div className={`${isSuperAdmin ? 'bg-[#c5a059]' : 'bg-[#0b1d3a]'} p-4 rounded-2xl flex items-center justify-between shadow-xl`}>
+                     <p className={`${isSuperAdmin ? 'text-[#0b1d3a]' : 'text-[#f4efe2]'} font-black uppercase tracking-widest text-[10px]`}>
+                       Visualizando Perfil: <span className="underline">{targetMemberData?.displayName || targetMemberData?.email}</span> {isReadOnly ? '(Somente Leitura)' : '(Modo Admin)'}
                      </p>
-                     <button onClick={() => navigate('/admin')} className="text-[#0b1d3a] hover:scale-105 transition-transform">
+                     <button onClick={() => navigate('/area-restrita?tab=welcome')} className={`${isSuperAdmin ? 'text-[#0b1d3a]' : 'text-[#f4efe2]'} hover:scale-105 transition-transform`}>
                        <X className="w-5 h-5" />
                      </button>
                    </div>
@@ -759,18 +902,20 @@ export default function MemberDashboard() {
                                  <p className="text-[7px] uppercase font-bold text-white/40">Aspecto 3x4</p>
                                </div>
                             </div>
-                            <button 
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleUpdatePhoto();
-                              }} 
-                              className="absolute -bottom-2 -right-2 p-3 bg-[#c5a059] text-[#0b1d3a] rounded-2xl cursor-pointer shadow-2xl hover:scale-110 active:scale-95 transition-all z-50 pointer-events-auto"
-                              title="Alterar Foto"
-                            >
-                               <Camera className="w-5 h-5" />
-                            </button>
+                            {!isReadOnly && (
+                              <button 
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleUpdatePhoto();
+                                }} 
+                                className="absolute -bottom-2 -right-2 p-3 bg-[#c5a059] text-[#0b1d3a] rounded-2xl cursor-pointer shadow-2xl hover:scale-110 active:scale-95 transition-all z-50 pointer-events-auto"
+                                title="Alterar Foto"
+                              >
+                                 <Camera className="w-5 h-5" />
+                              </button>
+                            )}
                          </div>
                          <div className="text-center">
                             <h3 className="font-serif text-2xl font-bold text-[#c5a059] uppercase tracking-widest">{editProfileData.displayName || 'Ir. Obreiro'}</h3>
@@ -784,9 +929,10 @@ export default function MemberDashboard() {
                             <div className="space-y-2">
                                <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Nome de Obreiro</label>
                                <input 
-                                className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none" 
+                                className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none disabled:bg-[#0b1d3a]/5 disabled:cursor-not-allowed" 
                                 value={editProfileData.displayName} 
                                 onChange={e => setEditProfileData(prev => ({ ...prev, displayName: e.target.value }))} 
+                                disabled={isReadOnly}
                                />
                             </div>
                             <div className="space-y-2">
@@ -795,7 +941,7 @@ export default function MemberDashboard() {
                                   <ShieldCheck className="w-4 h-4 text-[#c5a059]" />
                                   {targetMemberData?.currentRole || targetMemberData?.role || 'Membro'}
                                </div>
-                               <p className="text-[8px] text-[#c5a059]/60 italic ml-2 mt-1">Apenas o Administrador Master pode alterar este cargo oficial.</p>
+                               {!isReadOnly && <p className="text-[8px] text-[#c5a059]/60 italic ml-2 mt-1">Apenas o Administrador Master pode alterar este cargo oficial.</p>}
                             </div>
                          </div>
                          
@@ -803,36 +949,40 @@ export default function MemberDashboard() {
                             <div className="space-y-2">
                                <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Profissão</label>
                                <input 
-                                className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none" 
+                                className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none disabled:bg-[#0b1d3a]/5" 
                                 placeholder="Sua ocupação..." 
                                 value={editProfileData.occupation} 
                                 onChange={e => setEditProfileData(prev => ({ ...prev, occupation: e.target.value }))} 
+                                disabled={isReadOnly}
                                />
                             </div>
                             <div className="space-y-2">
                                <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Link MVU (GLMDF)</label>
                                <input 
-                                className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none text-xs" 
+                                className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none text-xs disabled:bg-[#0b1d3a]/5" 
                                 placeholder="https://..." 
                                 value={editProfileData.mvu_link} 
                                 onChange={e => setEditProfileData(prev => ({ ...prev, mvu_link: e.target.value }))} 
+                                disabled={isReadOnly}
                                />
                             </div>
                          </div>
 
                          <div className="space-y-2">
-                            <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Apresentação Pessoal</label>
+                            <label className="text-[10px] text-[#0b1d3a]/60 uppercase font-black tracking-widest ml-2">Apresentação Pessoal & História Maçônica</label>
                             <textarea 
-                              className="w-full bg-white border border-[#0b1d3a]/10 rounded-2xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none text-sm resize-none" 
+                              className="w-full bg-white border border-[#0b1d3a]/10 rounded-2xl p-4 text-[#0b1d3a] focus:border-[#c5a059] outline-none text-sm resize-none disabled:bg-[#0b1d3a]/5" 
                               rows={4} 
                               placeholder="Conte sua história..." 
                               value={editProfileData.masonic_history} 
                               onChange={e => setEditProfileData(prev => ({ ...prev, masonic_history: e.target.value }))} 
+                              disabled={isReadOnly}
                             />
                          </div>
 
-                         <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                            <div className="flex items-center gap-2 text-[9px] text-[#c5a059] uppercase font-black font-bold">
+                         {!isReadOnly && (
+                           <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                              <div className="flex items-center gap-2 text-[9px] text-[#c5a059] uppercase font-black font-bold">
                                <ShieldCheck className="w-4 h-4" /> 
                                {isEditingSomeoneElse ? 'Alterações Administrativas' : 'Auto-salvamento desativado - Clique em salvar'}
                             </div>
@@ -845,6 +995,7 @@ export default function MemberDashboard() {
                               SALVAR ALTERAÇÕES DO PERFIL
                             </button>
                          </div>
+                        )}
                       </div>
                     </div>
                  </div>
@@ -1003,6 +1154,17 @@ export default function MemberDashboard() {
                     <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest">Descrição / Objetivo</label>
                     <textarea name="description" rows={3} required className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-4 rounded-xl text-[#0b1d3a] resize-none" />
                   </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest">Abertura</label>
+                      <input name="openingDate" type="datetime-local" required className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-4 rounded-xl text-[#0b1d3a] text-xs font-bold" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] text-[#0b1d3a] uppercase font-black tracking-widest">Encerramento</label>
+                      <input name="closingDate" type="datetime-local" required className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-4 rounded-xl text-[#0b1d3a] text-xs font-bold" />
+                    </div>
+                  </div>
                   
                   {socialType === 'poll' && (
                     <div className="space-y-4">
@@ -1130,7 +1292,22 @@ function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComme
       <p className="text-[#0b1d3a]/80 text-xs italic leading-relaxed mb-8 flex-1 font-serif">"{item.description || "Sem descrição disponível."}"</p>
       
       <div className="pt-4 border-t border-[#0b1d3a]/5 flex items-center justify-between">
-         <span className="text-[9px] text-[#0b1d3a]/30 uppercase font-black tracking-widest">Por: {item.author || "Anônimo"}</span>
+         <div className="flex items-center gap-1">
+           <span className="text-[9px] text-[#0b1d3a]/30 uppercase font-black tracking-widest">Por:</span>
+           <button 
+            onClick={() => {
+              if (item.addedBy) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('uid', item.addedBy);
+                url.searchParams.set('tab', 'profile');
+                window.location.href = url.toString();
+              }
+            }}
+            className="text-[9px] text-[#c5a059] uppercase font-black tracking-widest hover:underline hover:text-[#0b1d3a] transition-all"
+           >
+            {item.author || "Anônimo"}
+           </button>
+         </div>
          <div className="flex gap-2">
             <button onClick={onToggleComments} className="p-2 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-lg text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all relative">
                <MessageSquare className="w-4 h-4" />
