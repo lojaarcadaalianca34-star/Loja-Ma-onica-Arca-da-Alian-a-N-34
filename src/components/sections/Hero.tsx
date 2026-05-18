@@ -57,8 +57,8 @@ export default function Hero() {
           transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
           className="relative mt-6 mb-10 group"
         >
-          {/* Subtle glow behind the logo */}
-          <div className="absolute inset-0 bg-[#c5a059]/5 blur-[80px] rounded-full animate-pulse" />
+          {/* Subtle glow behind the logo - DESATIVADO NO MOBILE PARA PREVENIR ERROS GRÁFICOS */}
+          <div className="absolute inset-0 bg-[#c5a059]/5 hidden md:block md:blur-[80px] rounded-full animate-pulse" />
           
           <motion.div
             animate={{ 
