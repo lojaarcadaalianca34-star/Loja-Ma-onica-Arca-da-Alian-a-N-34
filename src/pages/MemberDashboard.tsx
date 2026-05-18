@@ -37,19 +37,10 @@ interface LibraryItem {
   createdAt: any;
 }
 
-interface Comment {
-  id: string;
-  itemId: string;
-  userId: string;
-  userName: string;
-  text: string;
-  createdAt: any;
-}
-
 export default function MemberDashboard() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const highlightId = searchParams.get('id');
+  const targetUid = searchParams.get('uid');
   
   const [activeTab, setActiveTab] = useState<'welcome' | 'library' | 'professional' | 'profile' | 'social' | 'members'>('welcome');
   const [searchTerm, setSearchTerm] = useState('');
@@ -67,7 +58,6 @@ export default function MemberDashboard() {
   const [items, setItems] = useState<LibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [expandedComments, setExpandedComments] = useState<string | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
   const [registeredUsers, setRegisteredUsers] = useState<any[]>([]);
@@ -75,6 +65,14 @@ export default function MemberDashboard() {
 
   const [recentProfessional, setRecentProfessional] = useState<any[]>([]);
   const [discussedLibrary, setDiscussedLibrary] = useState<any[]>([]);
+
+  const isSuperAdmin = auth.currentUser?.email?.toLowerCase() === 'lojaarcadaalianca34@gmail.com' || 
+    auth.currentUser?.email?.toLowerCase() === 'sophiabohn@gmail.com';
+
+  const hasElevatedAccess = isSuperAdmin || 
+    ['Venerável Mestre', 'Venerável', 'Tesoureiro', 'Secretário', 'Secretario', 'Hospitaleiro'].some(role => 
+      (userData?.currentRole || userData?.role || '').toLowerCase().includes(role.toLowerCase())
+    );
 
   // Fetch Recent Professional Board
   useEffect(() => {
@@ -146,20 +144,11 @@ export default function MemberDashboard() {
       ))}
     </div>
   );
-  const isSuperAdmin = auth.currentUser?.email?.toLowerCase() === 'lojaarcadaalianca34@gmail.com' || 
-    auth.currentUser?.email?.toLowerCase() === 'sophiabohn@gmail.com';
 
-  const hasElevatedAccess = isSuperAdmin || 
-    ['Venerável Mestre', 'Venerável', 'Tesoureiro', 'Secretário', 'Secretario', 'Hospitaleiro'].some(role => 
-      (userData?.currentRole || userData?.role || '').toLowerCase().includes(role.toLowerCase())
-    );
-
-  // Fetch Current User Data
   useEffect(() => {
     if (!auth.currentUser) return;
     const userDocRef = doc(db, 'users', auth.currentUser.uid);
     
-    // Update online status and last seen
     updateDoc(userDocRef, { 
       isOnline: true, 
       lastSeen: serverTimestamp() 
@@ -169,7 +158,6 @@ export default function MemberDashboard() {
       if (doc.exists()) {
         const data = doc.data();
         setUserData(data);
-        // Recognition of first login to change status from Pending to Member
         if (data.status === 'PENDING') {
           updateDoc(userDocRef, { status: 'MEMBER' }).catch(console.error);
         }
@@ -178,7 +166,6 @@ export default function MemberDashboard() {
     return () => unsubscribe();
   }, []);
 
-  // Fetch Online Users
   useEffect(() => {
     const q = query(collection(db, 'users'), where('isOnline', '==', true));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -189,7 +176,6 @@ export default function MemberDashboard() {
     return () => unsubscribe();
   }, []);
 
-  // Fetch All Registered Users for Quadro de Obreiros
   useEffect(() => {
     const q = query(collection(db, 'users'), orderBy('displayName', 'asc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -208,7 +194,6 @@ export default function MemberDashboard() {
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [newItemType, setNewItemType] = useState<'LINK' | 'PDF'>('LINK');
 
-  // Fetch Library Items
   useEffect(() => {
     const q = query(collection(db, 'library_items'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -221,7 +206,6 @@ export default function MemberDashboard() {
     return () => unsubscribe();
   }, []);
 
-  // Fetch Social Content
   useEffect(() => {
     const q = query(collection(db, 'social_actions'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -242,7 +226,6 @@ export default function MemberDashboard() {
         const votes = data.votes || {};
         const userId = auth.currentUser.uid;
         
-        // Prevent double voting
         if (votes[userId] !== undefined) {
           alert('Você já votou nesta enquete.');
           return;
@@ -279,123 +262,4 @@ export default function MemberDashboard() {
       };
 
       if (socialType === 'poll') {
-        const filteredOptions = pollOptions.filter(o => o.trim() !== '').map(o => ({ text: o.trim(), count: 0 }));
-        if (filteredOptions.length < 2) {
-          alert('Por favor, adicione pelo menos 2 opções.');
-          return;
-        }
-        await addDoc(collection(db, 'social_actions'), { ...baseData, options: filteredOptions, votes: {} });
-      } else if (socialType === 'philanthropy') {
-        await addDoc(collection(db, 'social_actions'), { 
-          ...baseData, 
-          goal: Number(formData.get('goal')),
-          current: 0
-        });
-      }
-
-      setShowSocialModal(false);
-    } catch (e) {
-      handleFirestoreError(e, OperationType.CREATE, 'social_actions');
-    } finally {
-      setIsSubmittingSocial(false);
-    }
-  };
-
-  const targetUid = searchParams.get('uid');
-  const isEditingSomeoneElse = !!targetUid && isSuperAdmin && targetUid !== auth.currentUser?.uid;
-
-  useEffect(() => {
-    const initialTab = searchParams.get('tab');
-    if (initialTab) {
-      setActiveTab(initialTab as any);
-    }
-  }, [searchParams]);
-
-  const fetchTargetUser = async () => {
-    const uidToFetch = targetUid || auth.currentUser?.uid;
-    if (!uidToFetch) return;
-
-    const isOwner = uidToFetch === auth.currentUser?.uid;
-    setIsReadOnly(!isOwner && !isSuperAdmin);
-
-    try {
-      const docSnap = await getDoc(doc(db, 'users', uidToFetch));
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        const memberData = { id: docSnap.id, ...data };
-        setTargetMemberData(memberData);
-        setEditProfileData({
-          displayName: data.displayName || '',
-          occupation: data.occupation || '',
-          mvu_link: data.mvu_link || '',
-          masonic_history: data.masonic_history || data.roles_history || '',
-          photoURL: data.photoURL || ''
-        });
-      }
-    } catch (err) {
-      console.error("Error fetching target user:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchTargetUser();
-  }, [targetUid, isSuperAdmin, userData]);
-
-  const handleUpdatePhoto = () => {
-    const url = window.prompt('Cole aqui o link direto da foto (Ex: ImgBB):', editProfileData.photoURL || '');
-    if (url !== null) {
-      setEditProfileData(prev => ({ ...prev, photoURL: url }));
-    }
-  };
-
-  const handleSaveProfile = async () => {
-    const uid = (targetUid && isSuperAdmin) ? targetUid : auth.currentUser?.uid;
-    if (!uid) return;
-
-    setIsSavingProfile(true);
-    try {
-      await updateDoc(doc(db, 'users', uid), {
-        ...editProfileData,
-        updatedAt: serverTimestamp()
-      });
-      alert('Perfil updated com sucesso!');
-      if (targetUid) {
-        await fetchTargetUser();
-      }
-    } catch (err) {
-      handleFirestoreError(err, OperationType.UPDATE, `users/${uid}`);
-    } finally {
-      setIsSavingProfile(false);
-    }
-  };
-
-  const handleDeleteItem = async (itemId: string) => {
-    if (!isSuperAdmin) return;
-    if (window.confirm('Tem certeza que deseja excluir esta obra da biblioteca?')) {
-      try {
-        await deleteDoc(doc(db, 'library_items', itemId));
-      } catch (error) {
-        handleFirestoreError(error, OperationType.DELETE, 'library_items');
-      }
-    }
-  };
-
-  const filteredItems = items.filter(item => 
-    item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.category?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login-membro');
-  };
-
-  return (
-    <div className="min-h-screen bg-aged-beige flex flex-col font-sans selection:bg-[#c5a059]/30 selection:text-[#0b1d3a]">
-      <Navbar />
-
-      <main className="flex-1 pt-28 pb-20 px-4 md:px-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Header Section - RESPONSIVO E COM CORES SÓLIDAS NO MOBILE */}
-          <div className="relative mb-8 p-1 rounded-[2.5rem] bg-gradient-to-br from-[#c5a059]/20 via-transparent to-[#0b1d3a]/5 overflow-hidden">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 md:p-8 bg-white md:bg-white/
+        const filteredOptions = pollOptions.filter(o => o.trim() !== '').map(o => ({ text:

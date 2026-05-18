@@ -65,13 +65,6 @@ body {
     min-height: 5rem; /* Aumenta a altura mínima para o logotipo ter espaço */
   }
 
-  /* Fix para o quadrado branco desalinhado no menu mobile */
-  .mobile-menu-item-bg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    max-width: 90%; /* Limita a largura do fundo branco para não vazar */
-    height: 90%;
+  
   }
 }
