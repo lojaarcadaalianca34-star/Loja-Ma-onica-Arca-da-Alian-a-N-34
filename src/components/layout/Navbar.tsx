@@ -6,26 +6,25 @@ import { cn } from '@/src/lib/utils';
 import Logo from '../ui/Logo';
 import { auth, logout } from '@/src/lib/firebase';
 
+const navLinks = [
+  { name: 'Home', href: '#home', icon: Globe },
+  { name: 'Sobre Nós', href: '/sobre', icon: Landmark },
+  { name: 'Ações Sociais', href: '#social', icon: Heart },
+  { name: 'Past Masters', href: '#galeria', icon: Users },
+  { name: 'Eventos', href: '/eventos', icon: BookOpen },
+  { name: 'Galeria', href: '#galeria-fotos', icon: BookOpen },
+];
+
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const isHomePage = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const navLinks = [
-    { name: 'Home', href: isHomePage ? '#home' : '/', icon: Globe, isExternal: false },
-    { name: 'Sobre Nós', href: '/sobre', icon: Landmark, isExternal: true },
-    { name: 'Ações Sociais', href: isHomePage ? '#social' : '/acoes-sociais', icon: Heart, isExternal: !isHomePage },
-    { name: 'Past Masters', href: isHomePage ? '#galeria' : '/galeria-honra', icon: Users, isExternal: !isHomePage },
-    { name: 'Eventos', href: '/eventos', icon: BookOpen, isExternal: true },
-    { name: 'Galeria', href: isHomePage ? '#galeria-fotos' : '/#galeria-fotos', icon: BookOpen, isExternal: false },
-  ];
 
   const handleLogout = async () => {
     try {
@@ -43,7 +42,7 @@ export default function Navbar() {
 
   return (
     <>
-      {/* BARRA DO TOPO FIXA - NUNCA MUDA DE TAMANHO PARA EVITAR GLITCH DE EXPANSÃO */}
+      {/* 1. BARRA DO TOPO FIXA - LIMPA E LEVE */}
       <nav 
         className={cn(
           "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 px-4 md:px-6 bg-[#0b1d3a]/95 border-b border-[#c5a059]/20 backdrop-blur-sm",
@@ -68,23 +67,13 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-6 lg:gap-8 ml-auto">
             {navLinks.map((link) => (
-              link.isExternal ? (
-                <Link 
-                  key={link.name} 
-                  to={link.href}
-                  className="text-sm font-serif uppercase tracking-widest text-[#c5a059] hover:text-white transition-colors"
-                >
-                  {link.name}
-                </Link>
-              ) : (
-                <a 
-                  key={link.name} 
-                  href={link.href}
-                  className="text-sm font-serif uppercase tracking-widest text-[#c5a059] hover:text-white transition-colors"
-                >
-                  {link.name}
-                </a>
-              )
+              <a 
+                key={link.name} 
+                href={link.href}
+                className="text-sm font-serif uppercase tracking-widest text-[#c5a059] hover:text-white transition-colors"
+              >
+                {link.name}
+              </a>
             ))}
             <div className="flex items-center gap-3 ml-4">
               <Link 
@@ -103,7 +92,7 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile Toggle */}
+          {/* Mobile Toggle Button */}
           <div className="flex items-center gap-3 md:hidden z-[110]">
             {user && (
               <button 
@@ -123,39 +112,26 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* MENU MOBILE - COMPLETAMENTE ISOLADO PARA EVITAR TRAVAMENTOS E TARJAS ESCURAS */}
+      {/* 2. MENU MOBILE EXTRAÍDO - INDEPENDENTE E FLUTUANTE */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="fixed inset-0 bg-[#0b1d3a] z-[90] md:hidden flex flex-col pt-24 px-6 overflow-y-auto"
           >
             <div className="flex flex-col gap-3 pb-8">
               {navLinks.map((link) => (
-                link.isExternal ? (
-                  <Link 
-                    key={link.name} 
-                    to={link.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-4 text-[#f4efe2] p-4 bg-white/5 rounded-xl border border-white/5 active:bg-[#c5a059]/10 active:border-[#c5a059]/30 transition-all"
-                  >
-                    <link.icon className="w-5 h-5 text-[#c5a059]" />
-                    <span className="font-sans font-bold uppercase tracking-widest text-xs">{link.name}</span>
-                  </Link>
-                ) : (
-                  <a 
-                    key={link.name} 
-                    href={link.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-4 text-[#f4efe2] p-4 bg-white/5 rounded-xl border border-white/5 active:bg-[#c5a059]/10 active:border-[#c5a059]/30 transition-all"
-                  >
-                    <link.icon className="w-5 h-5 text-[#c5a059]" />
-                    <span className="font-sans font-bold uppercase tracking-widest text-xs">{link.name}</span>
-                  </a>
-                )
+                <a 
+                  key={link.name} 
+                  href={link.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-4 text-[#f4efe2] p-4 bg-white/5 rounded-xl border border-white/5 active:bg-[#c5a059]/10 active:border-[#c5a059]/30 transition-all"
+                >
+                  <link.icon className="w-5 h-5 text-[#c5a059]" />
+                  <span className="font-sans font-bold uppercase tracking-widest text-xs">{link.name}</span>
+                </a>
               ))}
               
               <div className="grid grid-cols-2 gap-3 mt-4">
