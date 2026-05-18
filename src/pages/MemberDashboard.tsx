@@ -295,6 +295,13 @@ export default function MemberDashboard() {
     }
   };
 
+  useEffect(() => {
+    const initialTab = searchParams.get('tab');
+    if (initialTab) {
+      setActiveTab(initialTab as any);
+    }
+  }, [searchParams]);
+
   const fetchTargetUser = async () => {
     const uidToFetch = targetUid || auth.currentUser?.uid;
     if (!uidToFetch) return;
@@ -342,7 +349,7 @@ export default function MemberDashboard() {
         ...editProfileData,
         updatedAt: serverTimestamp()
       });
-      alert('Perfil updated com sucesso!');
+      alert('Perfil atualizado com sucesso!');
       if (targetUid) {
         await fetchTargetUser();
       }
@@ -374,6 +381,8 @@ export default function MemberDashboard() {
     navigate('/login-membro');
   };
 
+  const isEditingSomeoneElse = !!targetUid && isSuperAdmin && targetUid !== auth.currentUser?.uid;
+
   return (
     <div className="min-h-screen bg-aged-beige flex flex-col font-sans selection:bg-[#c5a059]/30 selection:text-[#0b1d3a]">
       <Navbar />
@@ -382,11 +391,11 @@ export default function MemberDashboard() {
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <div className="relative mb-8 p-1 rounded-[2.5rem] bg-gradient-to-br from-[#c5a059]/20 via-transparent to-[#0b1d3a]/5 overflow-hidden">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 md:p-8 bg-white md:bg-white/40 md:backdrop-blur-md rounded-[2.3rem] border border-white/40">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 md:p-8 bg-white md:bg-white/40 rounded-[2.3rem] border border-white/40">
               <div className="flex items-center gap-6">
                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#0b1d3a] border-4 border-[#c5a059]/20 flex items-center justify-center text-[#c5a059] shadow-2xl relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-tr from-[#c5a059]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <Shield className="w-8 h-8 md:w-10 h-10 relative z-10" />
+                    <Shield className="w-8 h-8 md:w-10 md:h-10 relative z-10" />
                  </div>
                  <div className="text-left">
                     <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#c5a059] mb-1 block">Área Restrita</span>
@@ -604,7 +613,7 @@ export default function MemberDashboard() {
                       }}
                       onDelete={hasElevatedAccess ? () => handleDeleteItem(item.id) : undefined}
                       onEdit={hasElevatedAccess ? () => {
-                        alert('Funcionalidade de edição em desenvolvimento. Por favor, remova e adicione novamente para alterações.');
+                        alert('Funcionalidade de edição em desenvolvimento. Por favor, remova and adicione novamente para alterações.');
                       } : undefined}
                     />
                   ))}
@@ -1083,7 +1092,6 @@ export default function MemberDashboard() {
   );
 }
 
-{/* FUNÇÃO DE RECEITA COMPLETA DO CARD RESTAURADA NO FINAL PARA ELIMINAR ERROS DE COMPILAÇÃO */}
 function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComments, onShare, onDelete, onEdit }: any) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
