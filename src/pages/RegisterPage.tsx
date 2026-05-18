@@ -65,12 +65,26 @@ export default function RegisterPage() {
       const inviteDoc = await getDoc(doc(db, 'invitations', inviteEmail));
 
       if (!inviteDoc.exists()) {
+        // Log unauthorized attempt to membership_requests
+        try {
+          await setDoc(doc(db, 'membership_requests', `unauthorized_${Date.now()}`), {
+            name: displayName || 'Visitante Desconhecido',
+            email: inviteEmail,
+            status: 'PENDING',
+            type: 'UNAUTHORIZED_ATTEMPT',
+            createdAt: serverTimestamp(),
+            message: 'Tentativa de cadastro com e-mail não autorizado.'
+          });
+        } catch (logErr) {
+          console.error("Failed to log unauthorized attempt:", logErr);
+        }
+
         setError('Este e-mail não possui convite autorizado. Entre em contato com a secretaria da loja.');
         setLoading(false);
         return;
       }
 
-      if (inviteDoc.data().status === 'ACCEPTED') {
+      if (inviteDoc.data().status === 'ACCEPTED' || inviteDoc.data().status === 'CONCLUÍDO') {
         setError('Este convite já foi utilizado para outro cadastro.');
         setLoading(false);
         return;
@@ -94,7 +108,7 @@ export default function RegisterPage() {
 
       // Mark invitation as accepted
       await updateDoc(doc(db, 'invitations', inviteEmail), {
-        status: 'ACCEPTED',
+        status: 'CONCLUÍDO',
         acceptedAt: serverTimestamp(),
         userId: user.uid
       });
@@ -122,6 +136,20 @@ export default function RegisterPage() {
       const inviteDoc = await getDoc(doc(db, 'invitations', inviteEmail));
 
       if (!inviteDoc.exists()) {
+        // Log unauthorized attempt to membership_requests
+        try {
+          await setDoc(doc(db, 'membership_requests', `unauthorized_${Date.now()}`), {
+            name: user.displayName || 'Irmão (Google)',
+            email: inviteEmail,
+            status: 'PENDING',
+            type: 'UNAUTHORIZED_ATTEMPT',
+            createdAt: serverTimestamp(),
+            message: 'Tentativa de login Google com e-mail não autorizado.'
+          });
+        } catch (logErr) {
+          console.error("Failed to log unauthorized attempt:", logErr);
+        }
+
         await auth.signOut();
         setError(`O e-mail ${inviteEmail} não possui convite autorizado. Entre em contato com a secretaria.`);
         setLoading(false);
@@ -141,7 +169,7 @@ export default function RegisterPage() {
         });
 
         await updateDoc(doc(db, 'invitations', inviteEmail), {
-          status: 'ACCEPTED',
+          status: 'CONCLUÍDO',
           acceptedAt: serverTimestamp(),
           userId: user.uid
         });

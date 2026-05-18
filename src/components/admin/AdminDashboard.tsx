@@ -290,6 +290,7 @@ export default function AdminDashboard() {
   const [editContent, setEditContent] = useState<any>(content);
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+  const [deletingUser, setDeletingUser] = useState<any>(null);
   const [analyzingLeads, setAnalyzingLeads] = useState<Record<string, boolean>>({});
   const [expandedLead, setExpandedLead] = useState<string | null>(null);
   const [analysisReports, setAnalysisReports] = useState<Record<string, string>>({});
@@ -843,7 +844,12 @@ export default function AdminDashboard() {
               onClick={() => { setActiveTab('members'); setContentSubTab(null); }}
               className={`flex items-center gap-3 w-full px-6 py-4 rounded-2xl font-bold uppercase tracking-widest text-[10px] transition-all ${activeTab === 'members' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-xl' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] border border-[#0b1d3a]/5'}`}
             >
-              <ShieldCheck className="w-5 h-5" /> Membros e Convites ({membershipRequests.filter(r => r.status === 'PENDING').length > 0 ? `+${membershipRequests.filter(r => r.status === 'PENDING').length}` : ''})
+              <ShieldCheck className="w-5 h-5" /> Membros e Convites ({registeredUsers.length + invitations.filter(i => i.status === 'PENDING').length})
+              {membershipRequests.filter(r => r.status === 'PENDING' && r.type !== 'UNAUTHORIZED_ATTEMPT').length > 0 && (
+                <span className="ml-auto bg-[#c5a059] text-[#0b1d3a] text-[8px] px-1.5 py-0.5 rounded-full animate-pulse">
+                  +{membershipRequests.filter(r => r.status === 'PENDING' && r.type !== 'UNAUTHORIZED_ATTEMPT').length}
+                </span>
+              )}
             </button>
 
             <div className="mt-8 p-8 bg-[#c5a059]/10 border border-[#c5a059]/20 rounded-[2.5rem] text-center backdrop-blur-sm">
@@ -2655,7 +2661,7 @@ export default function AdminDashboard() {
                 </form>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {invitations.filter(inv => inv.status !== 'ACCEPTED').map(invite => (
+                  {invitations.filter(inv => inv.status === 'PENDING').map(invite => (
                     <div key={invite.id} className="p-6 bg-white/40 rounded-2xl border border-[#0b1d3a]/5 relative group hover:border-[#c5a059]/20 transition-all shadow-sm">
                       <button 
                         onClick={() => handleRemoveInvite(invite.email)}
@@ -2675,12 +2681,9 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                       <div className="flex items-center justify-between pt-4 border-t border-[#0b1d3a]/5">
-                        <span className={`text-[8px] font-black tracking-widest uppercase px-2 py-1 rounded-full ${invite.status === 'ACCEPTED' ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-[#c5a059]/10 text-[#c5a059] border border-[#c5a059]/20'}`}>
-                          {invite.status === 'ACCEPTED' ? 'Cadastrado' : 'Pendente'}
+                        <span className="bg-[#c5a059]/10 text-[#c5a059] border border-[#c5a059]/20 text-[8px] font-black tracking-widest uppercase px-2 py-1 rounded-full">
+                          Pendente
                         </span>
-                        {invite.status === 'ACCEPTED' && (
-                           <span className="text-[8px] text-[#0b1d3a]/30 truncate max-w-[100px]">UID: {invite.userId}</span>
-                        )}
                       </div>
                     </div>
                   ))}
@@ -2695,49 +2698,56 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {registeredUsers.map(user => (
-                    <div key={user.id} className="p-6 bg-white/40 rounded-2xl border border-[#0b1d3a]/5 flex gap-4 items-center group hover:border-[#c5a059]/20 transition-all shadow-sm">
-                      <div className="relative">
-                        <div className="w-14 h-14 rounded-2xl bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059] text-xl font-bold border border-[#c5a059]/20 overflow-hidden shadow-inner font-serif">
-                          {user.photoURL ? (
-                            <img src={user.photoURL} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                          ) : (
-                            user.displayName?.[0]?.toUpperCase() || 'I'
-                          )}
-                        </div>
-                        <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${user.isOnline ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-gray-500'}`} />
-                      </div>
-                      <div className="flex-1 overflow-hidden">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-[#0b1d3a] font-bold text-sm truncate">{user.displayName || 'Irmão'}</h4>
-                          <div className="flex items-center gap-1">
-                            <button 
-                              onClick={() => navigate(`/area-restrita?uid=${user.id}&tab=profile`)}
-                              className="text-[#c5a059] hover:text-[#0b1d3a] transition-colors p-1"
-                              title="Editar Perfil Completo"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button 
-                              onClick={async () => {
-                                if(confirm(`Desativar e excluir acesso do irmão ${user.displayName || user.email}?`)) {
-                                  try {
-                                    await deleteDoc(doc(db, 'users', user.id));
-                                    alert('Irmão excluído da base de dados.');
-                                  } catch(e) {
-                                    handleFirestoreError(e, OperationType.DELETE, `users/${user.id}`);
-                                  }
-                                }
-                              }}
-                              className="text-red-500/30 hover:text-red-500 transition-colors p-1"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
+                  {registeredUsers.map(user => {
+                    const inviteData = invitations.find(i => i.email === user.email);
+                    return (
+                      <div key={user.id} className="p-6 bg-white/40 rounded-2xl border border-[#0b1d3a]/5 flex flex-col gap-4 group hover:border-[#c5a059]/20 transition-all shadow-sm">
+                        <div className="flex gap-4 items-center">
+                          <div className="relative">
+                            <div className="w-14 h-14 rounded-2xl bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059] text-xl font-bold border border-[#c5a059]/20 overflow-hidden shadow-inner font-serif">
+                              {user.photoURL ? (
+                                <img src={user.photoURL} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                              ) : (
+                                user.displayName?.[0]?.toUpperCase() || 'I'
+                              )}
+                            </div>
+                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${user.isOnline ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-gray-500'}`} />
+                          </div>
+                          <div className="flex-1 overflow-hidden">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-[#0b1d3a] font-bold text-sm truncate">{user.displayName || 'Irmão'}</h4>
+                              <div className="flex items-center gap-1">
+                                <button 
+                                  onClick={() => navigate(`/area-restrita?uid=${user.id}&tab=profile`)}
+                                  className="text-[#c5a059] hover:text-[#0b1d3a] transition-colors p-1"
+                                  title="Editar Perfil Completo"
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </button>
+                                <button 
+                                  onClick={() => setDeletingUser(user)}
+                                  className="text-red-500/30 hover:text-red-500 transition-colors p-1"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                            <p className="text-[#0b1d3a]/40 text-xs truncate">{user.email}</p>
                           </div>
                         </div>
-                        <p className="text-[#0b1d3a]/40 text-xs truncate">{user.email}</p>
+
+                        <div className="space-y-1 bg-[#0b1d3a]/5 p-3 rounded-xl border border-[#0b1d3a]/5">
+                          <div className="flex items-center justify-between gap-2">
+                             <span className="text-[7px] text-[#0b1d3a]/40 uppercase font-black tracking-widest">Autorizado em:</span>
+                             <span className="text-[7px] text-[#c5a059] font-bold uppercase">{inviteData?.createdAt?.toDate ? inviteData.createdAt.toDate().toLocaleString('pt-BR') : 'Manual'}</span>
+                          </div>
+                          <div className="flex items-center justify-between gap-2">
+                             <span className="text-[7px] text-[#0b1d3a]/40 uppercase font-black tracking-widest">Cadastrado em:</span>
+                             <span className="text-[7px] text-[#c5a059] font-bold uppercase">{user.createdAt?.toDate ? user.createdAt.toDate().toLocaleString('pt-BR') : 'N/A'}</span>
+                          </div>
+                        </div>
                         
-                        <div className="mt-2 space-y-1">
+                        <div className="space-y-1">
                           <label className="text-[7px] text-[#c5a059] uppercase font-black tracking-widest block ml-1 font-bold">Cargo Atual</label>
                           <div className="flex gap-1">
                             <select 
@@ -2771,7 +2781,7 @@ export default function AdminDashboard() {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center gap-2">
                           <select 
                             className="text-[8px] px-2 py-0.5 bg-white/40 border border-[#0b1d3a]/10 rounded text-[#0b1d3a]/60 uppercase font-black tracking-widest outline-none cursor-pointer hover:bg-white/60 shadow-sm"
                             value={user.role || 'member'}
@@ -2786,13 +2796,13 @@ export default function AdminDashboard() {
                             <option value="member">Membro</option>
                             <option value="admin">Administrador</option>
                           </select>
-                          <span className="text-[8px] text-white/20 uppercase font-black tracking-widest">
+                          <span className="text-[8px] text-[#0b1d3a]/20 uppercase font-black tracking-widest ml-auto">
                             {user.isOnline ? 'Online agora' : user.lastSeen ? `Visto: ${new Date(user.lastSeen?.toDate?.() || user.lastSeen).toLocaleDateString()}` : 'Inativo'}
                           </span>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -2800,6 +2810,60 @@ export default function AdminDashboard() {
         </motion.div>
           </main>
         </div>
+        <AnimatePresence>
+          {deletingUser && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[300] bg-[#0b1d3a]/80 backdrop-blur-md flex items-center justify-center p-6"
+            >
+              <motion.div 
+                initial={{ scale: 0.9, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 20 }}
+                className="bg-[#f4efe2] border-4 border-[#c5a059]/40 p-10 rounded-[3rem] shadow-3xl max-w-lg w-full text-center space-y-8 relative overflow-hidden"
+              >
+                <div className="absolute top-0 left-0 w-full h-2 bg-[#c5a059]" />
+                <div className="w-24 h-24 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto text-red-500">
+                  <Trash2 className="w-12 h-12" />
+                </div>
+                <div className="space-y-4">
+                  <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] uppercase tracking-tight">Confirmação Solene</h3>
+                  <p className="text-[#0b1d3a]/80 text-sm leading-relaxed px-4">
+                    "Atenção: Deseja realmente remover este Obreiro do Quadro Digital da Arca da Aliança? Esta ação retirará o irmão de nossas colunas virtuais e revogará seu acesso definitivo."
+                  </p>
+                  <p className="text-[#c5a059] font-black uppercase tracking-widest text-[10px] bg-[#c5a059]/5 py-2 rounded-xl">
+                    Irmão: {deletingUser.displayName || deletingUser.email}
+                  </p>
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-4 pt-4">
+                  <button 
+                    onClick={async () => {
+                      try {
+                        await deleteDoc(doc(db, 'users', deletingUser.id));
+                        setDeletingUser(null);
+                        alert('Obreiro removido com sucesso.');
+                      } catch(e) {
+                        handleFirestoreError(e, OperationType.DELETE, `users/${deletingUser.id}`);
+                      }
+                    }}
+                    className="flex-1 px-8 py-4 bg-red-600 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-red-700 transition-all shadow-xl"
+                  >
+                    Confirmar Exclusão
+                  </button>
+                  <button 
+                    onClick={() => setDeletingUser(null)}
+                    className="flex-1 px-8 py-4 bg-[#0b1d3a]/5 text-[#0b1d3a]/60 font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-[#0b1d3a]/10 transition-all"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
