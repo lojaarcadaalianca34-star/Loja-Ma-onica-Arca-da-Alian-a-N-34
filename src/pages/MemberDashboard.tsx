@@ -384,40 +384,42 @@ export default function MemberDashboard() {
   const isEditingSomeoneElse = !!targetUid && isSuperAdmin && targetUid !== auth.currentUser?.uid;
 
   return (
-    <div className="min-h-screen bg-aged-beige flex flex-col font-sans selection:bg-[#c5a059]/30 selection:text-[#0b1d3a]">
+    <div className="min-h-screen bg-aged-beige flex flex-col font-sans overflow-x-hidden w-full selection:bg-[#c5a059]/30 selection:text-[#0b1d3a]">
       <Navbar />
 
-      <main className="flex-1 pt-28 pb-20 px-4 md:px-6">
-        <div className="max-w-7xl mx-auto">
+      <main className="flex-1 pt-28 pb-20 px-4 md:px-6 w-full max-w-full overflow-hidden">
+        <div className="max-w-7xl mx-auto w-full">
           {/* Header Section */}
-          <div className="relative mb-8 p-1 rounded-[2.5rem] bg-gradient-to-br from-[#c5a059]/20 via-transparent to-[#0b1d3a]/5 overflow-hidden">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 md:p-8 bg-white md:bg-white/40 rounded-[2.3rem] border border-white/40">
-              <div className="flex items-center gap-6">
-                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#0b1d3a] border-4 border-[#c5a059]/20 flex items-center justify-center text-[#c5a059] shadow-2xl relative overflow-hidden group">
+          <div className="relative mb-8 p-1 rounded-[2.5rem] bg-gradient-to-br from-[#c5a059]/20 via-transparent to-[#0b1d3a]/5 overflow-hidden w-full">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 md:p-8 bg-white md:bg-white/40 rounded-[2.3rem] border border-white/40 w-full">
+              <div className="flex flex-col sm:flex-row items-center gap-6 min-w-0 w-full md:w-auto">
+                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#0b1d3a] border-4 border-[#c5a059]/20 flex items-center justify-center text-[#c5a059] shadow-2xl relative overflow-hidden group shrink-0">
                     <div className="absolute inset-0 bg-gradient-to-tr from-[#c5a059]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     <Shield className="w-8 h-8 md:w-10 md:h-10 relative z-10" />
                  </div>
-                 <div className="text-left">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#c5a059] mb-1 block">Área Restrita</span>
-                    <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#0b1d3a] uppercase tracking-wider leading-none">Arca da Aliança <span className="gold-text">nº 34</span></h1>
+                 <div className="text-center sm:text-left min-w-0 w-full">
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#c5a059] mb-1 block truncate">Área Restrita</span>
+                    <h1 className="font-serif text-xl md:text-3xl font-bold text-[#0b1d3a] uppercase tracking-wider leading-none break-words max-w-full">
+                      Arca da Aliança <span className="gold-text block sm:inline">nº 34</span>
+                    </h1>
                  </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
                 <button 
                   onClick={() => setActiveTab('profile')}
-                  className="group relative flex items-center gap-3 p-1.5 pr-6 bg-white border border-[#c5a059]/30 rounded-xl hover:border-[#c5a059] transition-all shadow-sm"
+                  className="group relative flex items-center gap-3 p-1.5 pr-6 bg-white border border-[#c5a059]/30 rounded-xl hover:border-[#c5a059] transition-all shadow-sm min-w-0"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-[#0b1d3a]/5 overflow-hidden border border-[#c5a059]/10">
+                  <div className="w-10 h-10 rounded-lg bg-[#0b1d3a]/5 overflow-hidden border border-[#c5a059]/10 shrink-0">
                     {userData?.photoURL ? (
                       <img src={userData.photoURL} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-[#c5a059] font-serif text-lg">{userData?.displayName?.[0] || 'I'}</div>
                     )}
                   </div>
-                  <div className="text-left">
+                  <div className="text-left min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-widest text-[#0b1d3a] leading-tight line-clamp-1">{userData?.displayName || 'Ir. Obreiro'}</p>
-                    <p className="text-[8px] font-bold text-[#c5a059] uppercase tracking-widest">{userData?.currentRole || userData?.role || 'Membro'}</p>
+                    <p className="text-[8px] font-bold text-[#c5a059] uppercase tracking-widest truncate">{userData?.currentRole || userData?.role || 'Membro'}</p>
                   </div>
                   
                   <AnimatePresence>
@@ -428,7 +430,7 @@ export default function MemberDashboard() {
                     )}
                   </AnimatePresence>
                 </button>
-                <button onClick={handleLogout} className="flex items-center gap-2 p-3.5 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-xl text-[#0b1d3a] hover:text-red-500 transition-colors uppercase tracking-[0.2em] text-[9px] font-black">
+                <button onClick={handleLogout} className="flex items-center gap-2 p-3.5 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-xl text-[#0b1d3a] hover:text-red-500 transition-colors uppercase tracking-[0.2em] text-[9px] font-black shrink-0">
                   <LogOut className="w-4 h-4" /> <span>Sair</span>
                 </button>
               </div>
@@ -436,7 +438,7 @@ export default function MemberDashboard() {
           </div>
 
           {/* Navigation Grid */}
-          <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2 mb-8">
+          <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2 mb-8 w-full max-w-full">
              {[
                { id: 'welcome', label: 'Escrutínio de Atividades', icon: LayoutDashboard },
                { id: 'library', label: 'Biblioteca Ritualística', icon: BookMarked },
@@ -456,14 +458,14 @@ export default function MemberDashboard() {
                        setActiveTab(tab.id as any);
                      }
                    }}
-                   className={`flex items-center gap-2 px-3 py-3 md:px-6 md:py-4 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-wider transition-all w-full md:w-auto shadow-sm border text-left md:text-center ${
+                   className={`flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 md:gap-2 px-2 py-3 md:px-6 md:py-4 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-wider transition-all w-full md:w-auto shadow-sm border min-w-0 overflow-hidden ${
                      activeTab === tab.id 
                        ? 'bg-[#c5a059] text-[#0b1d3a] border-[#c5a059]' 
                        : 'bg-[#0b1d3a] text-white border-[#c5a059]/30 hover:bg-[#c5a059]/10 hover:text-[#c5a059]'
                    }`}
                  >
-                   <TabIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                   <span className="truncate">{tab.label}</span>
+                   <TabIcon className="w-3.5 h-3.5 flex-shrink-0 text-[#c5a059]" />
+                   <span className="break-words max-w-full leading-tight block">{tab.label}</span>
                  </button>
                );
              })}
@@ -471,18 +473,20 @@ export default function MemberDashboard() {
 
           <AnimatePresence mode="wait">
             {activeTab === 'welcome' && (
-              <motion.div key="welcome" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-12">
+              <motion.div key="welcome" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-12 w-full max-w-full overflow-hidden">
                 {/* Welcome Card */}
-                <div className="relative">
+                <div className="relative w-full">
                   <div className="absolute inset-0 bg-[#fdf6e3] rounded-[2rem] shadow-2xl rotate-[-0.5deg]" />
-                  <div className="relative p-6 md:p-10 bg-[#f4e4bc] rounded-[2rem] border-2 border-[#d4b068] overflow-hidden text-center">
+                  <div className="relative p-5 md:p-10 bg-[#f4e4bc] rounded-[2rem] border-2 border-[#d4b068] overflow-hidden text-center w-full">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none">
-                      <Shield className="w-[400px] h-[400px] text-[#8b5e34]" />
+                      <Shield className="w-[300px] h-[300px] md:w-[400px] md:h-[400px] text-[#8b5e34]" />
                     </div>
-                    <div className="relative z-10 max-w-3xl mx-auto space-y-6">
-                       <h2 className="font-serif text-2xl md:text-4xl text-[#5d4037] font-bold italic tracking-tight uppercase">Saudações Fraternais, Ir. {userData?.displayName?.split(' ')[0]}</h2>
+                    <div className="relative z-10 max-w-3xl mx-auto space-y-6 w-full">
+                       <h2 className="font-serif text-xl md:text-4xl text-[#5d4037] font-bold italic tracking-tight uppercase break-words max-w-full">
+                         Saudações Fraternais, <br className="sm:hidden" /> Ir. {userData?.displayName?.split(' ')[0]}
+                       </h2>
                        <div className="h-0.5 w-16 bg-[#d4b068] mx-auto" />
-                       <p className="font-serif text-[#5d4037]/90 text-sm md:text-lg leading-relaxed italic text-justify px-4">Seja bem-vindo ao Círculo Fechado da A.R.L.S. Arca da Aliança nº 34. Este ambiente digital foi erguido para que a nossa fraternidade não se limite apenas às nossas sessões físicas.</p>
+                       <p className="font-serif text-[#5d4037]/90 text-xs md:text-lg leading-relaxed italic text-justify px-2 md:px-4">Seja bem-vindo ao Círculo Fechado da A.R.L.S. Arca da Aliança nº 34. Este ambiente digital foi erguido para que a nossa fraternidade não se limite apenas às nossas sessões físicas.</p>
                        <div className="pt-4 flex items-center justify-center gap-8">
                          <div className="text-center">
                            <p className="text-xl md:text-2xl font-serif font-black text-[#8b5e34]">{registeredUsers.length}</p>
@@ -498,8 +502,8 @@ export default function MemberDashboard() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                  <div className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 w-full">
+                  <div className="space-y-6 w-full">
                     <div className="flex items-center justify-between border-b border-[#0b1d3a]/10 pb-4">
                       <h3 className="font-serif text-base md:text-xl font-bold text-[#0b1d3a] uppercase tracking-widest flex items-center gap-2">
                         <Handshake className="w-5 h-5 text-[#c5a059]" /> O Forja Profissional
@@ -509,7 +513,7 @@ export default function MemberDashboard() {
                     <RecentProfessionalFeed />
                   </div>
 
-                  <div className="space-y-6">
+                  <div className="space-y-6 w-full">
                     <div className="flex items-center justify-between border-b border-[#0b1d3a]/10 pb-4">
                       <h3 className="font-serif text-base md:text-xl font-bold text-[#0b1d3a] uppercase tracking-widest flex items-center gap-2">
                         <BookMarked className="w-5 h-5 text-[#c5a059]" /> Debates em Obra
@@ -521,9 +525,9 @@ export default function MemberDashboard() {
                 </div>
 
                 {/* Dashboard Integrated Activity Section */}
-                <div className="space-y-10">
+                <div className="space-y-10 w-full">
                   {/* Decisions Panel */}
-                  <div className="bg-white p-6 md:p-10 rounded-[2.5rem] border border-[#0b1d3a]/5 shadow-sm">
+                  <div className="bg-white p-6 md:p-10 rounded-[2.5rem] border border-[#0b1d3a]/5 shadow-sm w-full">
                     <div className="flex items-center justify-between mb-8">
                       <div className="flex items-center gap-3">
                         <Heart className="w-8 h-8 text-[#c5a059]" />
@@ -531,7 +535,7 @@ export default function MemberDashboard() {
                       </div>
                       <button onClick={() => setActiveTab('social')} className="text-[10px] font-black uppercase tracking-widest text-[#c5a059] hover:underline">Ver Completo</button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                       {socialItems.slice(0, 2).map((action) => (
                         <div key={action.id} className="p-6 bg-[#0b1d3a]/5 border border-[#c5a059]/10 rounded-[2rem] hover:border-[#c5a059]/30 transition-all group text-left">
                           <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest mb-4 inline-block ${action.type === 'poll' ? 'bg-[#0b1d3a]/10 text-[#0b1d3a]' : 'bg-[#c5a059]/10 text-[#c5a059]'}`}>
@@ -546,7 +550,7 @@ export default function MemberDashboard() {
                   </div>
 
                   {/* Members Gallery */}
-                  <div className="space-y-6">
+                  <div className="space-y-6 w-full">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#0b1d3a]/10 pb-4 gap-3">
                       <div className="text-left">
                         <h3 className="font-serif text-xl md:text-2xl font-bold text-[#0b1d3a] uppercase tracking-widest">Soberano Quadro de Obreiros</h3>
@@ -554,13 +558,13 @@ export default function MemberDashboard() {
                       </div>
                       <button onClick={() => setActiveTab('members')} className="w-fit px-6 py-2 border border-[#c5a059]/30 rounded-full text-[10px] font-black uppercase tracking-widest text-[#0b1d3a] hover:bg-[#c5a059] transition-all">Ver em Tela Cheia</button>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                    {/* TROCADO DE MOTION.DIV PARA DIV NORMAL NOS CARDS DA LISTA PARA SALVAR O CELULAR */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4 w-full">
                       {registeredUsers.filter(u => u.status !== 'PENDING').slice(0, 12).map((member) => (
-                        <motion.div 
+                        <div 
                           key={member.id}
-                          whileHover={{ y: -5 }}
                           onClick={() => navigate(`/area-restrita?uid=${member.id}&tab=profile`)}
-                          className="bg-white p-4 rounded-2xl border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 transition-all cursor-pointer shadow-sm group text-center"
+                          className="bg-white p-4 rounded-2xl border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 hover:-translate-y-1 transition-all cursor-pointer shadow-sm group text-center"
                         >
                           <div className="relative w-16 h-16 mx-auto mb-3">
                             <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden shadow-inner">
@@ -578,7 +582,7 @@ export default function MemberDashboard() {
                           </div>
                           <h4 className="font-serif text-[11px] font-bold text-[#0b1d3a] group-hover:text-[#c5a059] transition-colors truncate">{member.displayName || 'Ir. Obreiro'}</h4>
                           <p className="text-[7px] text-[#c5a059] font-black uppercase tracking-widest truncate">{member.currentRole || member.role || 'Membro'}</p>
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -587,8 +591,8 @@ export default function MemberDashboard() {
             )}
 
             {activeTab === 'library' && (
-              <motion.div key="library" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <div className="flex flex-col sm:flex-row gap-4 mb-8 items-center">
+              <motion.div key="library" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full">
+                <div className="flex flex-col sm:flex-row gap-4 mb-8 items-center w-full">
                   <div className="relative w-full flex-1 group">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0b1d3a]/30 group-focus-within:text-[#0b1d3a] transition-colors" />
                     <input type="text" placeholder="Buscar estudos, rituais..." className="w-full bg-white border border-[#0b1d3a]/10 rounded-2xl p-4 pl-12 text-[#0b1d3a] text-xs outline-none focus:border-[#c5a059]/50 shadow-sm" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
@@ -598,7 +602,7 @@ export default function MemberDashboard() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
                   {filteredItems.map((item, index) => (
                     <LibraryItemCard 
                       key={item.id} 
@@ -613,7 +617,7 @@ export default function MemberDashboard() {
                       }}
                       onDelete={hasElevatedAccess ? () => handleDeleteItem(item.id) : undefined}
                       onEdit={hasElevatedAccess ? () => {
-                        alert('Funcionalidade de edição em desenvolvimento. Por favor, remova and adicione novamente para alterações.');
+                        alert('Funcionalidade de edição em desenvolvimento.');
                       } : undefined}
                     />
                   ))}
@@ -622,35 +626,35 @@ export default function MemberDashboard() {
             )}
 
             {activeTab === 'professional' && (
-              <motion.div key="professional" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+              <motion.div key="professional" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full">
                 <ProfessionalBoard />
               </motion.div>
             )}
 
             {activeTab === 'social' && (
-              <motion.div key="social" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-8">
-                 <div className="p-5 md:p-10 bg-white border border-[#0b1d3a]/10 rounded-[2rem] md:rounded-[3.5rem] shadow-sm">
-                    <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center mb-8 md:mb-10 text-center md:text-left">
+              <motion.div key="social" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-8 w-full">
+                 <div className="p-5 md:p-10 bg-white border border-[#0b1d3a]/10 rounded-[2rem] md:rounded-[3.5rem] shadow-sm w-full">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center mb-8 md:mb-10 text-center md:text-left w-full">
                        <div className="w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-3xl bg-[#0b1d3a]/10 border border-[#0b1d3a]/20 flex items-center justify-center text-[#0b1d3a] flex-shrink-0">
                           <Heart className="w-8 h-8 md:w-12 md:h-12" />
                        </div>
-                       <div className="flex-1">
-                          <h2 className="text-xl md:text-3xl font-serif text-[#0b1d3a] font-bold mb-2 uppercase tracking-widest">Painel de Decisões e <span className="text-[#c5a059]">Ações Sociais</span></h2>
+                       <div className="flex-1 min-w-0">
+                          <h2 className="text-xl md:text-3xl font-serif text-[#0b1d3a] font-bold mb-2 uppercase tracking-widest truncate">Painel de Decisões e <span className="text-[#c5a059]">Ações Sociais</span></h2>
                           <p className="text-[#0b1d3a]/60 text-xs md:text-sm italic font-serif leading-relaxed">Este espaço é destinado à deliberação sobre nossas obras de assistência e suporte social.</p>
                        </div>
                        {hasElevatedAccess && (
-                         <div className="flex gap-2 w-full md:w-auto justify-center">
+                         <div className="flex gap-2 w-full md:w-auto justify-center shrink-0">
                            <button onClick={() => { setSocialType('poll'); setShowSocialModal(true); }} className="flex-1 md:flex-none px-4 py-2.5 bg-white border border-[#0b1d3a]/10 text-[#0b1d3a] rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-white/80 transition-all">Nova Enquete</button>
-                           <button onClick={() => { setSocialType('philanthropy'); setShowSocialModal(true); }} className="flex-1 md:flex-none px-4 py-2.5 bg-[#0b1d3a] text-[#f4efe2] border border-[#c5a059]/30 rounded-xl font-black uppercase text-[9px] tracking-widest shadow-xl hover:bg-[#c5a059]">Nova Filantropia</button>
+                           <button onClick={() => { setSocialType('poll'); setShowSocialModal(true); }} className="flex-1 md:flex-none px-4 py-2.5 bg-[#0b1d3a] text-[#f4efe2] border border-[#c5a059]/30 rounded-xl font-black uppercase text-[9px] tracking-widest shadow-xl hover:bg-[#c5a059]">Nova Filantropia</button>
                          </div>
                        )}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                        {socialItems.map((action) => (
-                         <div key={action.id} className="p-6 md:p-8 bg-white border border-[#0b1d3a]/10 rounded-[2rem] hover:border-[#c5a059]/30 transition-all group relative overflow-hidden text-left">
-                            <div className="flex justify-between items-start mb-6 gap-2">
-                               <div className="flex flex-col gap-1 min-w-0">
+                         <div key={action.id} className="p-6 md:p-8 bg-white border border-[#0b1d3a]/10 rounded-[2rem] hover:border-[#c5a059]/30 transition-all group relative overflow-hidden text-left w-full">
+                            <div className="flex justify-between items-start mb-6 gap-2 w-full">
+                               <div className="flex flex-col gap-1 min-w-0 w-full">
                                   <span className={`px-2.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider w-fit block ${
                                     action.type === 'poll' ? 'bg-blue-500/10 text-blue-600' : 
                                     action.type === 'philanthropy' ? 'bg-green-500/10 text-green-600' : 
@@ -682,7 +686,7 @@ export default function MemberDashboard() {
                             <p className="text-[#0b1d3a]/60 text-[11px] mb-6 italic leading-relaxed line-clamp-3">"{action.description}"</p>
 
                             {action.type === 'poll' && (
-                              <div className="space-y-2 mb-6">
+                              <div className="space-y-2 mb-6 w-full">
                                 {action.options?.map((opt: any, i: number) => {
                                   const totalVotes = action.options.reduce((acc: number, cur: any) => acc + (cur.count || 0), 0);
                                   const percentage = totalVotes > 0 ? Math.round((opt.count / totalVotes) * 100) : 0;
@@ -701,7 +705,7 @@ export default function MemberDashboard() {
                                       }`}
                                     >
                                       <div className="absolute inset-y-0 left-0 bg-[#c5a059]/10" style={{ width: `${percentage}%` }} />
-                                      <div className="relative flex justify-between items-center text-[10px]">
+                                      <div className="relative flex justify-between items-center text-[10px] w-full">
                                         <span className="text-[#0b1d3a] font-bold truncate pr-4">{opt.text}</span>
                                         <span className="text-[#c5a059] font-black shrink-0">{percentage}%</span>
                                       </div>
@@ -712,21 +716,21 @@ export default function MemberDashboard() {
                             )}
 
                             {action.type === 'philanthropy' && (
-                              <div className="space-y-2 mb-6">
-                                <div className="h-1.5 bg-[#0b1d3a]/5 rounded-full overflow-hidden">
+                              <div className="space-y-2 mb-6 w-full">
+                                <div className="h-1.5 bg-[#0b1d3a]/5 rounded-full overflow-hidden w-full">
                                   <div 
                                     className="h-full bg-gradient-to-r from-green-600 to-emerald-500 transition-all duration-1000" 
                                     style={{ width: `${Math.min(100, ((action.current || 0) / (action.goal || 1)) * 100)}%` }}
                                   />
                                 </div>
-                                <div className="flex justify-between text-[8px] font-black uppercase tracking-wider">
+                                <div className="flex justify-between text-[8px] font-black uppercase tracking-wider w-full">
                                   <span className="text-green-600">Total: R$ {action.current?.toLocaleString()}</span>
                                   <span className="text-[#0b1d3a]/40">Meta: R$ {action.goal?.toLocaleString()}</span>
                                 </div>
                               </div>
                             )}
 
-                            <div className="flex gap-2 border-t border-[#0b1d3a]/5 pt-4 mt-auto">
+                            <div className="flex gap-2 border-t border-[#0b1d3a]/5 pt-4 mt-auto w-full">
                                {hasElevatedAccess && (
                                  <button 
                                    onClick={() => {
@@ -735,7 +739,7 @@ export default function MemberDashboard() {
                                        updateDoc(doc(db, 'social_actions', action.id), { closingDate: newDate });
                                      }
                                    }}
-                                   className="p-2 bg-white border border-[#0b1d3a]/10 rounded-lg text-[#0b1d3a] hover:bg-[#c5a059] transition-all"
+                                   className="p-2 bg-white border border-[#0b1d3a]/10 rounded-lg text-[#0b1d3a] hover:bg-[#c5a059] transition-all shrink-0"
                                    title="Prazo"
                                  >
                                    <Calendar className="w-3.5 h-3.5" />
@@ -790,24 +794,24 @@ export default function MemberDashboard() {
             )}
 
             {activeTab === 'members' && (
-              <motion.div key="members" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#0b1d3a]/10 pb-4 gap-3">
+              <motion.div key="members" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8 w-full">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#0b1d3a]/10 pb-4 gap-3 w-full">
                   <div className="text-left">
                     <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#0b1d3a] uppercase tracking-widest">Soberano Quadro de Obreiros</h2>
                     <p className="text-[#0b1d3a]/60 text-xs italic font-serif">"Eis quão bom e quão suave é que os irmãos vivam em união."</p>
                   </div>
-                  <div className="text-[9px] uppercase font-black tracking-wider text-[#c5a059] bg-[#c5a059]/10 px-4 py-2 rounded-full border border-[#c5a059]/20 w-fit">
+                  <div className="text-[9px] uppercase font-black tracking-wider text-[#c5a059] bg-[#c5a059]/10 px-4 py-2 rounded-full border border-[#c5a059]/20 w-fit shrink-0">
                     {registeredUsers.length} Irmãos Cadastrados
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {/* TROCADO DE MOTION.DIV PARA DIV NORMAL NOS CARDS DA LISTA PARA SALVAR O CELULAR */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4 w-full">
                   {registeredUsers.filter(u => u.status !== 'PENDING').map((member) => (
-                    <motion.div 
+                    <div 
                       key={member.id}
-                      whileHover={{ y: -5 }}
                       onClick={() => navigate(`/area-restrita?uid=${member.id}&tab=profile`)}
-                      className="bg-white p-6 rounded-[2rem] border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 transition-all cursor-pointer shadow-sm group text-center"
+                      className="bg-white p-6 rounded-[2rem] border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 hover:-translate-y-1 transition-all cursor-pointer shadow-sm group text-center w-full"
                     >
                       <div className="relative w-24 h-24 mx-auto mb-4">
                         <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden shadow-inner">
@@ -828,28 +832,28 @@ export default function MemberDashboard() {
                       <div className="mt-4 pt-4 border-t border-[#0b1d3a]/5 flex items-center justify-center gap-2 text-[8px] font-black uppercase tracking-widest text-[#0b1d3a]/30 group-hover:text-[#c5a059] transition-colors">
                         Ver Perfil Completo <span>→</span>
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </motion.div>
             )}
 
             {activeTab === 'profile' && (
-              <motion.div key="profile" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="max-w-4xl mx-auto space-y-8">
+              <motion.div key="profile" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="max-w-4xl mx-auto space-y-8 w-full">
                  {(isEditingSomeoneElse || (targetUid && targetUid !== auth.currentUser?.uid)) && (
-                   <div className={`${isSuperAdmin ? 'bg-[#c5a059]' : 'bg-[#0b1d3a]'} p-4 rounded-xl flex items-center justify-between shadow-xl`}>
-                     <p className={`${isSuperAdmin ? 'text-[#0b1d3a]' : 'text-[#f4efe2]'} font-black uppercase tracking-wider text-[9px]`}>
+                   <div className={`${isSuperAdmin ? 'bg-[#c5a059]' : 'bg-[#0b1d3a]'} p-4 rounded-xl flex items-center justify-between shadow-xl w-full`}>
+                     <p className={`${isSuperAdmin ? 'text-[#0b1d3a]' : 'text-[#f4efe2]'} font-black uppercase tracking-wider text-[9px] truncate`}>
                        Visualizando Perfil: <span className="underline">{targetMemberData?.displayName || targetMemberData?.email}</span> {isReadOnly ? '(Somente Leitura)' : '(Modo Admin)'}
                      </p>
-                     <button onClick={() => navigate('/area-restrita?tab=welcome')} className="text-inherit hover:scale-105 transition-transform">
+                     <button onClick={() => navigate('/area-restrita?tab=welcome')} className="text-inherit hover:scale-105 transition-transform shrink-0">
                        <X className="w-5 h-5" />
                      </button>
                    </div>
                  )}
 
-                 <div className="bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-[2rem] md:rounded-[3rem] p-5 md:p-10 shadow-sm">
+                 <div className="bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-[2rem] md:rounded-[3rem] p-5 md:p-10 shadow-sm w-full">
                     <h2 className="text-center font-serif text-2xl md:text-3xl font-bold text-[#0b1d3a] mb-8 uppercase tracking-widest">Dados Pessoais</h2>
-                    <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-start text-center md:text-left">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-start text-center md:text-left w-full">
                       <div className="flex flex-col items-center gap-4 w-full md:w-48 text-center shrink-0">
                          <div className="relative">
                             <div className="w-32 h-44 rounded-2xl bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden relative shadow-md">
@@ -879,8 +883,8 @@ export default function MemberDashboard() {
                       </div>
 
                       <div className="flex-1 space-y-4 w-full">
-                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-1">
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                            <div className="space-y-1 w-full">
                                <label className="text-[9px] text-[#0b1d3a]/60 uppercase font-black tracking-wider ml-1 text-left block">Nome de Obreiro</label>
                                <input 
                                 className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-3.5 text-xs text-[#0b1d3a] font-bold outline-none focus:border-[#c5a059]" 
@@ -889,7 +893,7 @@ export default function MemberDashboard() {
                                 disabled={isReadOnly}
                                />
                             </div>
-                            <div className="space-y-1">
+                            <div className="space-y-1 w-full">
                                <label className="text-[9px] text-[#0b1d3a]/60 uppercase font-black tracking-wider ml-1 text-left block">Cargo Atual (Oficial)</label>
                                <div className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-3.5 text-[#0b1d3a]/50 text-xs italic flex items-center gap-2">
                                   <ShieldCheck className="w-3.5 h-3.5 text-[#c5a059]" />
@@ -898,8 +902,8 @@ export default function MemberDashboard() {
                             </div>
                          </div>
                          
-                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-1">
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                            <div className="space-y-1 w-full">
                                <label className="text-[9px] text-[#0b1d3a]/60 uppercase font-black tracking-wider ml-1 text-left block">Profissão</label>
                                <input 
                                 className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-3.5 text-xs text-[#0b1d3a] font-bold outline-none focus:border-[#c5a059]" 
@@ -909,7 +913,7 @@ export default function MemberDashboard() {
                                 disabled={isReadOnly}
                                />
                             </div>
-                            <div className="space-y-1">
+                            <div className="space-y-1 w-full">
                                <label className="text-[9px] text-[#0b1d3a]/60 uppercase font-black tracking-wider ml-1 text-left block">Link MVU</label>
                                <input 
                                 className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-3.5 text-xs text-[#0b1d3a] font-bold outline-none focus:border-[#c5a059]" 
@@ -921,7 +925,7 @@ export default function MemberDashboard() {
                             </div>
                          </div>
 
-                         <div className="space-y-1">
+                         <div className="space-y-1 w-full">
                             <label className="text-[9px] text-[#0b1d3a]/60 uppercase font-black tracking-wider ml-1 text-left block">Apresentação & História Maçônica</label>
                             <textarea 
                               className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-3.5 text-xs text-[#0b1d3a] leading-relaxed outline-none focus:border-[#c5a059] resize-none" 
@@ -1092,6 +1096,7 @@ export default function MemberDashboard() {
   );
 }
 
+{/* TROCADO DE MOTION.DIV PARA DIV NORMAL NESTE CARD PARA SALVAR O PROCESSAMENTO DO CELULAR */}
 function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComments, onShare, onDelete, onEdit }: any) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
@@ -1107,7 +1112,7 @@ function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComme
   }, [isExpanded, item.id]);
 
   return (
-    <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`bg-white p-5 md:p-8 rounded-2xl md:rounded-[2rem] border ${isHighlighted ? 'border-[#c5a059]' : 'border-[#0b1d3a]/10'} relative flex flex-col group transition-all hover:border-[#c5a059]/30 shadow-md text-left`}>
+    <div className={`bg-white p-5 md:p-8 rounded-2xl md:rounded-[2rem] border ${isHighlighted ? 'border-[#c5a059]' : 'border-[#0b1d3a]/10'} relative flex flex-col group transition-all hover:border-[#c5a059]/30 shadow-md text-left`}>
       {onDelete && (
         <div className="absolute top-4 right-4 flex gap-1.5">
            <button onClick={onEdit} className="p-1.5 bg-[#0b1d3a]/5 text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] rounded-md transition-all">
@@ -1167,6 +1172,6 @@ function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComme
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }
