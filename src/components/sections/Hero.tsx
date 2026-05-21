@@ -6,17 +6,18 @@ import { useContent } from '@/src/context/ContentContext';
 import Logo from '@/src/components/ui/Logo';
 
 export default function Hero() {
-  const { content } = useContent();
+  const { homeContent } = useContent();
+  const { hero } = homeContent;
 
   return (
     <section id="home" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-aged-beige">
       {/* Background patterns */}
       <div className="absolute inset-0 z-0">
         {/* Background image if provided */}
-        {content.hero.backgroundImage && (
+        {hero.backgroundImage && (
           <div 
             className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-5"
-            style={{ backgroundImage: `url(${content.hero.backgroundImage})` }}
+            style={{ backgroundImage: `url(${hero.backgroundImage})` }}
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0b1d3a]/10 via-aged-beige to-aged-beige" />
@@ -37,25 +38,12 @@ export default function Hero() {
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 flex flex-col items-center text-center pt-24 pb-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          <h1 className="font-serif text-xl md:text-3xl lg:text-4xl font-bold text-[#0b1d3a] mb-1 tracking-[0.15em] uppercase">
-            {content.hero.title}
-          </h1>
-          <h2 className="font-sans text-[10px] md:text-xs tracking-[0.4em] text-[#c5a059] mb-8 uppercase font-medium">
-            {content.hero.subTitle}
-          </h2>
-        </motion.div>
-
         {/* Central Logo Section */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8, y: 50 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
-          className="relative mt-6 mb-10 group"
+          className="relative mt-6 mb-10 group animate-none"
         >
           {/* Subtle glow behind the logo - DESATIVADO NO MOBILE PARA PREVENIR ERROS GRÁFICOS */}
           <div className="absolute inset-0 bg-[#c5a059]/5 hidden md:block md:blur-[80px] rounded-full animate-pulse" />
@@ -82,13 +70,38 @@ export default function Hero() {
         </motion.div>
 
         <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <h1 className={`font-serif text-xl md:text-3xl lg:text-4xl font-bold text-[#0b1d3a] mb-1 tracking-[0.15em] uppercase w-full ${
+            hero.title.align === 'center' ? 'text-center' :
+            hero.title.align === 'right' ? 'text-right' :
+            hero.title.align === 'justify' ? 'text-justify' : 'text-left'
+          }`}>
+            {hero.title.text}
+          </h1>
+          <h2 className={`font-sans text-[10px] md:text-xs tracking-[0.4em] text-[#c5a059] mb-8 uppercase font-medium w-full ${
+            hero.subTitle.align === 'center' ? 'text-center' :
+            hero.subTitle.align === 'right' ? 'text-right' :
+            hero.subTitle.align === 'justify' ? 'text-justify' : 'text-left'
+          }`}>
+            {hero.subTitle.text}
+          </h2>
+        </motion.div>
+
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 1.2 }}
-          className="max-w-lg text-center"
+          className="max-w-lg w-full flex flex-col items-center"
         >
-          <p className="font-serif text-xs md:text-sm text-[#0b1d3a]/60 tracking-[0.15em] uppercase mb-8 leading-loose text-center px-4">
-            {content.hero.tagline}
+          <p className={`font-serif text-xs md:text-sm text-[#0b1d3a]/60 tracking-[0.15em] uppercase mb-8 leading-loose px-4 w-full ${
+            hero.tagline.align === 'center' ? 'text-center' :
+            hero.tagline.align === 'right' ? 'text-right' :
+            hero.tagline.align === 'justify' ? 'text-justify' : 'text-left'
+          }`}>
+            {hero.tagline.text}
           </p>
         </motion.div>
       </div>

@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import Navbar from './components/layout/Navbar';
 import WelcomeBanner from './components/sections/WelcomeBanner';
 import Hero from './components/sections/Hero';
+import DynamicHomeSections from './components/sections/DynamicHomeSections';
 import History from './components/sections/History';
 import Philanthropy from './components/sections/Philanthropy';
 import PastMasters from './components/sections/PastMasters';
@@ -98,6 +99,7 @@ function LandingPage() {
       <main>
         <WelcomeBanner />
         <Hero />
+        <DynamicHomeSections />
         <History />
         <Philanthropy />
         <PastMasters />

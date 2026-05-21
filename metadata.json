@@ -2,5 +2,5 @@
   "name": "ARLS Arca da Aliança nº 34",
   "description": "Augusta e Respeitável Loja Simbólica Arca da Aliança nº 34 - Guará, Brasília. Tradição, Virtude e Fraternidade.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

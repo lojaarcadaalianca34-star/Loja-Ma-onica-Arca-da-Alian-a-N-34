@@ -245,9 +245,23 @@
         "deadline": { "type": "string" }
       },
       "required": ["type", "title", "createdBy", "createdAt"]
+    },
+    "HomeContent": {
+      "title": "Conteúdo Dinâmico Home",
+      "description": "Conteúdo e alinhamentos da página HOME",
+      "type": "object",
+      "properties": {
+        "welcomeBanner": { "type": "object" },
+        "hero": { "type": "object" },
+        "dynamicSections": { "type": "array" }
+      }
     }
   },
   "firestore": {
+    "conteudo_site/{docId}": {
+      "schema": "HomeContent",
+      "description": "Conteúdo dinâmico das páginas por documento"
+    },
     "leads/{leadId}": {
       "schema": "Lead",
       "description": "Leads de ingresso"

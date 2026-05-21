@@ -1,6 +1,145 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
+
+export interface TextBlock {
+  text: string;
+  align: 'left' | 'center' | 'right' | 'justify';
+}
+
+export interface DynamicSection {
+  id: string;
+  title: TextBlock;
+  description: TextBlock;
+  image: string;
+}
+
+export interface HomeContent {
+  welcomeBanner: {
+    title: TextBlock;
+    subTitle: TextBlock;
+    backgroundImage: string;
+  };
+  hero: {
+    title: TextBlock;
+    subTitle: TextBlock;
+    tagline: TextBlock;
+    backgroundImage: string;
+  };
+  dynamicSections: DynamicSection[];
+}
+
+export interface Milestone {
+  year: string;
+  title: string;
+  description: string;
+}
+
+export interface AboutContent {
+  smallTitle: TextBlock;
+  title: TextBlock;
+  subTitle: TextBlock;
+  text: TextBlock;
+  images: string[];
+  mission: TextBlock;
+  vision: TextBlock;
+  values: string[];
+  milestones: Milestone[];
+}
+
+export interface SocialCampaign {
+  title: string;
+  description: string;
+  image: string;
+  status: string;
+  link: string;
+}
+
+export interface SocialContent {
+  title: TextBlock;
+  subTitle: TextBlock;
+  description: TextBlock;
+  gallery: string[];
+  campaigns: SocialCampaign[];
+}
+
+export const defaultHomeContent: HomeContent = {
+  welcomeBanner: {
+    title: { text: "ARCA DA ALIANÇA Nº 34", align: "center" },
+    subTitle: { text: "Bem vindo à Loja Maçônica", align: "center" },
+    backgroundImage: ""
+  },
+  hero: {
+    title: { text: "A.R.L.S. Arca da Aliança nº 34", align: "center" },
+    subTitle: { text: "Augusta e Respeitável Loja Simbólica - GLMDF", align: "center" },
+    tagline: { text: "A Arca da Aliança: Um refúgio de Luz, Verdade e Fraternidade", align: "center" },
+    backgroundImage: ""
+  },
+  dynamicSections: []
+};
+
+export const defaultAboutContent: AboutContent = {
+  smallTitle: { text: "Nossa Jornada", align: "center" },
+  title: { text: "A Arca Através", align: "center" },
+  subTitle: { text: "do Tempo", align: "center" },
+  text: { text: "Fundada in 2009, a Arca da Aliança nº 34 nasceu com o propósito de ser um repositório de virtudes e um farol de luz no Oriente de Vicente Pires - Brasília. Ao longo das décadas, nossas colunas se fortaleceram com homens que dedicaram suas vidas à busca da verdade.", align: "left" },
+  images: ["", ""],
+  mission: { text: "Tornar feliz a humanidade pelo aperfeiçoamento dos costumes, pela tolerância, pela filantropia e pela busca incessante da verdade.", align: "left" },
+  vision: { text: "Ser uma oficina de referência na maçonaria do Distrito Federal, reconhecida pela excelência ritualística e pelo impacto transformador em nossa comunidade.", align: "left" },
+  values: ["Fraternidade", "Busca da Verdade", "Filantropia", "Tolerância", "Liberdade de Pensamento"],
+  milestones: [
+    {
+      year: '2009',
+      title: 'Fundação',
+      description: 'A Arca da Aliança nº 34 nasceu com o propósito de ser um repositório de virtudes e um farol de luz no Oriente de Vicente Pires - DF.'
+    },
+    {
+      year: '20XX',
+      title: 'Primeira Sede',
+      description: 'Estabelecimento das primeiras colunas físicas, um solo sagrado para o trabalho maçônico.'
+    },
+    {
+      year: '20XX',
+      title: 'Crescimento',
+      description: 'Celebração da evolução e influência positiva na comunidade do Distrito Federal.'
+    },
+    {
+      year: 'HOJE',
+      title: 'Futuro Presente',
+      description: 'Nossas colunas se fortaleceram com homens que dedicaram suas vidas à busca incessante da verdade.'
+    }
+  ]
+};
+
+export const defaultSocialContent: SocialContent = {
+  title: { text: "Solidariedade e", align: "center" },
+  subTitle: { text: "Fraternidade", align: "center" },
+  description: { text: "A verdadeira maçonaria se manifesta através do serviço ao próximo. Nossa Loja mantém compromisso constante com o desenvolvimento social do Distrito Federal.", align: "left" },
+  gallery: [],
+  campaigns: [
+    {
+      title: "Apoio a Orfanatos",
+      description: "Doações mensais de alimentos, itens de higiene e material escolar para crianças assistidas do DF.",
+      image: "",
+      status: "Ativo",
+      link: ""
+    },
+    {
+      title: "Sopa Fraterna",
+      description: "Distribuição semanal de sopas e refeições quentes para pessoas em situação de vulnerabilidade social no Guará.",
+      image: "",
+      status: "Ativo",
+      link: ""
+    },
+    {
+      title: "Fomento Educacional",
+      description: "Bolsas de estudo e mentoria para jovens talentos, filhos de trabalhadores da região administrativa de Vicente Pires.",
+      image: "",
+      status: "Ativo",
+      link: ""
+    }
+  ]
+};
 
 interface SiteContent {
   hero: {
@@ -54,12 +193,14 @@ interface SiteContent {
       url: string;
       title: string;
       category: string;
+      description?: string;
     }[];
   };
   gallery: {
     url: string;
     title: string;
     category: string;
+    description?: string;
   }[];
   mastersSection: {
     smallTitle: string;
@@ -101,6 +242,8 @@ interface SiteContent {
       image: string;
       photo?: string; // Fallback
       logo?: string; // Fallback
+      website?: string;
+      historyWithLodge?: string;
     };
     demolay: {
       name: string;
@@ -114,6 +257,8 @@ interface SiteContent {
       image: string;
       photo?: string; // Fallback
       logo?: string; // Fallback
+      website?: string;
+      historyWithLodge?: string;
     };
     daughters: {
       name: string;
@@ -127,6 +272,8 @@ interface SiteContent {
       image: string;
       photo?: string; // Fallback
       logo?: string; // Fallback
+      website?: string;
+      historyWithLodge?: string;
     };
   };
   quest: {
@@ -298,7 +445,9 @@ const defaultContent: SiteContent = {
       vision: "Ser reconhecida como um pilar de amor e caridade, fortalecendo a base familiar dos maçons e impactando positivamente a sociedade.",
       values: ["Amor ao Próximo", "Fraternidade", "Dedicação", "Trabalho em Equipe"],
       history: "Fundada junto com a consolidação da oficina, o grupo de cunhadas sempre foi o braço direito nas ações sociais, transformando reuniões em momentos de união familiar.",
-      image: ""
+      image: "",
+      website: "",
+      historyWithLodge: "Trabalhando em total harmonia e perfeita união, as Guardiãs da Aliança atuam como o pilar de amor e sustentáculo social da A.R.L.S. Arca da Aliança nº 34, colaborando ativamente nos ágapes, eventos fraternais e na assistência social."
     },
     demolay: {
       name: "Ordem DeMolay",
@@ -308,7 +457,9 @@ const defaultContent: SiteContent = {
       vision: "Preparar jovens para serem cidadãos de bem e líderes exemplares em suas comunidades.",
       values: ["Liderança", "Honestidade", "Respeito", "Responsabilidade"],
       history: "O Capítulo Arca da Aliança da Ordem DeMolay foi instalado para guiar a juventude masculina do Guará, seguindo os preceitos de Jacques DeMolay.",
-      image: ""
+      image: "",
+      website: "",
+      historyWithLodge: "A Ordem DeMolay é patrocinada pela A.R.L.S. Arca da Aliança nº 34, cujos tios maçons guiam os jovens como conselheiros e mentores, oferecendo suporte físico, financeiro e espiritual ao crescimento do Capítulo."
     },
     daughters: {
       name: "Garotas do Arco-Íris",
@@ -318,7 +469,9 @@ const defaultContent: SiteContent = {
       vision: "Inspirar garotas a serem o melhor de si mesmas, agindo com bondade e coragem no mundo moderno.",
       values: ["Amor", "Religião", "Natureza", "Imortalidade", "Fidelidade", "Patriotismo", "Serviço"],
       history: "Nossa Assembleia acolhe jovens mulheres buscando o aperfeiçoamento pessoal e a criação de laços eternos de amizade e cooperação.",
-      image: ""
+      image: "",
+      website: "",
+      historyWithLodge: "As Garotas do Arco-Íris contam com o forte amparo e incentivo constante de todos os obreiros da A.R.L.S. Arca da Aliança nº 34, que acompanham e prestigiam todas as cerimônias públicas e iniciativas sociais promovidas pela Assembleia."
     }
   },
   quest: {
@@ -342,19 +495,34 @@ const defaultContent: SiteContent = {
 const ContentContext = createContext<{
   content: SiteContent;
   updateContent: (newContent: SiteContent) => void;
+  homeContent: HomeContent;
+  updateHomeContent: (newHomeContent: HomeContent) => Promise<void>;
+  aboutContent: AboutContent;
+  updateAboutContent: (newAboutContent: AboutContent) => Promise<void>;
+  socialContent: SocialContent;
+  updateSocialContent: (newSocialContent: SocialContent) => Promise<void>;
   loading: boolean;
 }>({
   content: defaultContent,
   updateContent: () => {},
+  homeContent: defaultHomeContent,
+  updateHomeContent: async () => {},
+  aboutContent: defaultAboutContent,
+  updateAboutContent: async () => {},
+  socialContent: defaultSocialContent,
+  updateSocialContent: async () => {},
   loading: true
 });
 
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState<SiteContent>(defaultContent);
+  const [homeContent, setHomeContent] = useState<HomeContent>(defaultHomeContent);
+  const [aboutContent, setAboutContent] = useState<AboutContent>(defaultAboutContent);
+  const [socialContent, setSocialContent] = useState<SocialContent>(defaultSocialContent);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Listen for real-time updates
+    // Listen for real-time updates for general content
     const unsubscribe = onSnapshot(doc(db, 'content', 'main'), (snapshot) => {
       if (snapshot.exists()) {
         setContent(snapshot.data() as SiteContent);
@@ -365,15 +533,175 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    // Listen for real-time updates of home content (fase 1)
+    const unsubscribeHome = onSnapshot(doc(db, 'conteudo_site', 'home'), (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        const loadedHome: HomeContent = {
+          welcomeBanner: {
+            title: {
+              text: data.welcomeBanner?.title?.text || defaultHomeContent.welcomeBanner.title.text,
+              align: data.welcomeBanner?.title?.align || defaultHomeContent.welcomeBanner.title.align
+            },
+            subTitle: {
+              text: data.welcomeBanner?.subTitle?.text || defaultHomeContent.welcomeBanner.subTitle.text,
+              align: data.welcomeBanner?.subTitle?.align || defaultHomeContent.welcomeBanner.subTitle.align
+            },
+            backgroundImage: data.welcomeBanner?.backgroundImage || defaultHomeContent.welcomeBanner.backgroundImage
+          },
+          hero: {
+            title: {
+              text: data.hero?.title?.text || defaultHomeContent.hero.title.text,
+              align: data.hero?.title?.align || defaultHomeContent.hero.title.align
+            },
+            subTitle: {
+              text: data.hero?.subTitle?.text || defaultHomeContent.hero.subTitle.text,
+              align: data.hero?.subTitle?.align || defaultHomeContent.hero.subTitle.align
+            },
+            tagline: {
+              text: data.hero?.tagline?.text || defaultHomeContent.hero.tagline.text,
+              align: data.hero?.tagline?.align || defaultHomeContent.hero.tagline.align
+            },
+            backgroundImage: data.hero?.backgroundImage || defaultHomeContent.hero.backgroundImage
+          },
+          dynamicSections: Array.isArray(data.dynamicSections) ? data.dynamicSections.map((sec: any) => ({
+            id: sec.id || String(Math.random()),
+            title: {
+              text: sec.title?.text || '',
+              align: sec.title?.align || 'left'
+            },
+            description: {
+              text: sec.description?.text || '',
+              align: sec.description?.align || 'left'
+            },
+            image: sec.image || ''
+          })) : []
+        };
+        setHomeContent(loadedHome);
+      } else {
+        setHomeContent(defaultHomeContent);
+      }
+    }, (error) => {
+      console.error("Home Content fetch error:", error);
+    });
+
+    // Listen for real-time updates of about_nos content (fase 2)
+    const unsubscribeAbout = onSnapshot(doc(db, 'conteudo_site', 'sobre_nos'), (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        const loadedAbout: AboutContent = {
+          smallTitle: {
+            text: data.smallTitle?.text !== undefined ? data.smallTitle.text : defaultAboutContent.smallTitle.text,
+            align: data.smallTitle?.align || defaultAboutContent.smallTitle.align
+          },
+          title: {
+            text: data.title?.text !== undefined ? data.title.text : defaultAboutContent.title.text,
+            align: data.title?.align || defaultAboutContent.title.align
+          },
+          subTitle: {
+            text: data.subTitle?.text !== undefined ? data.subTitle.text : defaultAboutContent.subTitle.text,
+            align: data.subTitle?.align || defaultAboutContent.subTitle.align
+          },
+          text: {
+            text: data.text?.text !== undefined ? data.text.text : defaultAboutContent.text.text,
+            align: data.text?.align || defaultAboutContent.text.align
+          },
+          images: Array.isArray(data.images) ? data.images : defaultAboutContent.images,
+          mission: {
+            text: data.mission?.text !== undefined ? data.mission.text : defaultAboutContent.mission.text,
+            align: data.mission?.align || defaultAboutContent.mission.align
+          },
+          vision: {
+            text: data.vision?.text !== undefined ? data.vision.text : defaultAboutContent.vision.text,
+            align: data.vision?.align || defaultAboutContent.vision.align
+          },
+          values: Array.isArray(data.values) ? data.values : defaultAboutContent.values,
+          milestones: Array.isArray(data.milestones) ? data.milestones.map((ms: any) => ({
+            year: ms.year || '',
+            title: ms.title || '',
+            description: ms.description || ''
+          })) : defaultAboutContent.milestones
+        };
+        setAboutContent(loadedAbout);
+      } else {
+        setAboutContent(defaultAboutContent);
+      }
+    }, (error) => {
+      console.error("About Content fetch error:", error);
+    });
+
+    // Listen for real-time updates of acoes_sociais content (fase 3)
+    const unsubscribeSocial = onSnapshot(doc(db, 'conteudo_site', 'acoes_sociais'), (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        const loadedSocial: SocialContent = {
+          title: {
+            text: data.title?.text !== undefined ? data.title.text : defaultSocialContent.title.text,
+            align: data.title?.align || defaultSocialContent.title.align
+          },
+          subTitle: {
+            text: data.subTitle?.text !== undefined ? data.subTitle.text : defaultSocialContent.subTitle.text,
+            align: data.subTitle?.align || defaultSocialContent.subTitle.align
+          },
+          description: {
+            text: data.description?.text !== undefined ? data.description.text : defaultSocialContent.description.text,
+            align: data.description?.align || defaultSocialContent.description.align
+          },
+          gallery: Array.isArray(data.gallery) ? data.gallery : defaultSocialContent.gallery,
+          campaigns: Array.isArray(data.campaigns) ? data.campaigns.map((camp: any) => ({
+            title: camp.title || '',
+            description: camp.description || '',
+            image: camp.image || '',
+            status: camp.status || 'Ativo',
+            link: camp.link || ''
+          })) : defaultSocialContent.campaigns
+        };
+        setSocialContent(loadedSocial);
+      } else {
+        setSocialContent(defaultSocialContent);
+      }
+    }, (error) => {
+      console.error("Social Content fetch error:", error);
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeHome();
+      unsubscribeAbout();
+      unsubscribeSocial();
+    };
   }, []);
 
   const updateContent = (newContent: SiteContent) => {
     setContent(newContent);
   };
 
+  const updateHomeContent = async (newHomeContent: HomeContent) => {
+    try {
+      await setDoc(doc(db, 'conteudo_site', 'home'), newHomeContent);
+    } catch (e) {
+      handleFirestoreError(e, OperationType.WRITE, 'conteudo_site/home');
+    }
+  };
+
+  const updateAboutContent = async (newAboutContent: AboutContent) => {
+    try {
+      await setDoc(doc(db, 'conteudo_site', 'sobre_nos'), newAboutContent);
+    } catch (e) {
+      handleFirestoreError(e, OperationType.WRITE, 'conteudo_site/sobre_nos');
+    }
+  };
+
+  const updateSocialContent = async (newSocialContent: SocialContent) => {
+    try {
+      await setDoc(doc(db, 'conteudo_site', 'acoes_sociais'), newSocialContent);
+    } catch (e) {
+      handleFirestoreError(e, OperationType.WRITE, 'conteudo_site/acoes_sociais');
+    }
+  };
+
   return (
-    <ContentContext.Provider value={{ content, updateContent, loading }}>
+    <ContentContext.Provider value={{ content, updateContent, homeContent, updateHomeContent, aboutContent, updateAboutContent, socialContent, updateSocialContent, loading }}>
       {children}
     </ContentContext.Provider>
   );

@@ -5,9 +5,35 @@ import Footer from '../components/layout/Footer';
 import { useContent } from '../context/ContentContext';
 import { Landmark, Target, Eye, Sparkles, History as HistoryIcon, Star } from 'lucide-react';
 
+const getAlignClass = (align: 'left' | 'center' | 'right' | 'justify') => {
+  if (align === 'center') return 'text-center';
+  if (align === 'right') return 'text-right';
+  if (align === 'justify') return 'text-justify';
+  return 'text-left';
+};
+
+const getFlexAlignClass = (align: 'left' | 'center' | 'right' | 'justify') => {
+  if (align === 'center') return 'items-center justify-center';
+  if (align === 'right') return 'items-end justify-end';
+  return 'items-start justify-start';
+};
+
 export default function AboutPage() {
-  const { content } = useContent();
+  const { content, aboutContent } = useContent();
   const { history } = content;
+
+  // Fallbacks
+  const missionText = aboutContent?.mission?.text || history.mission;
+  const missionAlign = aboutContent?.mission?.align || 'left';
+
+  const visionText = aboutContent?.vision?.text || history.vision;
+  const visionAlign = aboutContent?.vision?.align || 'left';
+
+  const values = aboutContent?.values && aboutContent.values.length > 0 ? aboutContent.values : history.values || [];
+
+  const milestones = aboutContent?.milestones && aboutContent.milestones.length > 0 
+    ? aboutContent.milestones 
+    : history.milestones || [];
 
   return (
     <div className="min-h-screen bg-aged-beige">
@@ -43,14 +69,14 @@ export default function AboutPage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="p-10 rounded-3xl bg-white/50 border border-[#c5a059]/20 hover:border-[#c5a059]/50 transition-all flex flex-col items-center text-center group shadow-sm"
+              className={`p-10 rounded-3xl bg-white/50 border border-[#c5a059]/20 hover:border-[#c5a059]/50 transition-all flex flex-col ${getFlexAlignClass(missionAlign)} group shadow-sm`}
             >
               <div className="w-16 h-16 rounded-2xl bg-[#c5a059]/10 flex items-center justify-center mb-6 group-hover:bg-[#c5a059] transition-all">
                 <Target className="w-8 h-8 text-[#c5a059] group-hover:text-white" />
               </div>
-              <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-4 uppercase tracking-widest gold-text">Missão</h3>
-              <p className="text-[#0b1d3a]/80 font-sans text-sm leading-relaxed italic">
-                "{history.mission}"
+              <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-4 uppercase tracking-widest gold-text text-center">Missão</h3>
+              <p className={`text-[#0b1d3a]/80 font-sans text-sm leading-relaxed italic whitespace-pre-wrap w-full ${getAlignClass(missionAlign)}`}>
+                "{missionText}"
               </p>
             </motion.div>
 
@@ -60,14 +86,14 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="p-10 rounded-3xl bg-white/50 border border-[#c5a059]/20 hover:border-[#c5a059]/50 transition-all flex flex-col items-center text-center group shadow-sm"
+              className={`p-10 rounded-3xl bg-white/50 border border-[#c5a059]/20 hover:border-[#c5a059]/50 transition-all flex flex-col ${getFlexAlignClass(visionAlign)} group shadow-sm`}
             >
               <div className="w-16 h-16 rounded-2xl bg-[#c5a059]/10 flex items-center justify-center mb-6 group-hover:bg-[#c5a059] transition-all">
                 <Eye className="w-8 h-8 text-[#c5a059] group-hover:text-white" />
               </div>
-              <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-4 uppercase tracking-widest gold-text">Visão</h3>
-              <p className="text-[#0b1d3a]/80 font-sans text-sm leading-relaxed mb-4">
-                {history.vision}
+              <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-4 uppercase tracking-widest gold-text text-center">Visão</h3>
+              <p className={`text-[#0b1d3a]/80 font-sans text-sm leading-relaxed whitespace-pre-wrap w-full ${getAlignClass(visionAlign)}`}>
+                {visionText}
               </p>
             </motion.div>
 
@@ -77,14 +103,14 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="p-10 rounded-3xl bg-white/50 border border-[#c5a059]/20 hover:border-[#c5a059]/50 transition-all flex flex-col items-center text-center group shadow-sm"
+              className="p-10 rounded-3xl bg-white/50 border border-[#c5a059]/20 hover:border-[#c5a059]/50 transition-all flex flex-col items-center justify-center text-center group shadow-sm"
             >
               <div className="w-16 h-16 rounded-2xl bg-[#c5a059]/10 flex items-center justify-center mb-6 group-hover:bg-[#c5a059] transition-all">
                 <Sparkles className="w-8 h-8 text-[#c5a059] group-hover:text-white" />
               </div>
               <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-4 uppercase tracking-widest gold-text">Valores</h3>
               <div className="flex flex-wrap justify-center gap-2">
-                {history.values.map((v, i) => (
+                {values.map((v, i) => (
                   <span key={i} className="px-3 py-1 rounded-full bg-navy-blue/10 text-[#c5a059] text-[10px] font-bold uppercase tracking-widest">
                     {v}
                   </span>
@@ -112,7 +138,7 @@ export default function AboutPage() {
               <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[1px] bg-[#c5a059]/20 md:-ml-[0.5px]" />
 
               <div className="space-y-12 md:space-y-0">
-                {history.milestones.map((item, index) => (
+                {milestones.map((item, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
@@ -124,7 +150,7 @@ export default function AboutPage() {
                     <div className={`pl-12 md:pl-0 ${index % 2 === 0 ? 'md:text-right' : 'md:order-2'}`}>
                       <span className="text-4xl font-serif font-black gold-text mb-2 block">{item.year}</span>
                       <h3 className="text-[#0b1d3a] font-bold text-xl uppercase tracking-widest mb-3">{item.title}</h3>
-                      <p className="text-[#0b1d3a]/70 font-sans text-sm leading-relaxed max-w-sm ml-auto mr-0 rtl:ml-0 rtl:mr-auto">
+                      <p className="text-[#0b1d3a]/70 font-sans text-sm leading-relaxed max-w-sm ml-auto mr-0 rtl:ml-0 rtl:mr-auto whitespace-pre-wrap">
                         {item.description}
                       </p>
                     </div>

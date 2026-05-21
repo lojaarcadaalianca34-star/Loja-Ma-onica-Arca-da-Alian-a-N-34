@@ -4,7 +4,7 @@ import { db, auth, logout, handleFirestoreError, OperationType, storage } from '
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, getDoc, setDoc, deleteDoc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { useContent } from '@/src/context/ContentContext';
-import { LogOut, Users, FileText, Save, Check, RefreshCw, X, Brain, Printer, ChevronDown, ChevronUp, Book, Video, Globe, Star, Play, Download, LayoutDashboard, ExternalLink, ArrowLeft, ShieldCheck, Clock, Eye, EyeOff, Plus, Upload, Link as LinkIcon, Trash2, MessageSquare, Edit } from 'lucide-react';
+import { LogOut, Users, FileText, Save, Check, RefreshCw, X, Brain, Printer, ChevronDown, ChevronUp, Book, Video, Globe, Star, Play, Download, LayoutDashboard, ExternalLink, ArrowLeft, ShieldCheck, Clock, Eye, EyeOff, Plus, Upload, Link as LinkIcon, Trash2, MessageSquare, Edit, History, HandHeart, AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { analyzeCandidate } from '@/src/services/masonicAnalysisService';
 import { jsPDF } from 'jspdf';
@@ -269,7 +269,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const { content, updateContent } = useContent();
   const [activeTab, setActiveTab] = useState<'leads' | 'content' | 'events' | 'library' | 'members'>('leads');
-  const [contentSubTab, setContentSubTab] = useState<'site' | 'management' | 'family' | 'masters' | 'social' | 'contact' | null>(null);
+  const [contentSubTab, setContentSubTab] = useState<'site' | 'management' | 'family' | 'masters' | 'social' | 'contact' | 'home' | 'about' | 'filantropia' | null>(null);
   const [newLibrarySection, setNewLibrarySection] = useState('');
   const [leads, setLeads] = useState<any[]>([]);
   const [libraryItems, setLibraryItems] = useState<any[]>([]);
@@ -295,6 +295,251 @@ export default function AdminDashboard() {
   const [expandedLead, setExpandedLead] = useState<string | null>(null);
   const [analysisReports, setAnalysisReports] = useState<Record<string, string>>({});
   const [uploadingItems, setUploadingItems] = useState<Record<string, boolean>>({});
+
+  const { homeContent, updateHomeContent } = useContent();
+  const [tempHomeContent, setTempHomeContent] = useState<any>(null);
+  const [isSavingHome, setIsSavingHome] = useState(false);
+  const [uploadingHomeImages, setUploadingHomeImages] = useState<Record<string, boolean>>({});
+
+  const { aboutContent, updateAboutContent } = useContent();
+  const [tempAboutContent, setTempAboutContent] = useState<any>(null);
+  const [isSavingAbout, setIsSavingAbout] = useState(false);
+  const [uploadingAboutImages, setUploadingAboutImages] = useState<Record<string, boolean>>({});
+
+  const { socialContent, updateSocialContent } = useContent();
+  const [tempSocialContent, setTempSocialContent] = useState<any>(null);
+  const [isSavingSocial, setIsSavingSocial] = useState(false);
+  const [uploadingSocialImages, setUploadingSocialImages] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (homeContent) {
+      setTempHomeContent(JSON.parse(JSON.stringify(homeContent)));
+    }
+  }, [homeContent]);
+
+  useEffect(() => {
+    if (aboutContent) {
+      setTempAboutContent(JSON.parse(JSON.stringify(aboutContent)));
+    }
+  }, [aboutContent]);
+
+  useEffect(() => {
+    if (socialContent) {
+      setTempSocialContent(JSON.parse(JSON.stringify(socialContent)));
+    }
+  }, [socialContent]);
+
+  const handleSocialImageUpload = async (fieldPath: string, file: File, indexProp?: number) => {
+    if (!file) return;
+    
+    setUploadingSocialImages(prev => ({ ...prev, [fieldPath]: true }));
+    
+    try {
+      const storageRef = ref(storage, `social/${Date.now()}_${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      
+      return new Promise<string>((resolve, reject) => {
+        uploadTask.on('state_changed', 
+          null,
+          (error) => {
+            console.error("Social image upload error:", error);
+            setUploadingSocialImages(prev => ({ ...prev, [fieldPath]: false }));
+            reject(error);
+          },
+          async () => {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            
+            setTempSocialContent((prev: any) => {
+              if (!prev) return prev;
+              const updated = { ...prev };
+              if (indexProp !== undefined) {
+                if (fieldPath === 'gallery') {
+                  const updatedGallery = [...(updated.gallery || [])];
+                  updatedGallery[indexProp] = downloadURL;
+                  updated.gallery = updatedGallery;
+                } else if (fieldPath === 'campaigns') {
+                  const updatedCampaigns = [...(updated.campaigns || [])];
+                  updatedCampaigns[indexProp].image = downloadURL;
+                  updated.campaigns = updatedCampaigns;
+                }
+              } else {
+                const parts = fieldPath.split('.');
+                if (parts.length === 2) {
+                  updated[parts[0]] = { ...updated[parts[0]], [parts[1]]: downloadURL };
+                } else {
+                  updated[fieldPath] = downloadURL;
+                }
+              }
+              return updated;
+            });
+            
+            setUploadingSocialImages(prev => ({ ...prev, [fieldPath]: false }));
+            resolve(downloadURL);
+          }
+        );
+      });
+    } catch (error) {
+      console.error("Error setting up social image upload:", error);
+      setUploadingSocialImages(prev => ({ ...prev, [fieldPath]: false }));
+    }
+  };
+
+  const handleAboutImageUpload = async (fieldPath: string, file: File, indexProp?: number) => {
+    if (!file) return;
+    
+    setUploadingAboutImages(prev => ({ ...prev, [fieldPath]: true }));
+    
+    try {
+      const storageRef = ref(storage, `about/${Date.now()}_${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      
+      return new Promise<string>((resolve, reject) => {
+        uploadTask.on('state_changed', 
+          null,
+          (error) => {
+            console.error("About image upload error:", error);
+            setUploadingAboutImages(prev => ({ ...prev, [fieldPath]: false }));
+            reject(error);
+          },
+          async () => {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            
+            setTempAboutContent((prev: any) => {
+              if (!prev) return prev;
+              const updated = { ...prev };
+              if (indexProp !== undefined) {
+                const updatedImages = [...(updated.images || [])];
+                updatedImages[indexProp] = downloadURL;
+                updated.images = updatedImages;
+              } else {
+                const parts = fieldPath.split('.');
+                if (parts.length === 2) {
+                  updated[parts[0]] = { ...updated[parts[0]], [parts[1]]: downloadURL };
+                } else {
+                  updated[fieldPath] = downloadURL;
+                }
+              }
+              return updated;
+            });
+            
+            setUploadingAboutImages(prev => ({ ...prev, [fieldPath]: false }));
+            resolve(downloadURL);
+          }
+        );
+      });
+    } catch (error) {
+      console.error("Error setting up about image upload:", error);
+      setUploadingAboutImages(prev => ({ ...prev, [fieldPath]: false }));
+    }
+  };
+
+  const renderAboutImageEditor = (label: string, fieldPath: string, imageUrl: string, indexProp?: number) => {
+    return (
+      <div className="space-y-3 bg-white/35 border border-[#0b1d3a]/5 p-4 rounded-2xl shadow-sm text-left">
+        <label className="block text-[10px] uppercase font-black tracking-widest text-[#0b1d3a]">{label}</label>
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          <input
+            type="text"
+            className="flex-1 w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-2.5 text-xs text-[#0b1d3a] lg:text-sm focus:border-[#c5a059]/50 outline-none"
+            placeholder="URL da Imagem..."
+            value={imageUrl || ''}
+            onChange={(e) => {
+              const urlVal = e.target.value;
+              setTempAboutContent((prev: any) => {
+                if (!prev) return prev;
+                const updated = { ...prev };
+                if (indexProp !== undefined) {
+                  const updatedImages = [...(updated.images || [])];
+                  updatedImages[indexProp] = urlVal;
+                  updated.images = updatedImages;
+                } else {
+                  const parts = fieldPath.split('.');
+                  if (parts.length === 2) {
+                    updated[parts[0]] = { ...updated[parts[0]], [parts[1]]: urlVal };
+                  } else {
+                    updated[fieldPath] = urlVal;
+                  }
+                }
+                return updated;
+              });
+            }}
+          />
+          <div className="relative">
+            <button className="flex items-center gap-2 px-3 py-2 bg-[#0b1d3a] hover:bg-[#c5a059] text-white text-[10px] font-black uppercase rounded-xl transition-all shadow pointer-events-none">
+              <Upload className="w-3.5 h-3.5" /> Enviar
+            </button>
+            <input
+              type="file"
+              accept="image/*"
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleAboutImageUpload(fieldPath, file, indexProp);
+              }}
+            />
+          </div>
+        </div>
+        {uploadingAboutImages[fieldPath] && (
+          <p className="text-[10px] text-[#c5a059] font-bold animate-pulse">Enviando imagem, aguarde...</p>
+        )}
+        {imageUrl && (
+          <div className="mt-2 w-full max-w-[200px] h-20 rounded-xl overflow-hidden border border-[#0b1d3a]/10 bg-black/5 shadow-inner">
+            <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const handleHomeImageUpload = async (fieldPath: string, file: File, sectionId?: string) => {
+    if (!file) return;
+    
+    setUploadingHomeImages(prev => ({ ...prev, [fieldPath]: true }));
+    
+    try {
+      const storageRef = ref(storage, `home/${Date.now()}_${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      
+      return new Promise<string>((resolve, reject) => {
+        uploadTask.on('state_changed', 
+          null,
+          (error) => {
+            console.error("Home image upload error:", error);
+            setUploadingHomeImages(prev => ({ ...prev, [fieldPath]: false }));
+            reject(error);
+          },
+          async () => {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            
+            setTempHomeContent((prev: any) => {
+              if (!prev) return prev;
+              const updated = { ...prev };
+              if (sectionId) {
+                updated.dynamicSections = (updated.dynamicSections || []).map((sec: any) => {
+                  if (sec.id === sectionId) {
+                    return { ...sec, image: downloadURL };
+                  }
+                  return sec;
+                });
+              } else {
+                const parts = fieldPath.split('.');
+                if (parts.length === 2) {
+                  updated[parts[0]] = { ...updated[parts[0]], [parts[1]]: downloadURL };
+                }
+              }
+              return updated;
+            });
+            
+            setUploadingHomeImages(prev => ({ ...prev, [fieldPath]: false }));
+            resolve(downloadURL);
+          }
+        );
+      });
+    } catch (error) {
+      console.error("Error setting up home image upload:", error);
+      setUploadingHomeImages(prev => ({ ...prev, [fieldPath]: false }));
+    }
+  };
 
   const handleLibraryFileUpload = async (itemId: string, file: File) => {
     if (!file) return;
@@ -747,6 +992,129 @@ export default function AdminDashboard() {
     doc.save(`Ficha_Candidato_${lead.fullName?.replace(/\s+/g, '_') || 'Desconhecido'}.pdf`);
   };
 
+  const renderTextBlockEditor = (label: string, valueObj: any, onChangeText: (txt: string) => void, onChangeAlign: (align: any) => void) => {
+    const currentAlign = valueObj?.align || 'left';
+    return (
+      <div className="space-y-2 bg-white/35 border border-[#0b1d3a]/5 p-4 rounded-2xl shadow-sm text-left">
+        <div className="flex justify-between items-center">
+          <label className="text-[10px] uppercase font-black tracking-widest text-[#0b1d3a]">{label}</label>
+          <span className="flex items-center gap-1.5 bg-white/60 p-0.5 rounded-lg border border-[#0b1d3a]/10 shadow-sm">
+            <button
+              type="button"
+              onClick={() => onChangeAlign('left')}
+              className={`p-1 rounded-md transition-all ${
+                currentAlign === 'left'
+                  ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-sm'
+                  : 'text-[#0b1d3a]/60 hover:text-[#0b1d3a] hover:bg-[#0b1d3a]/5'
+              }`}
+              title="Esquerda"
+            >
+              <AlignLeft className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onChangeAlign('center')}
+              className={`p-1 rounded-md transition-all ${
+                currentAlign === 'center'
+                  ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-sm'
+                  : 'text-[#0b1d3a]/60 hover:text-[#0b1d3a] hover:bg-[#0b1d3a]/5'
+              }`}
+              title="Centralizado"
+            >
+              <AlignCenter className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onChangeAlign('right')}
+              className={`p-1 rounded-md transition-all ${
+                currentAlign === 'right'
+                  ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-sm'
+                  : 'text-[#0b1d3a]/60 hover:text-[#0b1d3a] hover:bg-[#0b1d3a]/5'
+              }`}
+              title="Direita"
+            >
+              <AlignRight className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onChangeAlign('justify')}
+              className={`p-1 rounded-md transition-all ${
+                currentAlign === 'justify'
+                  ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-sm'
+                  : 'text-[#0b1d3a]/60 hover:text-[#0b1d3a] hover:bg-[#0b1d3a]/5'
+              }`}
+              title="Justificado"
+            >
+              <AlignJustify className="w-3.5 h-3.5" />
+            </button>
+          </span>
+        </div>
+        <textarea
+          className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-3 text-[#0b1d3a] text-sm focus:border-[#c5a059]/50 outline-none shadow-inner animate-none"
+          rows={2}
+          value={valueObj?.text || ''}
+          onChange={(e) => onChangeText(e.target.value)}
+        />
+      </div>
+    );
+  };
+
+  const renderImageEditor = (label: string, fieldPath: string, imageUrl: string, sectionId?: string) => {
+    return (
+      <div className="space-y-3 bg-white/35 border border-[#0b1d3a]/5 p-4 rounded-2xl shadow-sm text-left">
+        <label className="block text-[10px] uppercase font-black tracking-widest text-[#0b1d3a]">{label}</label>
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          <input
+            type="text"
+            className="flex-1 w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-2.5 text-xs text-[#0b1d3a] focus:border-[#c5a059]/50 outline-none"
+            placeholder="URL da Imagem..."
+            value={imageUrl || ''}
+            onChange={(e) => {
+              const urlVal = e.target.value;
+              setTempHomeContent((prev: any) => {
+                if (!prev) return prev;
+                const updated = { ...prev };
+                if (sectionId) {
+                  updated.dynamicSections = (updated.dynamicSections || []).map((sec: any) => 
+                    sec.id === sectionId ? { ...sec, image: urlVal } : sec
+                  );
+                } else {
+                  const parts = fieldPath.split('.');
+                  if (parts.length === 2) {
+                    updated[parts[0]] = { ...updated[parts[0]], [parts[1]]: urlVal };
+                  }
+                }
+                return updated;
+              });
+            }}
+          />
+          <div className="relative">
+            <button className="flex items-center gap-2 px-3 py-2 bg-[#0b1d3a] hover:bg-[#c5a059] text-white text-[10px] font-black uppercase rounded-xl transition-all shadow pointer-events-none">
+              <Upload className="w-3.5 h-3.5" /> Enviar
+            </button>
+            <input
+              type="file"
+              accept="image/*"
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleHomeImageUpload(fieldPath, file, sectionId);
+              }}
+            />
+          </div>
+        </div>
+        {uploadingHomeImages[fieldPath] && (
+          <p className="text-[10px] text-[#c5a059] font-bold animate-pulse">Enviando imagem, aguarde...</p>
+        )}
+        {imageUrl && (
+          <div className="mt-2 w-full max-w-[200px] h-20 rounded-xl overflow-hidden border border-[#0b1d3a]/10 bg-black/5 shadow-inner">
+            <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#f4efe2] text-[#0b1d3a] p-6 pt-24">
       <AnimatePresence>
@@ -1180,6 +1548,39 @@ export default function AdminDashboard() {
               {!contentSubTab ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   <button 
+                    onClick={() => setContentSubTab('home')}
+                    className="group bg-white/40 border border-[#0b1d3a]/5 p-8 rounded-[2.5rem] text-left hover:border-[#c5a059]/40 transition-all hover:bg-white/80 shadow-sm"
+                  >
+                    <div className="w-14 h-14 rounded-2xl bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059] mb-6 group-hover:scale-110 transition-transform">
+                      <LayoutDashboard className="w-7 h-7" />
+                    </div>
+                    <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-2 uppercase tracking-wider">Gerenciar <span className="text-[#c5a059]">Home</span></h3>
+                    <p className="text-[#0b1d3a]/40 text-[10px] uppercase tracking-widest font-black">Boas-Vindas, Banner Principal, Alinhamentos e Seções Dinâmicas</p>
+                  </button>
+
+                  <button 
+                    onClick={() => setContentSubTab('about')}
+                    className="group bg-white/40 border border-[#0b1d3a]/5 p-8 rounded-[2.5rem] text-left hover:border-[#c5a059]/40 transition-all hover:bg-white/80 shadow-sm"
+                  >
+                    <div className="w-14 h-14 rounded-2xl bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059] mb-6 group-hover:scale-110 transition-transform">
+                      <History className="w-7 h-7" />
+                    </div>
+                    <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-2 uppercase tracking-wider">Gerenciar <span className="text-[#c5a059]">Sobre Nós</span></h3>
+                    <p className="text-[#0b1d3a]/40 text-[10px] uppercase tracking-widest font-black">Nossa História, Tríade Maçônica, Linha do Tempo e Fotos Dinâmicas</p>
+                  </button>
+
+                  <button 
+                    onClick={() => setContentSubTab('filantropia')}
+                    className="group bg-white/40 border border-[#0b1d3a]/5 p-8 rounded-[2.5rem] text-left hover:border-[#c5a059]/40 transition-all hover:bg-white/80 shadow-sm"
+                  >
+                    <div className="w-14 h-14 rounded-2xl bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059] mb-6 group-hover:scale-110 transition-transform">
+                      <HandHeart className="w-7 h-7" />
+                    </div>
+                    <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-2 uppercase tracking-wider">Gerenciar <span className="text-[#c5a059]">Ações Sociais</span></h3>
+                    <p className="text-[#0b1d3a]/40 text-[10px] uppercase tracking-widest font-black">Filantropia, Campanhas, Projetos, Galeria de Fotos e Alinhamentos</p>
+                  </button>
+
+                  <button 
                     onClick={() => setContentSubTab('site')}
                     className="group bg-white/40 border border-[#0b1d3a]/5 p-8 rounded-[2.5rem] text-left hover:border-[#c5a059]/40 transition-all hover:bg-white/80 shadow-sm"
                   >
@@ -1219,8 +1620,8 @@ export default function AdminDashboard() {
                     <div className="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center text-pink-500 mb-6 group-hover:scale-110 transition-transform">
                       <Star className="w-7 h-7" />
                     </div>
-                    <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-2 uppercase tracking-wider">Cunhadas e <span className="text-pink-500">Jovens</span></h3>
-                    <p className="text-[#0b1d3a]/40 text-[10px] uppercase tracking-widest font-black">Fraternidade Feminina e Ordem DeMolay/Garotas do Arco Iris</p>
+                    <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-2 uppercase tracking-wider">Gerenciar Família / <span className="text-pink-500">Paramaçônicas</span></h3>
+                    <p className="text-[#0b1d3a]/40 text-[10px] uppercase tracking-widest font-black">Fraternidade de Cunhadas e Grupos Paramaçônicos Juvenis</p>
                   </button>
 
                   <button 
@@ -1230,7 +1631,7 @@ export default function AdminDashboard() {
                     <div className="w-14 h-14 rounded-2xl bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059] mb-6 group-hover:scale-110 transition-transform">
                       <Play className="w-7 h-7" />
                     </div>
-                    <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-2 uppercase tracking-wider">Álbum <span className="text-[#c5a059]">Social</span></h3>
+                    <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] mb-2 uppercase tracking-wider">Gerenciar <span className="text-[#c5a059]">Galeria de Fotos</span></h3>
                     <p className="text-[#0b1d3a]/40 text-[10px] uppercase tracking-widest font-black">Vídeos e fotos da Galeria do Site</p>
                   </button>
 
@@ -1256,6 +1657,827 @@ export default function AdminDashboard() {
 
                   <div className="pt-4">
                     {/* Render the specific content editor based on contentSubTab */}
+                    {contentSubTab === 'home' && tempHomeContent && (
+                      <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300">
+                        {/* Header and Live Save Bar */}
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-[#0b1d3a]/10 gap-4">
+                          <div>
+                            <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] uppercase tracking-wider">Gerenciar Home</h3>
+                            <p className="text-[10px] text-[#0b1d3a]/50 uppercase tracking-widest font-black">Configure textos, alinhamentos, imagens e seções dinâmicas da página inicial pública</p>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              setIsSavingHome(true);
+                              try {
+                                await updateHomeContent(tempHomeContent);
+                                setShowSaveSuccess(true);
+                              } catch (err) {
+                                console.error("Error saving Home content:", err);
+                              } finally {
+                                setIsSavingHome(false);
+                              }
+                            }}
+                            disabled={isSavingHome}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-[#0b1d3a] hover:bg-[#c5a059] text-white text-xs rounded-xl font-black uppercase transition-all shadow-lg hover:shadow-xl hover:-translate-y-px"
+                          >
+                            {isSavingHome ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                            {isSavingHome ? 'Salvando...' : 'Salvar Alterações'}
+                          </button>
+                        </div>
+
+                        {/* Welcoming Banner Section */}
+                        <div className="space-y-6">
+                          <h3 className="font-serif text-xl border-l-4 border-[#c5a059] pl-4 uppercase tracking-widest font-bold text-[#0b1d3a]">Banner de Boas-Vindas (Bem-vindo)</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                              {renderTextBlockEditor(
+                                "Título de Boas-Vindas",
+                                tempHomeContent.welcomeBanner?.title,
+                                (txt) => setTempHomeContent((prev: any) => ({
+                                  ...prev,
+                                  welcomeBanner: { ...prev.welcomeBanner, title: { ...prev.welcomeBanner.title, text: txt } }
+                                })),
+                                (aln) => setTempHomeContent((prev: any) => ({
+                                  ...prev,
+                                  welcomeBanner: { ...prev.welcomeBanner, title: { ...prev.welcomeBanner.title, align: aln } }
+                                }))
+                              )}
+
+                              {renderTextBlockEditor(
+                                "Subtítulo de Boas-Vindas",
+                                tempHomeContent.welcomeBanner?.subTitle,
+                                (txt) => setTempHomeContent((prev: any) => ({
+                                  ...prev,
+                                  welcomeBanner: { ...prev.welcomeBanner, subTitle: { ...prev.welcomeBanner.subTitle, text: txt } }
+                                })),
+                                (aln) => setTempHomeContent((prev: any) => ({
+                                  ...prev,
+                                  welcomeBanner: { ...prev.welcomeBanner, subTitle: { ...prev.welcomeBanner.subTitle, align: aln } }
+                                }))
+                              )}
+                            </div>
+
+                            <div>
+                              {renderImageEditor(
+                                "Imagem de Fundo - Banner Boas-Vindas (URL ou File)",
+                                "welcomeBanner.backgroundImage",
+                                tempHomeContent.welcomeBanner?.backgroundImage
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Hero Section */}
+                        <div className="space-y-6 pt-6 border-t border-[#0b1d3a]/5">
+                          <h3 className="font-serif text-xl border-l-4 border-[#c5a059] pl-4 uppercase tracking-widest font-bold text-[#0b1d3a]">Banner Principal (Hero)</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                              {renderTextBlockEditor(
+                                "Título Principal (Hero)",
+                                tempHomeContent.hero?.title,
+                                (txt) => setTempHomeContent((prev: any) => ({
+                                  ...prev,
+                                  hero: { ...prev.hero, title: { ...prev.hero.title, text: txt } }
+                                })),
+                                (aln) => setTempHomeContent((prev: any) => ({
+                                  ...prev,
+                                  hero: { ...prev.hero, title: { ...prev.hero.title, align: aln } }
+                                }))
+                              )}
+
+                              {renderTextBlockEditor(
+                                "Linha de Topo (Sub-título Hero)",
+                                tempHomeContent.hero?.subTitle,
+                                (txt) => setTempHomeContent((prev: any) => ({
+                                  ...prev,
+                                  hero: { ...prev.hero, subTitle: { ...prev.hero.subTitle, text: txt } }
+                                })),
+                                (aln) => setTempHomeContent((prev: any) => ({
+                                  ...prev,
+                                  hero: { ...prev.hero, subTitle: { ...prev.hero.subTitle, align: aln } }
+                                }))
+                              )}
+
+                              {renderTextBlockEditor(
+                                "Tagline / Descrição Principal",
+                                tempHomeContent.hero?.tagline,
+                                (txt) => setTempHomeContent((prev: any) => ({
+                                  ...prev,
+                                  hero: { ...prev.hero, tagline: { ...prev.hero.tagline, text: txt } }
+                                })),
+                                (aln) => setTempHomeContent((prev: any) => ({
+                                  ...prev,
+                                  hero: { ...prev.hero, tagline: { ...prev.hero.tagline, align: aln } }
+                                }))
+                              )}
+                            </div>
+
+                            <div>
+                              {renderImageEditor(
+                                "Imagem de Fundo - Hero",
+                                "hero.backgroundImage",
+                                tempHomeContent.hero?.backgroundImage
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Dynamic HTML Sections */}
+                        <div className="space-y-6 pt-6 border-t border-[#0b1d3a]/5">
+                          <div className="flex justify-between items-center bg-white/40 p-4 rounded-2xl border border-[#0b1d3a]/5 shadow-sm">
+                            <div>
+                              <h3 className="font-serif text-lg font-bold text-[#0b1d3a] uppercase tracking-wider">Seções Dinâmicas de Texto</h3>
+                              <p className="text-[10px] text-[#0b1d3a]/50 uppercase font-bold tracking-wider">Adicione novos carrosséis de imagens ou seções explicativas</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newSec = {
+                                  id: String(Date.now()),
+                                  title: { text: 'Nova Seção Dinâmica', align: 'left' },
+                                  description: { text: 'Substitua este texto pelo conteúdo desejado...', align: 'left' },
+                                  image: ''
+                                };
+                                setTempHomeContent((prev: any) => ({
+                                  ...prev,
+                                  dynamicSections: [...(prev.dynamicSections || []), newSec]
+                                }));
+                              }}
+                              className="flex items-center gap-2 px-4 py-2 bg-[#0b1d3a] hover:bg-[#c5a059] text-white text-xs font-black uppercase rounded-xl transition-all shadow-md hover:-translate-y-px"
+                            >
+                              <Plus className="w-4 h-4" /> Adicionar Nova Seção
+                            </button>
+                          </div>
+
+                          {(!tempHomeContent.dynamicSections || tempHomeContent.dynamicSections.length === 0) ? (
+                            <div className="text-center py-12 bg-white/20 rounded-3xl border border-dashed border-[#0b1d3a]/10">
+                              <p className="text-sm text-[#0b1d3a]/40 italic">Nenhuma seção dinâmica de texto adicionada ainda.</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-6">
+                              {tempHomeContent.dynamicSections.map((section: any, index: number) => (
+                                <div key={section.id} className="border border-[#0b1d3a]/10 p-6 rounded-[2.5rem] bg-white/40 relative space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (window.confirm('Tem certeza que deseja excluir esta seção dinâmica?')) {
+                                        setTempHomeContent((prev: any) => ({
+                                          ...prev,
+                                          dynamicSections: prev.dynamicSections.filter((sec: any) => sec.id !== section.id)
+                                        }));
+                                      }
+                                    }}
+                                    className="absolute top-4 right-4 text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-all border border-red-200"
+                                    title="Excluir seção"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                  
+                                  <h4 className="font-serif text-sm font-bold text-[#0b1d3a] uppercase tracking-wider border-b border-[#0b1d3a]/5 pb-2 text-left">Seção Dinâmica #{index + 1}</h4>
+                                  
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                      {renderTextBlockEditor(
+                                        "Título da Seção", 
+                                        section.title, 
+                                        (txt) => {
+                                          setTempHomeContent((prev: any) => ({
+                                            ...prev,
+                                            dynamicSections: prev.dynamicSections.map((s: any) => s.id === section.id ? { ...s, title: { ...s.title, text: txt } } : s)
+                                          }));
+                                        },
+                                        (aln) => {
+                                          setTempHomeContent((prev: any) => ({
+                                            ...prev,
+                                            dynamicSections: prev.dynamicSections.map((s: any) => s.id === section.id ? { ...s, title: { ...s.title, align: aln } } : s)
+                                          }));
+                                        }
+                                      )}
+                                      
+                                      {renderTextBlockEditor(
+                                        "Descrição / Texto", 
+                                        section.description, 
+                                        (txt) => {
+                                          setTempHomeContent((prev: any) => ({
+                                            ...prev,
+                                            dynamicSections: prev.dynamicSections.map((s: any) => s.id === section.id ? { ...s, description: { ...s.description, text: txt } } : s)
+                                          }));
+                                        },
+                                        (aln) => {
+                                          setTempHomeContent((prev: any) => ({
+                                            ...prev,
+                                            dynamicSections: prev.dynamicSections.map((s: any) => s.id === section.id ? { ...s, description: { ...s.description, align: aln } } : s)
+                                          }));
+                                        }
+                                      )}
+                                    </div>
+                                    
+                                    <div>
+                                      {renderImageEditor("Imagem da Seção", `dynamicImage_${section.id}`, section.image, section.id)}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {contentSubTab === 'about' && tempAboutContent && (
+                      <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300 text-left">
+                        {/* Header and Live Save Bar */}
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-[#0b1d3a]/10 gap-4">
+                          <div>
+                            <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] uppercase tracking-wider">Gerenciar Sobre Nós</h3>
+                            <p className="text-[10px] text-[#0b1d3a]/50 uppercase tracking-widest font-black">Gerencie Nossa História, Missão, Visão, Valores, Linha do Tempo e Fotos Dinâmicas</p>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              setIsSavingAbout(true);
+                              try {
+                                await updateAboutContent(tempAboutContent);
+                                setShowSaveSuccess(true);
+                              } catch (err) {
+                                console.error("Error saving About content:", err);
+                              } finally {
+                                setIsSavingAbout(false);
+                              }
+                            }}
+                            disabled={isSavingAbout}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-[#0b1d3a] hover:bg-[#c5a059] text-white text-xs rounded-xl font-black uppercase transition-all shadow-lg hover:shadow-xl hover:-translate-y-px"
+                          >
+                            {isSavingAbout ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                            {isSavingAbout ? 'Salvando...' : 'Salvar Alterações'}
+                          </button>
+                        </div>
+
+                        {/* Nossa História Editor */}
+                        <div className="bg-white/40 p-8 rounded-3xl border border-[#0b1d3a]/5 space-y-6">
+                          <h3 className="font-serif text-xl border-l-4 border-[#c5a059] pl-4 uppercase tracking-widest font-bold text-[#0b1d3a]">Nossa História</h3>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                              {renderTextBlockEditor(
+                                "Pequeno Título (Tagline)",
+                                tempAboutContent.smallTitle,
+                                (txt) => setTempAboutContent((prev: any) => ({ ...prev, smallTitle: { ...prev.smallTitle, text: txt } })),
+                                (aln) => setTempAboutContent((prev: any) => ({ ...prev, smallTitle: { ...prev.smallTitle, align: aln } }))
+                              )}
+
+                              {renderTextBlockEditor(
+                                "Título Principal",
+                                tempAboutContent.title,
+                                (txt) => setTempAboutContent((prev: any) => ({ ...prev, title: { ...prev.title, text: txt } })),
+                                (aln) => setTempAboutContent((prev: any) => ({ ...prev, title: { ...prev.title, align: aln } }))
+                              )}
+
+                              {renderTextBlockEditor(
+                                "Subtítulo (Destaque)",
+                                tempAboutContent.subTitle,
+                                (txt) => setTempAboutContent((prev: any) => ({ ...prev, subTitle: { ...prev.subTitle, text: txt } })),
+                                (aln) => setTempAboutContent((prev: any) => ({ ...prev, subTitle: { ...prev.subTitle, align: aln } }))
+                              )}
+                            </div>
+
+                            <div className="space-y-4">
+                              {renderTextBlockEditor(
+                                "Memorial Descritivo (Texto Completo)",
+                                tempAboutContent.text,
+                                (txt) => setTempAboutContent((prev: any) => ({ ...prev, text: { ...prev.text, text: txt } })),
+                                (aln) => setTempAboutContent((prev: any) => ({ ...prev, text: { ...prev.text, align: aln } }))
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Nossa História Imagens Editor */}
+                        <div className="bg-white/40 p-8 rounded-3xl border border-[#0b1d3a]/5 space-y-6">
+                          <div className="flex justify-between items-center pb-2 border-b border-[#0b1d3a]/10">
+                            <div>
+                              <h3 className="font-serif text-xl border-l-4 border-[#c5a059] pl-4 uppercase tracking-widest font-bold text-[#0b1d3a]">Fotos Ilustrativas (História)</h3>
+                              <p className="text-[9px] text-[#0b1d3a]/50 uppercase tracking-widest ml-4 font-black">Insira links ou carregue fotos para ilustrar a aba Sobre Nós</p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setTempAboutContent((prev: any) => ({
+                                  ...prev,
+                                  images: [...(prev.images || []), ""]
+                                }));
+                              }}
+                              className="flex items-center gap-2 px-3 py-1.5 bg-[#0b1d3a] hover:bg-[#c5a059] text-white text-[9px] uppercase tracking-wider font-extrabold rounded-lg transition-all"
+                            >
+                              <Plus className="w-3 h-3" /> Adicionar Foto
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {(tempAboutContent.images || []).map((imgUrl: string, idx: number) => (
+                              <div key={idx} className="relative bg-white/60 p-4 rounded-2xl border border-dashed border-[#0b1d3a]/10 space-y-3">
+                                <div className="absolute top-2 right-2 z-10">
+                                  <button
+                                    onClick={() => {
+                                      setTempAboutContent((prev: any) => ({
+                                        ...prev,
+                                        images: (prev.images || []).filter((_: any, i: number) => i !== idx)
+                                      }));
+                                    }}
+                                    className="p-1 px-2 bg-red-500 hover:bg-red-600 text-white text-[10px] font-black uppercase rounded transition-all shadow"
+                                  >
+                                    X
+                                  </button>
+                                </div>
+                                {renderAboutImageEditor(`Foto #${idx + 1}`, `images`, imgUrl, idx)}
+                              </div>
+                            ))}
+                            {(tempAboutContent.images || []).length === 0 && (
+                              <div className="col-span-full text-center py-6 text-xs text-[#0b1d3a]/40 font-bold bg-[#0b1d3a]/5 rounded-2xl border border-dashed border-[#0b1d3a]/10">
+                                Nenhuma foto ilustrativa configurada. Será renderizada a moldura padrão "2009".
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Missão, Visão e Valores Editor */}
+                        <div className="bg-white/40 p-8 rounded-3xl border border-[#0b1d3a]/5 space-y-6">
+                          <h3 className="font-serif text-xl border-l-4 border-[#c5a059] pl-4 uppercase tracking-widest font-bold text-[#0b1d3a]">Tríade da Oficina (Missão, Visão e Valores)</h3>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                              {renderTextBlockEditor(
+                                "Definição de Missão",
+                                tempAboutContent.mission,
+                                (txt) => setTempAboutContent((prev: any) => ({ ...prev, mission: { ...prev.mission, text: txt } })),
+                                (aln) => setTempAboutContent((prev: any) => ({ ...prev, mission: { ...prev.mission, align: aln } }))
+                              )}
+
+                              {renderTextBlockEditor(
+                                "Definição de Visão",
+                                tempAboutContent.vision,
+                                (txt) => setTempAboutContent((prev: any) => ({ ...prev, vision: { ...prev.vision, text: txt } })),
+                                (aln) => setTempAboutContent((prev: any) => ({ ...prev, vision: { ...prev.vision, align: aln } }))
+                              )}
+                            </div>
+
+                            <div className="space-y-4 bg-white/30 p-6 rounded-2xl border border-[#0b1d3a]/5">
+                              <div className="flex justify-between items-center pb-2 border-b border-[#0b1d3a]/10">
+                                <label className="block text-[10px] uppercase font-black tracking-widest text-[#0b1d3a]">Nossos Valores Maçônicos</label>
+                                <button
+                                  type="button"
+                                  className="flex items-center gap-1.5 px-2.5 py-1 bg-[#0b1d3a] hover:bg-[#c5a059] text-[#f4efe2] text-[8px] uppercase tracking-wider font-extrabold rounded"
+                                  onClick={() => {
+                                    setTempAboutContent((prev: any) => ({
+                                      ...prev,
+                                      values: [...(prev.values || []), "Novo Valor"]
+                                    }));
+                                  }}
+                                >
+                                  <Plus className="w-3 h-3" /> Adicionar
+                                </button>
+                              </div>
+
+                              <div className="space-y-3 max-h-[280px] overflow-y-auto pr-2 pt-2">
+                                {(tempAboutContent.values || []).map((val: string, index: number) => (
+                                  <div key={index} className="flex gap-2 items-center bg-white/50 p-2.5 rounded-xl border border-[#0b1d3a]/5">
+                                    <input
+                                      type="text"
+                                      className="flex-1 bg-white border border-[#0b1d3a]/10 rounded-lg p-1.5 text-xs text-[#0b1d3a] focus:border-[#c5a059]/50 outline-none"
+                                      value={val}
+                                      onChange={(e) => {
+                                        const newVal = e.target.value;
+                                        setTempAboutContent((prev: any) => {
+                                          const nextVals = [...prev.values];
+                                          nextVals[index] = newVal;
+                                          return { ...prev, values: nextVals };
+                                        });
+                                      }}
+                                    />
+                                    <button
+                                      type="button"
+                                      className="p-1 px-2.5 bg-red-105 hover:bg-red-200 text-red-600 rounded-lg text-xs font-bold"
+                                      onClick={() => {
+                                        setTempAboutContent((prev: any) => ({
+                                          ...prev,
+                                          values: prev.values.filter((_: any, i: number) => i !== index)
+                                        }));
+                                      }}
+                                    >
+                                      Remover
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Marcos Históricos (Timeline) Editor */}
+                        <div className="bg-white/40 p-8 rounded-3xl border border-[#0b1d3a]/5 space-y-6">
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-[#0b1d3a]/10 gap-4">
+                            <div>
+                              <h3 className="font-serif text-xl border-l-4 border-[#c5a059] pl-4 uppercase tracking-widest font-bold text-[#0b1d3a]">Marcos Históricos (Linha do Tempo)</h3>
+                              <p className="text-[9px] text-[#0b1d3a]/50 uppercase tracking-widest ml-4 font-black">Crie, edite e organize marcos de fundação e atos gloriosos no tempo</p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setTempAboutContent((prev: any) => ({
+                                  ...prev,
+                                  milestones: [
+                                    ...(prev.milestones || []),
+                                    { year: new Date().getFullYear().toString(), title: "Novo Marco", description: "Escreva os fatos históricos do período de forma resumida." }
+                                  ]
+                                }));
+                              }}
+                              className="flex items-center gap-2 px-3 py-1.5 bg-[#0b1d3a] hover:bg-[#c5a059] text-white text-[9px] uppercase tracking-wider font-extrabold rounded-lg transition-all"
+                            >
+                              <Plus className="w-3 h-3" /> Adicionar Marco
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {(tempAboutContent.milestones || []).map((ms: any, index: number) => (
+                              <div key={index} className="bg-white/60 p-6 rounded-2xl border border-[#0b1d3a]/5 space-y-4 relative group">
+                                <button
+                                  onClick={() => {
+                                    setTempAboutContent((prev: any) => ({
+                                      ...prev,
+                                      milestones: prev.milestones.filter((_: any, i: number) => i !== index)
+                                    }));
+                                  }}
+                                  className="absolute top-4 right-4 p-1 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg text-xs font-bold animate-in"
+                                >
+                                  Excluir
+                                </button>
+                                <div className="grid grid-cols-3 gap-3">
+                                  <div className="col-span-1">
+                                    <label className="block text-[8px] uppercase tracking-widest font-black text-[#0b1d3a]/50 mb-1">Ano</label>
+                                    <input
+                                      type="text"
+                                      className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-2.5 text-xs text-[#0b1d3a] font-bold focus:border-[#c5a059]/50 outline-none text-center"
+                                      value={ms.year || ''}
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        setTempAboutContent((prev: any) => {
+                                          const nextMilestones = [...prev.milestones];
+                                          nextMilestones[index] = { ...nextMilestones[index], year: val };
+                                          return { ...prev, milestones: nextMilestones };
+                                        });
+                                      }}
+                                    />
+                                  </div>
+                                  <div className="col-span-2">
+                                    <label className="block text-[8px] uppercase tracking-widest font-black text-[#0b1d3a]/50 mb-1">Título do Fato</label>
+                                    <input
+                                      type="text"
+                                      className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-2.5 text-xs text-[#0b1d3a] focus:border-[#c5a059]/50 outline-none"
+                                      value={ms.title || ''}
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        setTempAboutContent((prev: any) => {
+                                          const nextMilestones = [...prev.milestones];
+                                          nextMilestones[index] = { ...nextMilestones[index], title: val };
+                                          return { ...prev, milestones: nextMilestones };
+                                        });
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <label className="block text-[8px] uppercase tracking-widest font-black text-[#0b1d3a]/50 mb-1">Fatos/Descrição do Marco</label>
+                                  <textarea
+                                    className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-3 text-xs text-[#0b1d3a] leading-relaxed focus:border-[#c5a059]/50 outline-none min-h-[80px]"
+                                    value={ms.description || ''}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setTempAboutContent((prev: any) => {
+                                        const nextMilestones = [...prev.milestones];
+                                        nextMilestones[index] = { ...nextMilestones[index], description: val };
+                                        return { ...prev, milestones: nextMilestones };
+                                      });
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {contentSubTab === 'filantropia' && tempSocialContent && (
+                      <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300">
+                        {/* Header and Live Save Bar */}
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-[#0b1d3a]/10 gap-4">
+                          <div className="text-left">
+                            <h3 className="font-serif text-2xl font-bold text-[#0b1d3a] uppercase tracking-wider">Gerenciar Ações Sociais</h3>
+                            <p className="text-[#0b1d3a]/60 text-xs mt-1">Configure o título principal, subtítulos, campanhas e imagens de filantropia d'A Arca.</p>
+                          </div>
+                          <button
+                            type="button"
+                            disabled={isSavingSocial}
+                            onClick={async () => {
+                              setIsSavingSocial(true);
+                              try {
+                                await updateSocialContent(tempSocialContent);
+                                alert('Salvo com sucesso!');
+                              } catch (err) {
+                                console.error(err);
+                              } finally {
+                                setIsSavingSocial(false);
+                              }
+                            }}
+                            className="flex items-center gap-2 px-6 py-3 bg-[#0b1d3a] hover:bg-[#c5a059] text-[#f4efe2] hover:text-[#0b1d3a] rounded-xl font-bold uppercase tracking-wider text-xs transition-all shadow-lg hover:shadow-xl shrink-0"
+                          >
+                            {isSavingSocial ? (
+                              <RefreshCw className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Save className="w-4 h-4" />
+                            )}
+                            {isSavingSocial ? 'Salvando...' : 'Salvar Alterações'}
+                          </button>
+                        </div>
+
+                        {/* Text Block Editors (Hero layout) */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                          {renderTextBlockEditor(
+                            "Título Principal de Filantropia",
+                            tempSocialContent.title,
+                            (txt) => setTempSocialContent((prev: any) => ({ ...prev, title: { ...prev.title, text: txt } })),
+                            (aln) => setTempSocialContent((prev: any) => ({ ...prev, title: { ...prev.title, align: aln } }))
+                          )}
+                          
+                          {renderTextBlockEditor(
+                            "Subtítulo Descritivo",
+                            tempSocialContent.subTitle,
+                            (txt) => setTempSocialContent((prev: any) => ({ ...prev, subTitle: { ...prev.subTitle, text: txt } })),
+                            (aln) => setTempSocialContent((prev: any) => ({ ...prev, subTitle: { ...prev.subTitle, align: aln } }))
+                          )}
+
+                          {renderTextBlockEditor(
+                            "Mensagem / Apresentação Institucional",
+                            tempSocialContent.description,
+                            (txt) => setTempSocialContent((prev: any) => ({ ...prev, description: { ...prev.description, text: txt } })),
+                            (aln) => setTempSocialContent((prev: any) => ({ ...prev, description: { ...prev.description, align: aln } }))
+                          )}
+                        </div>
+
+                        {/* Campaigns Management */}
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center border-b border-[#0b1d3a]/5 pb-3">
+                            <h4 className="font-serif text-lg font-bold text-[#0b1d3a] uppercase tracking-wider text-left">Campanhas e Projetos de Solidariedade</h4>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setTempSocialContent((prev: any) => ({
+                                  ...prev,
+                                  campaigns: [
+                                    ...(prev.campaigns || []),
+                                    { title: 'Nova Campanha', description: '', image: '', status: 'Ativo', link: '' }
+                                  ]
+                                }));
+                              }}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 rounded-lg text-xs font-black uppercase tracking-wider transition-all"
+                            >
+                              <Plus className="w-4 h-4" /> Nova Campanha
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {(tempSocialContent.campaigns || []).map((camp: any, index: number) => (
+                              <div key={index} className="border border-[#0b1d3a]/10 p-6 rounded-[2rem] bg-white/40 relative space-y-4 shadow-sm flex flex-col justify-between">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (window.confirm('Tem certeza que deseja excluir esta campanha?')) {
+                                      setTempSocialContent((prev: any) => ({
+                                        ...prev,
+                                        campaigns: prev.campaigns.filter((_: any, i: number) => i !== index)
+                                      }));
+                                    }
+                                  }}
+                                  className="absolute top-4 right-4 text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-all border border-red-200 z-10"
+                                  title="Excluir campanha"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+
+                                <div className="space-y-4">
+                                  <div className="text-left font-bold text-xs text-[#0b1d3a]/40 font-serif border-b border-[#0b1d3a]/5 pb-1">
+                                    Campanha #{index + 1}
+                                  </div>
+
+                                  <div className="text-left">
+                                    <label className="block text-[9px] uppercase font-black tracking-widest text-[#0b1d3a] mb-1 font-bold">Título</label>
+                                    <input
+                                      type="text"
+                                      value={camp.title || ''}
+                                      className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-2.5 text-xs text-[#0b1d3a] outline-none focus:border-[#c5a059]/50"
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        setTempSocialContent((prev: any) => {
+                                          const camps = [...prev.campaigns];
+                                          camps[index] = { ...camps[index], title: val };
+                                          return { ...prev, campaigns: camps };
+                                        });
+                                      }}
+                                    />
+                                  </div>
+
+                                  <div className="text-left">
+                                    <label className="block text-[9px] uppercase font-black tracking-widest text-[#0b1d3a] mb-1 font-bold">Descrição</label>
+                                    <textarea
+                                      rows={3}
+                                      value={camp.description || ''}
+                                      className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-2.5 text-xs text-[#0b1d3a] outline-none focus:border-[#c5a059]/50"
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        setTempSocialContent((prev: any) => {
+                                          const camps = [...prev.campaigns];
+                                          camps[index] = { ...camps[index], description: val };
+                                          return { ...prev, campaigns: camps };
+                                        });
+                                      }}
+                                    />
+                                  </div>
+
+                                  <div className="grid grid-cols-2 gap-2 text-left">
+                                    <div>
+                                      <label className="block text-[9px] uppercase font-black tracking-widest text-[#0b1d3a] mb-1 font-bold">Meta / Status</label>
+                                      <input
+                                        type="text"
+                                        value={camp.status || ''}
+                                        placeholder="Ex: Ativo, Concluído"
+                                        className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-2.5 text-xs text-[#0b1d3a] outline-none focus:border-[#c5a059]/50"
+                                        onChange={(e) => {
+                                          const val = e.target.value;
+                                          setTempSocialContent((prev: any) => {
+                                            const camps = [...prev.campaigns];
+                                            camps[index] = { ...camps[index], status: val };
+                                            return { ...prev, campaigns: camps };
+                                          });
+                                        }}
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-[9px] uppercase font-black tracking-widest text-[#0b1d3a] mb-1 font-bold">Link (Doação)</label>
+                                      <input
+                                        type="text"
+                                        value={camp.link || ''}
+                                        placeholder="https://..."
+                                        className="w-full bg-white border border-[#0b1d3a]/10 rounded-xl p-2.5 text-xs text-[#0b1d3a] outline-none focus:border-[#c5a059]/50"
+                                        onChange={(e) => {
+                                          const val = e.target.value;
+                                          setTempSocialContent((prev: any) => {
+                                            const camps = [...prev.campaigns];
+                                            camps[index] = { ...camps[index], link: val };
+                                            return { ...prev, campaigns: camps };
+                                          });
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+
+                                  {/* Campaign Image upload/url input */}
+                                  <div className="space-y-2 text-left bg-white/35 border border-[#0b1d3a]/5 p-3 rounded-xl shadow-inner">
+                                    <label className="block text-[9px] uppercase font-black tracking-widest text-[#0b1d3a] font-bold">Imagem da Campanha</label>
+                                    <div className="flex gap-2">
+                                      <input
+                                        type="text"
+                                        value={camp.image || ''}
+                                        placeholder="URL da Imagem..."
+                                        className="flex-1 bg-white border border-[#0b1d3a]/10 rounded-lg p-2 text-xs text-[#0b1d3a] outline-none focus:border-[#c5a059]/50"
+                                        onChange={(e) => {
+                                          const val = e.target.value;
+                                          setTempSocialContent((prev: any) => {
+                                            const camps = [...prev.campaigns];
+                                            camps[index] = { ...camps[index], image: val };
+                                            return { ...prev, campaigns: camps };
+                                          });
+                                        }}
+                                      />
+                                      <label className="flex items-center justify-center p-2 bg-white border border-[#0b1d3a]/10 rounded-lg cursor-pointer hover:bg-[#c5a059]/10 hover:border-[#c5a059]/30 transition-all shrink-0">
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          className="hidden"
+                                          onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                              await handleSocialImageUpload('campaigns', file, index);
+                                            }
+                                          }}
+                                        />
+                                        {uploadingSocialImages[`campaigns`] ? (
+                                          <RefreshCw className="w-4 h-4 text-[#c5a059] animate-spin" />
+                                        ) : (
+                                          <Upload className="w-4 h-4 text-[#c5a059]" />
+                                        )}
+                                      </label>
+                                    </div>
+                                    {camp.image && (
+                                      <div className="mt-2 h-20 rounded-lg overflow-hidden border border-[#0b1d3a]/10 relative group">
+                                        <img src={camp.image} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+
+                            {(tempSocialContent.campaigns || []).length === 0 && (
+                              <div className="col-span-full text-center py-10 bg-white/20 rounded-3xl border border-dashed border-[#0b1d3a]/10">
+                                <p className="text-sm text-[#0b1d3a]/40 italic">Nenhum projeto cadastrado. Adicione projetos e dê luz ao plano filantrópico!</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Gallery / Past Action Images */}
+                        <div className="space-y-4 pt-4 border-t border-[#0b1d3a]/5">
+                          <div className="flex justify-between items-center pb-3">
+                            <h4 className="font-serif text-lg font-bold text-[#0b1d3a] uppercase tracking-wider text-left">Galeria de Fotos (Álbum de Ações Realizadas)</h4>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setTempSocialContent((prev: any) => ({
+                                  ...prev,
+                                  gallery: [...(prev.gallery || []), '']
+                                }));
+                              }}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 rounded-lg text-xs font-black uppercase tracking-wider transition-all"
+                            >
+                              <Plus className="w-4 h-4" /> Nova Foto da Galeria
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {(tempSocialContent.gallery || []).map((imgUrl: string, idx: number) => (
+                              <div key={idx} className="border border-[#0b1d3a]/10 p-4 rounded-2xl bg-white/40 relative space-y-3 shadow-sm text-left animate-in fade-in-30">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setTempSocialContent((prev: any) => ({
+                                      ...prev,
+                                      gallery: prev.gallery.filter((_: any, i: number) => i !== idx)
+                                    }));
+                                  }}
+                                  className="absolute top-2 right-2 text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-full transition-all border border-red-100 z-10"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+
+                                <label className="block text-[9px] uppercase font-black tracking-widest text-[#0b1d3a]">Foto #{idx + 1}</label>
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={imgUrl || ''}
+                                    placeholder="URL da Imagem..."
+                                    className="flex-1 bg-white border border-[#0b1d3a]/10 rounded-lg p-2 text-xs text-[#0b1d3a] outline-none focus:border-[#c5a059]/50"
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setTempSocialContent((prev: any) => {
+                                        const gal = [...prev.gallery];
+                                        gal[idx] = val;
+                                        return { ...prev, gallery: gal };
+                                      });
+                                    }}
+                                  />
+                                  <label className="flex items-center justify-center p-2 bg-white border border-[#0b1d3a]/10 rounded-lg cursor-pointer hover:bg-[#c5a059]/10 hover:border-[#c5a059]/30 transition-all shrink-0">
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      className="hidden"
+                                      onChange={async (e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                          await handleSocialImageUpload('gallery', file, idx);
+                                        }
+                                      }}
+                                    />
+                                    {uploadingSocialImages[`gallery`] ? (
+                                      <RefreshCw className="w-4 h-4 text-[#c5a059] animate-spin" />
+                                    ) : (
+                                      <Upload className="w-4 h-4 text-[#c5a059]" />
+                                    )}
+                                  </label>
+                                </div>
+                                {imgUrl && (
+                                  <div className="mt-2 h-32 rounded-lg overflow-hidden border border-[#0b1d3a]/10 relative animate-in fade-in zoom-in-95 duration-200">
+                                    <img src={imgUrl} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+
+                            {(tempSocialContent.gallery || []).length === 0 && (
+                              <div className="col-span-full text-center py-10 bg-white/20 rounded-3xl border border-dashed border-[#0b1d3a]/10">
+                                <p className="text-sm text-[#0b1d3a]/40 italic">Nenhuma imagem adicionada à galeria. Faça upload de fotos dos momentos gloriosos de caridade!</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {contentSubTab === 'site' && (
                       <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -1546,6 +2768,17 @@ export default function AdminDashboard() {
                                       onChange={e => {
                                         const newIn = [...editContent.philanthropy.initiatives];
                                         newIn[idx].impact = e.target.value;
+                                        setEditContent({...editContent, philanthropy: {...editContent.philanthropy, initiatives: newIn}});
+                                      }}
+                                    />
+                                    <textarea 
+                                      className="w-full bg-transparent border border-[#0b1d3a]/10 rounded-lg p-2 text-[10px] text-[#0b1d3a]/80 placeholder:text-[#0b1d3a]/30 outline-none focus:border-[#c5a059]"
+                                      value={item.description || ''}
+                                      placeholder="Descrição da iniciativa"
+                                      rows={2}
+                                      onChange={e => {
+                                        const newIn = [...editContent.philanthropy.initiatives];
+                                        newIn[idx].description = e.target.value;
                                         setEditContent({...editContent, philanthropy: {...editContent.philanthropy, initiatives: newIn}});
                                       }}
                                     />
@@ -2131,6 +3364,15 @@ export default function AdminDashboard() {
                                       </div>
                                     )}
                                   </div>
+                                  <div>
+                                    <label className="block text-[10px] text-[#0b1d3a]/60 uppercase mb-1 font-bold">Website / Link Oficial</label>
+                                    <input 
+                                      className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] text-xs focus:border-[#c5a059] outline-none shadow-sm"
+                                      value={editContent.familyGroups?.[groupKey].website || ''}
+                                      placeholder="https://exemplo.com"
+                                      onChange={e => setEditContent({...editContent, familyGroups: {...editContent.familyGroups!, [groupKey]: {...editContent.familyGroups![groupKey], website: e.target.value}}})}
+                                    />
+                                  </div>
                                 </div>
 
                                 <div className="space-y-4">
@@ -2167,6 +3409,16 @@ export default function AdminDashboard() {
                                   className="w-full bg-white/40 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] text-sm min-h-[120px] focus:border-[#c5a059] outline-none"
                                   value={editContent.familyGroups?.[groupKey].history || ''}
                                   onChange={e => setEditContent({...editContent, familyGroups: {...editContent.familyGroups!, [groupKey]: {...editContent.familyGroups![groupKey], history: e.target.value}}})}
+                                />
+                              </div>
+
+                              <div className="space-y-4">
+                                <label className="block text-[10px] text-white/40 uppercase mb-1">História com a Loja</label>
+                                <textarea 
+                                  className="w-full bg-white/40 border border-[#0b1d3a]/10 rounded-lg p-3 text-[#0b1d3a] text-sm min-h-[120px] focus:border-[#c5a059] outline-none"
+                                  placeholder="História ou ligação desta instituição com a Loja Maçônica ARLS Arca da Aliança nº 34"
+                                  value={editContent.familyGroups?.[groupKey].historyWithLodge || ''}
+                                  onChange={e => setEditContent({...editContent, familyGroups: {...editContent.familyGroups!, [groupKey]: {...editContent.familyGroups![groupKey], historyWithLodge: e.target.value}}})}
                                 />
                               </div>
 
@@ -2213,7 +3465,7 @@ export default function AdminDashboard() {
                     {contentSubTab === 'social' && (
                       <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300">
                         <div className="space-y-4 bg-white/40 p-6 rounded-2xl border border-[#0b1d3a]/10 mb-8 shadow-sm">
-                          <h3 className="font-serif text-xl border-l-4 border-[#c5a059] pl-4 uppercase tracking-widest font-bold mb-4 text-[#0b1d3a]">Cabeçalho do Álbum Social</h3>
+                          <h3 className="font-serif text-xl border-l-4 border-[#c5a059] pl-4 uppercase tracking-widest font-bold mb-4 text-[#0b1d3a]">Cabeçalho da Galeria de Fotos</h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <label className="block text-[10px] uppercase tracking-widest text-[#0b1d3a] mb-2 font-bold">Título Pequeno</label>
@@ -2243,10 +3495,10 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="flex justify-between items-center">
-                          <h3 className="font-serif text-2xl text-[#0b1d3a] uppercase tracking-widest border-b border-[#c5a059]/20 pb-2 font-bold">Álbum Social & Galeria</h3>
+                          <h3 className="font-serif text-2xl text-[#0b1d3a] uppercase tracking-widest border-b border-[#c5a059]/20 pb-2 font-bold">Gerenciar Galeria de Fotos</h3>
                           <button 
                             onClick={() => {
-                              const newPhoto = { url: "", title: "Nova Foto", category: "Social" };
+                              const newPhoto = { url: "", title: "Nova Foto", category: "Social", description: "" };
                               setEditContent({...editContent, gallery: [...(editContent.gallery || []), newPhoto]});
                             }}
                             className="px-6 py-3 bg-[#0b1d3a] text-[#f4efe2] font-black rounded-xl text-xs uppercase tracking-widest hover:bg-[#c5a059] transition-all shadow-xl"
@@ -2255,9 +3507,9 @@ export default function AdminDashboard() {
                           </button>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                           {(editContent.gallery || []).map((photo, index) => (
-                            <div key={index} className="bg-white/40 p-6 rounded-2xl border border-[#0b1d3a]/5 relative group shadow-sm">
+                            <div key={index} className="bg-white/40 p-6 rounded-2xl border border-[#0b1d3a]/5 relative group shadow-sm flex flex-col justify-between">
                               <button 
                                 onClick={() => {
                                   const newGallery = editContent.gallery.filter((_, i) => i !== index);
@@ -2267,7 +3519,7 @@ export default function AdminDashboard() {
                               >
                                 <X className="w-5 h-5" />
                               </button>
-                              <div className="space-y-3">
+                              <div className="space-y-3 flex-1 flex flex-col justify-between">
                                 {photo.url && (
                                   <div className="w-full h-32 overflow-hidden rounded-xl border border-[#0b1d3a]/10 bg-black/5 shadow-inner">
                                     <img 
@@ -2281,30 +3533,45 @@ export default function AdminDashboard() {
                                     />
                                   </div>
                                 )}
-                                <div>
-                                  <label className="block text-[9px] text-[#0b1d3a] uppercase font-black mb-1">Legenda</label>
-                                  <input 
-                                    className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-2 text-[#0b1d3a] text-xs outline-none shadow-sm"
-                                    value={photo.title}
-                                    onChange={e => {
-                                      const newGallery = editContent.gallery.map((p, i) => i === index ? { ...p, title: e.target.value } : p);
-                                      setEditContent({...editContent, gallery: newGallery});
-                                    }}
-                                  />
+                                <div className="space-y-3 mt-2">
+                                  <div>
+                                    <label className="block text-[9px] text-[#0b1d3a] uppercase font-black mb-1">Legenda</label>
+                                    <input 
+                                      className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-2 text-[#0b1d3a] text-xs outline-none shadow-sm"
+                                      value={photo.title}
+                                      onChange={e => {
+                                        const newGallery = editContent.gallery.map((p, i) => i === index ? { ...p, title: e.target.value } : p);
+                                        setEditContent({...editContent, gallery: newGallery});
+                                      }}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[9px] text-[#0b1d3a] uppercase font-black mb-1">Descrição</label>
+                                    <textarea 
+                                      rows={3}
+                                      className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-2 text-[#0b1d3a] text-xs outline-none shadow-sm resize-y"
+                                      placeholder="Descreva este registro ou momento fraternal..."
+                                      value={photo.description || ''}
+                                      onChange={e => {
+                                        const newGallery = editContent.gallery.map((p, i) => i === index ? { ...p, description: e.target.value } : p);
+                                        setEditContent({...editContent, gallery: newGallery});
+                                      }}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[9px] text-[#0b1d3a] uppercase font-black mb-1">URL da Imagem</label>
+                                    <input 
+                                      className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-2 text-[#0b1d3a] text-xs outline-none shadow-sm"
+                                      placeholder="Link direto (.jpg, .png)"
+                                      value={photo.url}
+                                      onChange={e => {
+                                        const newGallery = editContent.gallery.map((p, i) => i === index ? { ...p, url: e.target.value } : p);
+                                        setEditContent({...editContent, gallery: newGallery});
+                                      }}
+                                    />
+                                  </div>
                                 </div>
-                                <div>
-                                  <label className="block text-[9px] text-[#0b1d3a] uppercase font-black mb-1">URL da Imagem</label>
-                                  <input 
-                                    className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-2 text-[#0b1d3a] text-xs outline-none shadow-sm"
-                                    placeholder="Link direto (.jpg, .png)"
-                                    value={photo.url}
-                                    onChange={e => {
-                                      const newGallery = editContent.gallery.map((p, i) => i === index ? { ...p, url: e.target.value } : p);
-                                      setEditContent({...editContent, gallery: newGallery});
-                                    }}
-                                  />
-                                </div>
-                                <div className="pt-2 flex justify-end">
+                                <div className="pt-3 flex justify-end border-t border-[#0b1d3a]/5 mt-3">
                                   <button 
                                     onClick={handleSaveContent}
                                     disabled={isSaving}
@@ -2324,7 +3591,7 @@ export default function AdminDashboard() {
                             disabled={isSaving}
                             className="flex items-center gap-2 bg-[#0b1d3a] text-[#f4efe2] px-10 py-4 rounded-xl font-bold uppercase tracking-widest disabled:opacity-50 hover:bg-[#c5a059] transition-all font-sans shadow-xl"
                           >
-                            {isSaving ? <RefreshCw className="animate-spin" /> : <Save />} Salvar Álbum
+                            {isSaving ? <RefreshCw className="animate-spin" /> : <Save />} Salvar Galeria de Fotos
                           </button>
                         </div>
                       </div>

@@ -476,7 +476,7 @@ export default function MemberDashboard() {
               <motion.div key="welcome" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-12 w-full max-w-full overflow-hidden">
                 {/* Welcome Card */}
                 <div className="relative w-full">
-                  <div className="absolute inset-0 bg-[#fdf6e3] rounded-[2rem] shadow-2xl rotate-[-0.5deg]" />
+                  <div className="absolute inset-0 bg-[#fdf6e3] rounded-[2rem] shadow-2xl" />
                   <div className="relative p-5 md:p-10 bg-[#f4e4bc] rounded-[2rem] border-2 border-[#d4b068] overflow-hidden text-center w-full">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none">
                       <Shield className="w-[300px] h-[300px] md:w-[400px] md:h-[400px] text-[#8b5e34]" />

@@ -46,6 +46,11 @@ export default function Gallery() {
               <div className="absolute inset-0 bg-gradient-to-t from-[#0b1d3a] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
                 <span className="text-[#c5a059] text-[9px] uppercase font-black tracking-widest mb-1">{photo.category}</span>
                 <h3 className="text-white font-serif font-bold text-lg">{photo.title}</h3>
+                {photo.description && (
+                  <p className="text-white/80 text-xs mt-1 leading-relaxed font-sans line-clamp-3">
+                    {photo.description}
+                  </p>
+                )}
               </div>
             </motion.div>
           ))}

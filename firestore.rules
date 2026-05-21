@@ -62,7 +62,7 @@ service cloud.firestore {
       let isQuest = data.keys().hasAll(['fullName', 'type']) && 
                     data.fullName is string && data.fullName.size() > 0 && data.fullName.size() < 200 &&
                     data.type == 'masonic_quest' &&
-                    data.keys().size() <= 25;
+                    data.keys().size() <= 40;
 
       return hasCommon && (isBasic || isQuest);
     }
@@ -72,6 +72,13 @@ service cloud.firestore {
       allow get: if true;
       allow list: if isAdmin(); // Admins can list if needed, but usually just 'get' main
       allow write: if isAdmin() && docId == 'main' && isValidContent(incoming());
+    }
+
+    // Conteudo Site: Public can read, Admins can manage
+    match /conteudo_site/{docId} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow write: if isAdmin();
     }
 
     function isValidContent(data) {

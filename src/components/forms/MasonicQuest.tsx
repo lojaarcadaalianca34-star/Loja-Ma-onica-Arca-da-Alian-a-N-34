@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { User, Mail, Phone, ChevronRight, Landmark, ShieldCheck } from 'lucide-react';
+import { User, Mail, Phone, ChevronRight, Landmark, ShieldCheck, X } from 'lucide-react';
 import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { analyzeCandidate } from '@/src/services/masonicAnalysisService';
@@ -20,19 +20,25 @@ const steps = [
       { id: 'birthDate', label: "Data de Nascimento", type: 'date', required: true },
       { id: 'profession', label: "Profissão", type: 'text', required: true },
       { id: 'education', label: "Escolaridade", type: 'text', required: true },
-      { id: 'income', label: "Renda Mensal Estimada (Importante para garantir que a Maçonaria não sobrecarregue o sustento da família)", type: 'text', required: true },
-      { id: 'residentialAddress', label: "Endereço Residencial", type: 'text', required: true },
-      { id: 'professionalAddress', label: "Endereço Profissional", type: 'text', required: true },
-      { id: 'civilStatus', label: "Estado Civil", type: 'select', options: ['Solteiro', 'Casado', 'União Estável', 'Divorciado', 'Viúvo'], required: true },
-      { id: 'childrenCount', label: "Filhos (Quantos e idades)", type: 'text' },
-      { id: 'city', label: "Cidade", type: 'text', required: true },
-      { id: 'faith', label: "Crença / Religião", type: 'text', required: true },
       { id: 'email', label: "E-mail", type: 'email', icon: Mail, required: true },
-      { id: 'phone', label: "Telefone", type: 'tel', icon: Phone, required: true },
+      { id: 'phone', label: "Telefone (Whatsapp)", type: 'tel', icon: Phone, required: true },
     ]
   },
   {
     id: 2,
+    title: "",
+    questions: [
+      { id: 'residentialAddress', label: "Endereço Residencial", type: 'text', required: true },
+      { id: 'professionalAddress', label: "Endereço Profissional", type: 'text', required: true },
+      { id: 'city', label: "Cidade", type: 'text', required: true },
+      { id: 'civilStatus', label: "Estado Civil", type: 'select', options: ['Solteiro', 'Casado', 'União Estável', 'Divorciado', 'Viúvo'], required: true },
+      { id: 'childrenCount', label: "Filhos (Quantos e idades)", type: 'text' },
+      { id: 'faith', label: "Crença / Religião", type: 'text', required: true },
+      { id: 'income', label: "Renda Mensal Estimada (Importante para garantir que a Maçonaria não sobrecarregue o sustento da família)", type: 'text', required: true },
+    ]
+  },
+  {
+    id: 3,
     title: "",
     questions: [
       { 
@@ -44,7 +50,7 @@ const steps = [
     ]
   },
   {
-    id: 3,
+    id: 4,
     title: "",
     questions: [
       { 
@@ -86,7 +92,7 @@ const steps = [
     ]
   },
   {
-    id: 4,
+    id: 5,
     title: "",
     questions: [
       { 
@@ -116,7 +122,7 @@ const steps = [
     ]
   },
   {
-    id: 5,
+    id: 6,
     title: "",
     questions: [
       { 
@@ -158,7 +164,7 @@ const steps = [
     ]
   },
   {
-    id: 6,
+    id: 7,
     title: "",
     questions: [
       { 
@@ -276,8 +282,25 @@ export default function MasonicQuest({ isOpen, onClose, isStatic = false }: Maso
     }
   };
 
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    }
+    if (isStatic) {
+      window.location.href = '/';
+    }
+  };
+
   const renderContent = () => (
-    <div className={`${isStatic ? 'w-full h-auto' : 'relative w-full max-w-3xl h-[85vh] md:h-[650px] overflow-hidden rounded-[2rem] border-4 border-[#0b1d3a]/10 bg-white flex flex-col md:flex-row'}`}>
+    <div className={`${isStatic ? 'relative w-full h-auto' : 'relative w-full max-w-2xl h-[85vh] md:h-[580px] max-h-[600px] overflow-hidden rounded-[2rem] border-4 border-[#0b1d3a]/10 bg-white flex flex-col md:flex-row'}`}>
+      <button 
+        id="close-masonic-quest"
+        onClick={handleClose}
+        className="absolute top-4 right-4 z-[200] w-8 h-8 p-1.5 text-[#c5a059] hover:opacity-80 transition-opacity bg-[#0b1d3a]/10 backdrop-blur-sm rounded-full cursor-pointer flex items-center justify-center border border-[#c5a059]/20 shadow-lg"
+        aria-label="Fechar"
+      >
+        <X className="w-5 h-5 font-bold" />
+      </button>
       <div className={`${isStatic ? 'hidden' : 'md:w-1/3 bg-[#0b1d3a] border-r border-[#c5a059]/20 p-8 relative overflow-hidden flex flex-col'}`}>
         <div 
           className="absolute inset-0 bg-[#c5a059]/10"
@@ -404,24 +427,25 @@ export default function MasonicQuest({ isOpen, onClose, isStatic = false }: Maso
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
+              className="relative z-10 space-y-6"
             >
               <div className="space-y-2 border-b border-[#0b1d3a]/10 pb-4">
-                <span className="text-[#c5a059] text-[10px] uppercase font-black tracking-[0.4em]">Passo {currentStep + 1} de {steps.length}</span>
+                <span className="text-[#c5a059] text-[10px] uppercase font-black tracking-[0.4em]" style={{ color: '#c5a059' }}>Passo {currentStep + 1} de {steps.length}</span>
               </div>
               <div className="space-y-6">
                 {steps[currentStep].questions.map((q: any) => (
                   <div key={q.id} className="space-y-3">
-                    <label className="text-[#0b1d3a] text-sm md:text-base font-bold block leading-relaxed">
+                    <label className="text-[#c5a059] text-sm md:text-base font-bold block leading-relaxed" style={{ color: '#c5a059' }}>
                       {q.label}
                     </label>
                     <div className="relative group">
-                      {q.icon && <q.icon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0b1d3a]/20" />}
+                      {q.icon && <q.icon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#c5a059]/50" />}
                       {q.type === 'textarea' ? (
                         <textarea 
                           required={q.required}
                           rows={3}
-                          className="w-full bg-white/40 border-b border-[#0b1d3a]/10 p-3 text-[#0b1d3a] focus:outline-none focus:border-[#c5a059] transition-all font-sans text-sm md:text-base placeholder:text-[#0b1d3a]/20 resize-none shadow-sm rounded-lg"
+                          className="w-full bg-white/10 border-b border-[#c5a059]/30 p-3 text-[#c5a059] focus:outline-none focus:border-[#c5a059] transition-all font-sans text-sm md:text-base placeholder:text-[#c5a059]/40 resize-none shadow-sm rounded-lg"
+                          style={{ color: '#c5a059' }}
                           onChange={e => setFormData({...formData, [q.id]: e.target.value})}
                           value={formData[q.id] || ''}
                         />
@@ -429,13 +453,14 @@ export default function MasonicQuest({ isOpen, onClose, isStatic = false }: Maso
                         <div className="space-y-4">
                           <select 
                             required={q.required}
-                            className="w-full bg-white/40 border-b border-[#0b1d3a]/10 p-3 text-[#0b1d3a] focus:outline-none focus:border-[#c5a059] transition-all font-sans text-sm md:text-base appearance-none cursor-pointer rounded-lg shadow-sm"
+                            className="w-full bg-white/10 border-b border-[#c5a059]/30 p-3 text-[#c5a059] focus:outline-none focus:border-[#c5a059] transition-all font-sans text-sm md:text-base appearance-none cursor-pointer rounded-lg shadow-sm"
+                            style={{ color: '#c5a059' }}
                             onChange={e => setFormData({...formData, [q.id]: e.target.value})}
                             value={formData[q.id] || ''}
                           >
-                            <option value="" className="bg-white">Selecione...</option>
+                            <option value="" className="bg-[#050c1a] text-[#c5a059]" style={{ color: '#c5a059' }}>Selecione...</option>
                             {q.options.map((opt: string) => (
-                              <option key={opt} value={opt} className="bg-white py-2">{opt}</option>
+                              <option key={opt} value={opt} className="bg-[#050c1a] text-[#c5a059] py-2" style={{ color: '#c5a059' }}>{opt}</option>
                             ))}
                           </select>
                           
@@ -444,24 +469,26 @@ export default function MasonicQuest({ isOpen, onClose, isStatic = false }: Maso
                             <motion.div 
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: 'auto' }}
-                              className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#0b1d3a]/10"
+                              className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#c5a059]/20"
                             >
                               <div className="space-y-3">
-                                <label className="text-[#0b1d3a] text-sm font-bold block">Nome da Esposa</label>
+                                <label className="text-[#c5a059] text-sm font-bold block" style={{ color: '#c5a059' }}>Nome da Esposa</label>
                                 <input 
                                   type="text"
                                   placeholder="Nome completo da esposa"
-                                  className="w-full bg-white/40 border-b border-[#0b1d3a]/10 p-3 text-[#0b1d3a] focus:outline-none focus:border-[#c5a059] transition-all font-sans text-sm rounded-lg shadow-sm"
+                                  className="w-full bg-white/10 border-b border-[#c5a059]/30 p-3 text-[#c5a059] focus:outline-none focus:border-[#c5a059] transition-all font-sans text-sm rounded-lg shadow-sm placeholder:text-[#c5a059]/40"
+                                  style={{ color: '#c5a059' }}
                                   value={formData.wifeName || ''}
                                   onChange={e => setFormData({...formData, wifeName: e.target.value})}
                                 />
                               </div>
                               <div className="space-y-3">
-                                <label className="text-[#0b1d3a] text-sm font-bold block">Tempo de Casado em anos</label>
+                                <label className="text-[#c5a059] text-sm font-bold block" style={{ color: '#c5a059' }}>Tempo de Casado em anos</label>
                                 <input 
                                   type="text"
                                   placeholder="Ex: 10 anos"
-                                  className="w-full bg-white/40 border-b border-[#0b1d3a]/10 p-3 text-[#0b1d3a] focus:outline-none focus:border-[#c5a059] transition-all font-sans text-sm rounded-lg shadow-sm"
+                                  className="w-full bg-white/10 border-b border-[#c5a059]/30 p-3 text-[#c5a059] focus:outline-none focus:border-[#c5a059] transition-all font-sans text-sm rounded-lg shadow-sm placeholder:text-[#c5a059]/40"
+                                  style={{ color: '#c5a059' }}
                                   value={formData.marriageTime || ''}
                                   onChange={e => setFormData({...formData, marriageTime: e.target.value})}
                                 />
@@ -477,24 +504,24 @@ export default function MasonicQuest({ isOpen, onClose, isStatic = false }: Maso
                             className="hidden"
                             id="file-upload"
                             onChange={async (e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                const reader = new FileReader();
-                                reader.onloadend = () => setFormData({...formData, [q.id]: reader.result});
-                                reader.readAsDataURL(file);
-                              }
-                            }}
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onloadend = () => setFormData({...formData, [q.id]: reader.result});
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
                           />
                           <label 
                             htmlFor="file-upload"
-                            className="flex flex-col items-center justify-center border-2 border-dashed border-[#0b1d3a]/10 rounded-2xl p-8 hover:border-[#c5a059]/50 hover:bg-[#c5a059]/5 transition-all cursor-pointer"
+                            className="flex flex-col items-center justify-center border-2 border-dashed border-[#c5a059]/30 rounded-2xl p-8 hover:border-[#c5a059]/50 hover:bg-[#c5a059]/5 transition-all cursor-pointer"
                           >
                             {formData[q.id] ? (
                               <img src={formData[q.id]} className="w-32 h-32 object-cover rounded-xl border-2 border-[#c5a059] shadow-2xl" alt="Preview" />
                             ) : (
                               <>
                                 <Landmark className="w-8 h-8 text-[#c5a059] mb-2" />
-                                <span className="text-[#0b1d3a] text-sm font-bold uppercase tracking-widest text-center">{q.label}</span>
+                                <span className="text-[#c5a059] text-sm font-bold uppercase tracking-widest text-center" style={{ color: '#c5a059' }}>{q.label}</span>
                               </>
                             )}
                           </label>
@@ -503,7 +530,8 @@ export default function MasonicQuest({ isOpen, onClose, isStatic = false }: Maso
                         <input 
                           type={q.type}
                           required={q.required}
-                          className={`w-full bg-white/40 border-b border-[#0b1d3a]/10 p-3 ${q.icon ? 'pl-11' : ''} text-[#0b1d3a] focus:outline-none focus:border-[#c5a059] transition-all font-sans text-sm md:text-base rounded-lg shadow-sm`}
+                          className={`w-full bg-white/10 border-b border-[#c5a059]/30 p-3 ${q.icon ? 'pl-11' : ''} text-[#c5a059] focus:outline-none focus:border-[#c5a059] transition-all font-sans text-sm md:text-base rounded-lg shadow-sm placeholder:text-[#c5a059]/40 [color-scheme:dark]`}
+                          style={{ color: '#c5a059' }}
                           onChange={e => setFormData({...formData, [q.id]: e.target.value})}
                           value={formData[q.id] || ''}
                         />
@@ -515,7 +543,7 @@ export default function MasonicQuest({ isOpen, onClose, isStatic = false }: Maso
               <div className="pt-8 flex justify-between items-center">
                 <button 
                   onClick={() => currentStep === 0 ? setShowIntro(true) : setCurrentStep(prev => prev - 1)}
-                  className="text-[#0b1d3a]/40 hover:text-[#0b1d3a] uppercase tracking-[0.3em] text-[10px] font-black transition-colors"
+                  className="text-[#c5a059]/50 hover:text-[#c5a059] uppercase tracking-[0.3em] text-[10px] font-black transition-colors"
                 >
                   Retornar
                 </button>
@@ -553,7 +581,7 @@ export default function MasonicQuest({ isOpen, onClose, isStatic = false }: Maso
               initial={{ opacity: 0, scale: 0.9, y: 50 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 50 }}
-              className="relative w-full max-w-3xl h-[85vh] md:h-[650px] overflow-hidden rounded-[2rem] border-4 border-[#0b1d3a]/10 bg-white"
+              className="relative w-full max-w-2xl h-[85vh] md:h-[580px] max-h-[600px] overflow-hidden rounded-[2rem] border-4 border-[#0b1d3a]/10 bg-white"
             >
             {renderContent()}
           </motion.div>
