@@ -115,10 +115,20 @@ function LandingPage() {
 }
 
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   useEffect(() => {
+    if (hash) {
+      const targetId = hash.replace('#', '');
+      const element = document.getElementById(targetId);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+        return;
+      }
+    }
     window.scrollTo(0, 0);
-  }, [pathname]);
+  }, [pathname, hash]);
   return null;
 }
 
@@ -148,11 +158,23 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
     return onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) {
-        // Auto-admin for specific emails or check Firestore
         const masterEmails = ['lojaarcadaalianca34@gmail.com', 'sophiabohn@gmail.com'];
         const isMasterEmail = masterEmails.includes(u.email?.toLowerCase() || '');
-        const adminDoc = await getDoc(doc(db, 'admins', u.uid));
-        setIsAdmin(isMasterEmail || adminDoc.exists());
+        
+        let hasDbAdmin = false;
+        try {
+          const [adminDoc, userDoc] = await Promise.all([
+            getDoc(doc(db, 'admins', u.uid)),
+            getDoc(doc(db, 'users', u.uid))
+          ]);
+          
+          hasDbAdmin = adminDoc.exists() || 
+                       (userDoc.exists() && (userDoc.data()?.role === 'admin' || userDoc.data()?.isAdmin === true));
+        } catch (e) {
+          console.error("Admin check failed:", e);
+        }
+
+        setIsAdmin(isMasterEmail || hasDbAdmin);
       } else {
         setIsAdmin(false);
       }

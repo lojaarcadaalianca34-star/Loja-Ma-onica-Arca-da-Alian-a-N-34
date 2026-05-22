@@ -42,6 +42,18 @@ async function startServer() {
       return res.status(200).json({ error: "Gemini Key missing" });
     }
 
+    // Calculate age deterministically based on the reference year 2026
+    const birthDateStr = formData?.birthDate || "";
+    let calculatedAgeFact = "";
+    if (birthDateStr) {
+      const yearMatch = birthDateStr.match(/\d{4}/);
+      if (yearMatch) {
+         const birthYear = parseInt(yearMatch[0], 10);
+         const age = 2026 - birthYear;
+         calculatedAgeFact = `DADOS REAIS DO CANDIDATO PARA REFERÊNCIA:\n- Ano de nascimento: ${birthYear}\n- Idade calculada para 2026: ${age} anos completos (esteja atento a esta idade exata de ${age} anos na redação do seu parecer e na síntese, nunca recomende ou afirme uma idade incorreta!)`;
+      }
+    }
+
     const prompt = `
       Como um experiente Mestre Maçom e analista de perfis, analise o seguinte formulário de interesse de ingresso na Maçonaria.
       Sua análise deve ser técnica, discreta e profunda, focando na compatibilidade do candidato com os valores da Ordem (Verdade, Honra, Filantropia, Família, Estabilidade).
@@ -54,6 +66,10 @@ async function startServer() {
 
       DADOS DO CANDIDATO:
       ${JSON.stringify(formData, null, 2)}
+
+      ANO ATUAL DE REFERÊNCIA: 2026
+      ${calculatedAgeFact}
+      Ao redigir a síntese do candidato, certifique-se de calcular a idade dele CORRETAMENTE baseando-se no ano atual de 2026 (por exemplo, se o candidato nasceu em 1985, ele tem exatamente 41 anos em 2026, nunca escreva 38 anos).
 
       SAÍDA DA ANÁLISE (Responda APENAS em JSON com esta estrutura):
       {

@@ -4,7 +4,7 @@ import { db, auth, logout, handleFirestoreError, OperationType, storage } from '
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, getDoc, setDoc, deleteDoc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { useContent } from '@/src/context/ContentContext';
-import { LogOut, Users, FileText, Save, Check, RefreshCw, X, Brain, Printer, ChevronDown, ChevronUp, Book, Video, Globe, Star, Play, Download, LayoutDashboard, ExternalLink, ArrowLeft, ShieldCheck, Clock, Eye, EyeOff, Plus, Upload, Link as LinkIcon, Trash2, MessageSquare, Edit, History, HandHeart, AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react';
+import { LogOut, Users, FileText, Save, Check, RefreshCw, X, Brain, Printer, ChevronDown, ChevronUp, Book, Video, Globe, Star, Play, Download, LayoutDashboard, ExternalLink, ArrowLeft, ShieldCheck, Clock, Eye, EyeOff, Plus, Upload, Link as LinkIcon, Trash2, MessageSquare, Edit, History, HandHeart, AlignLeft, AlignCenter, AlignRight, AlignJustify, Archive, Sliders } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { analyzeCandidate } from '@/src/services/masonicAnalysisService';
 import { jsPDF } from 'jspdf';
@@ -265,10 +265,122 @@ const LibraryItemEditor = ({
   );
 };
 
+const formatBirthDate = (dateStr: any) => {
+  if (!dateStr) return "-";
+  
+  // If it is a Firestore timestamp or contains toDate
+  if (dateStr && typeof dateStr === 'object' && typeof dateStr.toDate === 'function') {
+    try {
+      const d = dateStr.toDate();
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    } catch (e) {
+      // fallback
+    }
+  }
+
+  const str = String(dateStr);
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) return str;
+  
+  try {
+    const parts = str.split('T')[0].split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+  } catch (e) {
+    // fallback
+  }
+  return str;
+};
+
+const renderAnalysisReport = (reportVal: any) => {
+  if (!reportVal) return null;
+  
+  let report = reportVal;
+  if (typeof report === 'string') {
+    try {
+      report = JSON.parse(report);
+    } catch (e) {
+      // It is plain text
+      return <pre className="whitespace-pre-wrap text-[#0b1d3a]/90 font-sans text-xs md:text-sm">{report}</pre>;
+    }
+  }
+
+  // Beautiful styled rendering for structured report
+  return (
+    <div className="space-y-6 text-[#0b1d3a]">
+      <div className="flex items-center justify-between border-b border-[#0b1d3a]/10 pb-3">
+        <h5 className="font-bold uppercase text-[10px] tracking-wider text-[#c5a059]">Parecer de Sindicância AI</h5>
+        <div className="bg-[#0b1d3a] text-[#f4efe2] px-3 py-1 rounded-full text-xs font-bold font-serif whitespace-nowrap">
+          Perfil {report.profileType || 'Indefinido'}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-[10px] uppercase font-semibold text-[#0b1d3a]/40 tracking-wider">Síntese do Candidato</p>
+        <p className="font-serif leading-relaxed text-sm mt-1">{report.synthesis}</p>
+      </div>
+
+      <div>
+        <p className="text-[10px] uppercase font-semibold text-[#0b1d3a]/40 tracking-wider mb-2">Desempenho por Valores</p>
+        <div className="space-y-2">
+          {Array.isArray(report.performanceTable) ? (
+            report.performanceTable.map((row: any, idx: number) => {
+              const scoreColors: Record<string, string> = {
+                'A': 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+                'B': 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+                'C': 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+                'D': 'bg-red-500/10 text-red-600 border-red-500/20'
+              };
+              const scoreColor = scoreColors[row.score?.toUpperCase()] || 'bg-gray-500/10 text-gray-600 border-gray-500/20';
+              
+              return (
+                <div key={idx} className="flex justify-between items-start gap-4 p-3 bg-[#0b1d3a]/5 rounded-xl border border-[#0b1d3a]/5">
+                  <div className="space-y-1">
+                    <p className="font-bold text-xs">{row.category}</p>
+                    <p className="text-[11px] text-[#0b1d3a]/70 leading-normal">{row.reason}</p>
+                  </div>
+                  <span className={`text-xs font-serif font-bold px-2 py-1 rounded border ${scoreColor} min-w-[32px] text-center shrink-0`}>
+                    {row.score}
+                  </span>
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-xs text-[#0b1d3a]/60 italic">Nenhum detalhe de desempenho disponível.</p>
+          )}
+        </div>
+      </div>
+
+      {report.sindicanciaPoints && (
+        <div>
+          <p className="text-[10px] uppercase font-semibold text-[#0b1d3a]/40 tracking-wider mb-2">Pontos para Sindicância</p>
+          <ul className="space-y-1.5 list-disc pl-4 text-xs font-medium leading-relaxed">
+            {Array.isArray(report.sindicanciaPoints) ? (
+              report.sindicanciaPoints.map((point: string, idx: number) => (
+                <li key={idx} className="text-[#0b1d3a]/80">{point}</li>
+              ))
+            ) : (
+              <li className="text-[#0b1d3a]/80">{String(report.sindicanciaPoints)}</li>
+            )}
+          </ul>
+        </div>
+      )}
+
+      <div className="bg-[#0b1d3a]/5 p-4 rounded-xl border border-[#c5a059]/20">
+        <p className="text-[10px] uppercase font-bold text-[#c5a059] tracking-wider">Parecer Final do Consultor</p>
+        <p className="font-serif italic leading-relaxed text-xs text-[#0b1d3a]/90 mt-1.5">{report.finalParecer}</p>
+      </div>
+    </div>
+  );
+};
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { content, updateContent } = useContent();
-  const [activeTab, setActiveTab] = useState<'leads' | 'content' | 'events' | 'library' | 'members'>('leads');
+  const [activeTab, setActiveTab] = useState<'leads' | 'content' | 'events' | 'library' | 'members' | 'permissions'>('leads');
   const [contentSubTab, setContentSubTab] = useState<'site' | 'management' | 'family' | 'masters' | 'social' | 'contact' | 'home' | 'about' | 'filantropia' | null>(null);
   const [newLibrarySection, setNewLibrarySection] = useState('');
   const [leads, setLeads] = useState<any[]>([]);
@@ -293,7 +405,8 @@ export default function AdminDashboard() {
   const [deletingUser, setDeletingUser] = useState<any>(null);
   const [analyzingLeads, setAnalyzingLeads] = useState<Record<string, boolean>>({});
   const [expandedLead, setExpandedLead] = useState<string | null>(null);
-  const [analysisReports, setAnalysisReports] = useState<Record<string, string>>({});
+  const [analysisReports, setAnalysisReports] = useState<Record<string, any>>({});
+  const [leadsSubTab, setLeadsSubTab] = useState<'new' | 'sindicancia' | 'archived'>('new');
   const [uploadingItems, setUploadingItems] = useState<Record<string, boolean>>({});
 
   const { homeContent, updateHomeContent } = useContent();
@@ -310,6 +423,26 @@ export default function AdminDashboard() {
   const [tempSocialContent, setTempSocialContent] = useState<any>(null);
   const [isSavingSocial, setIsSavingSocial] = useState(false);
   const [uploadingSocialImages, setUploadingSocialImages] = useState<Record<string, boolean>>({});
+
+  const loggedInEmail = auth.currentUser?.email?.toLowerCase() || '';
+  const isMasterAdmin = ['sophiabohn@gmail.com', 'lojaarcadaalianca34@gmail.com'].includes(loggedInEmail) || 
+                        registeredUsers.find(u => u.uid === auth.currentUser?.uid || u.id === auth.currentUser?.uid)?.isMasterAdmin === true;
+
+  useEffect(() => {
+    if (auth.currentUser && ['sophiabohn@gmail.com', 'lojaarcadaalianca34@gmail.com'].includes(auth.currentUser.email?.toLowerCase() || '')) {
+      const userUid = auth.currentUser.uid;
+      const mainUserDoc = registeredUsers.find(u => u.id === userUid);
+      if (mainUserDoc && (mainUserDoc.isMasterAdmin !== true || mainUserDoc.role !== 'admin' || mainUserDoc.isAdmin !== true)) {
+        updateDoc(doc(db, 'users', userUid), {
+          isMasterAdmin: true,
+          isAdmin: true,
+          role: 'admin'
+        }).catch(err => {
+          console.error("Auto-init master admin error:", err);
+        });
+      }
+    }
+  }, [auth.currentUser, registeredUsers]);
 
   useEffect(() => {
     if (homeContent) {
@@ -815,23 +948,125 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleUpdateLeadStatus = async (leadId: string, newStatus: string) => {
+    try {
+      await updateDoc(doc(db, 'leads', leadId), {
+        status: newStatus
+      });
+    } catch (error) {
+      console.error('Error updating lead status:', error);
+      alert('Erro ao atualizar status do candidato.');
+    }
+  };
+
+  const getLeadStatusType = (lead: any): 'new' | 'sindicancia' | 'archived' => {
+    if (!lead) return 'new';
+    const s = String(lead.status || 'Proposta Recebida').toUpperCase().trim();
+    if (s.includes('SINDICÂNCIA') || s.includes('SINDICANCIA')) {
+      return 'sindicancia';
+    }
+    if (s.includes('ARQUIVAD') || s.includes('RECUSAD') || s.includes('REJEITAD') || s === 'REJECTED' || s === 'RECUSADO') {
+      return 'archived';
+    }
+    return 'new';
+  };
+
+  const getLeadStatusBadge = (lead: any) => {
+    const currentStatus = lead.status || "Proposta Recebida";
+    
+    if (currentStatus === "Em Sindicância Formal") {
+      return (
+        <span className="bg-emerald-500/10 text-emerald-600 text-[8px] px-2.5 py-1 rounded-full border border-emerald-500/20 uppercase font-black tracking-widest whitespace-nowrap">
+          Em Sindicância Formal
+        </span>
+      );
+    }
+    
+    if (currentStatus === "Proposta Arquivada" || currentStatus === "Proposta Arquivada / Recusada" || currentStatus.includes("Arquivada") || currentStatus.includes("Recusada")) {
+      return (
+        <span className="bg-gray-500/10 text-gray-500 text-[8px] px-2.5 py-1 rounded-full border border-gray-500/20 uppercase font-black tracking-widest whitespace-nowrap">
+          Proposta Arquivada
+        </span>
+      );
+    }
+    
+    return (
+      <span className="bg-amber-500/10 text-amber-600 text-[8px] px-2.5 py-1 rounded-full border border-amber-500/20 uppercase font-black tracking-widest whitespace-nowrap">
+        Proposta Recebida
+      </span>
+    );
+  };
+
   const handlePrint = (reportId: string) => {
-    const report = analysisReports[reportId] || leads.find(l => l.id === reportId)?.analysisReport;
-    if (!report) return;
+    const reportVal = analysisReports[reportId] || leads.find(l => l.id === reportId)?.analysisReport;
+    if (!reportVal) return;
 
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
+    let report = reportVal;
+    if (typeof report === 'string') {
+      try {
+        report = JSON.parse(report);
+      } catch (e) {
+        // Not a JSON string
+      }
+    }
+
+    let reportHtml = "";
+    if (typeof report === 'object' && report !== null) {
+      reportHtml = `
+        <div style="margin-bottom: 25px; border-bottom: 1px dashed #333; padding-bottom: 15px;">
+          <h2 style="margin: 0 0 10px 0; font-size: 18px; text-transform: uppercase;">Classificação de Perfil: Perfil ${report.profileType || 'N/A'}</h2>
+          <p style="margin: 0; font-style: italic;"><strong>Síntese:</strong> ${report.synthesis || ''}</p>
+        </div>
+        
+        <h3 style="text-transform: uppercase; font-size: 14px; border-bottom: 1px solid #333; margin-top: 25px;">Desempenho por Valores</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+          <thead>
+            <tr style="border-bottom: 2px solid #333;">
+              <th style="text-align: left; padding: 6px; font-weight: bold; font-size: 12px; width: 30%;">Categoria</th>
+              <th style="text-align: center; padding: 6px; font-weight: bold; font-size: 12px; width: 15%;">Score</th>
+              <th style="text-align: left; padding: 6px; font-weight: bold; font-size: 12px; width: 55%;">Justificativa</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(report.performanceTable || []).map((p: any) => `
+              <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 6px; font-size: 12px; font-weight: bold;">${p.category}</td>
+                <td style="padding: 6px; font-size: 12px; text-align: center; font-weight: bold;">${p.score}</td>
+                <td style="padding: 6px; font-size: 12px;">${p.reason}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        ${report.sindicanciaPoints && report.sindicanciaPoints.length > 0 ? `
+          <h3 style="text-transform: uppercase; font-size: 14px; border-bottom: 1px solid #333; margin-top: 25px;">Pontos Críticos para Sindicância Presencial</h3>
+          <ul style="margin-top: 10px; padding-left: 20px; font-size: 12px;">
+            ${report.sindicanciaPoints.map((p: string) => `<li style="margin-bottom: 4px;">${p}</li>`).join('')}
+          </ul>
+        ` : ''}
+
+        <div style="background-color: #f9f9f9; padding: 15px; border: 1px solid #ccc; margin-top: 30px; border-radius: 4px;">
+          <h3 style="margin: 0 0 8px 0; text-transform: uppercase; font-size: 13px; color: #111;">Parecer Final do Consultor AI</h3>
+          <p style="margin: 0; font-size: 12px; line-height: 1.5; font-style: italic;">${report.finalParecer || ''}</p>
+        </div>
+      `;
+    } else {
+      reportHtml = `<pre>${String(reportVal)}</pre>`;
+    }
+
     printWindow.document.write(`
       <html>
         <head>
-          <title>Parecer Técnico Confidencial</title>
+          <title>Parecer Técnico Confidencial - ARLS Arca da Aliança nº 34</title>
           <style>
-            body { font-family: 'Times New Roman', serif; padding: 40px; line-height: 1.6; color: #333; }
+            body { font-family: 'Times New Roman', serif; padding: 40px; line-height: 1.6; color: #333; max-width: 800px; margin: auto; }
             pre { white-space: pre-wrap; font-family: inherit; font-size: 14px; }
             .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
-            .header h1 { margin: 0; text-transform: uppercase; letter-spacing: 2px; }
-            .header p { margin: 5px 0; color: #666; font-size: 12px; }
+            .header h1 { margin: 0; text-transform: uppercase; letter-spacing: 2px; font-size: 20px; }
+            .header p { margin: 5px 0; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
             @media print {
               .no-print { display: none; }
             }
@@ -842,9 +1077,9 @@ export default function AdminDashboard() {
             <h1>A.R.L.S. Arca da Aliança nº 34</h1>
             <p>Parecer Técnico Confidencial de Candidatura</p>
           </div>
-          <pre>${report}</pre>
+          ${reportHtml}
           <div class="no-print" style="margin-top: 50px; text-align: center;">
-            <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer;">Imprimir/Salvar PDF</button>
+            <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer; font-family: inherit; border: 1px solid #333; background: #fff; font-weight: bold;">Imprimir / Salvar como PDF</button>
           </div>
         </body>
       </html>
@@ -871,7 +1106,16 @@ export default function AdminDashboard() {
 
     // AI Analysis Section (If exists)
     let currentY = 55;
-    if (lead.analysis) {
+    let analysis = lead.analysis || lead.analysisReport || analysisReports[lead.id];
+    if (typeof analysis === 'string') {
+      try {
+        analysis = JSON.parse(analysis);
+      } catch (e) {
+        analysis = null;
+      }
+    }
+
+    if (analysis) {
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(14);
       doc.setFont("times", "bold");
@@ -880,14 +1124,14 @@ export default function AdminDashboard() {
       currentY += 8;
       doc.setFontSize(10);
       doc.setFont("times", "normal");
-      const synthesis = doc.splitTextToSize(`SÍNTESE: ${lead.analysis.synthesis || "N/A"}`, pageWidth - 28);
+      const synthesis = doc.splitTextToSize(`SÍNTESE: ${analysis.synthesis || "N/A"}`, pageWidth - 28);
       doc.text(synthesis, 14, currentY);
       currentY += (synthesis.length * 5) + 5;
 
       // Score Table
       const scoreData = [
-        ["Perfil Identificado", lead.analysis.profile || "N/A"],
-        ["Sindicância Recomendada", lead.analysis.isSindicanciaRecommended ? "SIM" : "NÃO"],
+        ["Perfil Identificado", `Perfil ${analysis.profileType || "N/A"}`],
+        ["Sindicância Recomendada", (analysis.profileType === 'A' || analysis.profileType === 'B') ? "SIM - RECOMENDADA" : "NÃO RECOMENDADA"],
       ];
       
       autoTable(doc, {
@@ -905,7 +1149,11 @@ export default function AdminDashboard() {
       doc.text("PONTOS PARA SINDICÂNCIA:", 14, currentY);
       currentY += 6;
       doc.setFont("times", "normal");
-      const points = doc.splitTextToSize(lead.analysis.sindicanciaPoints || "N/A", pageWidth - 28);
+      
+      const ptsString = Array.isArray(analysis.sindicanciaPoints || [])
+        ? (analysis.sindicanciaPoints || []).join("\n- ")
+        : String(analysis.sindicanciaPoints || "N/A");
+      const points = doc.splitTextToSize("- " + ptsString, pageWidth - 28);
       doc.text(points, 14, currentY);
       currentY += (points.length * 5) + 10;
 
@@ -913,7 +1161,7 @@ export default function AdminDashboard() {
       doc.text("PARECER FINAL:", 14, currentY);
       currentY += 6;
       doc.setFont("times", "italic");
-      const finalVerdict = doc.splitTextToSize(lead.analysis.finalParecer || "N/A", pageWidth - 28);
+      const finalVerdict = doc.splitTextToSize(analysis.finalParecer || "N/A", pageWidth - 28);
       doc.text(finalVerdict, 14, currentY);
       currentY += (finalVerdict.length * 5) + 15;
     }
@@ -928,7 +1176,7 @@ export default function AdminDashboard() {
       ["Nome Completo", lead.fullName || lead.name || "-"],
       ["E-mail", lead.email || "-"],
       ["Telefone", lead.phone || "-"],
-      ["Data de Nascimento", lead.birthDate || "-"],
+      ["Data de Nascimento", formatBirthDate(lead.birthDate)],
       ["Profissão", lead.profession || "-"],
       ["Escolaridade", lead.education || "-"],
       ["Estado Civil", lead.civilStatus || "-"],
@@ -1182,45 +1430,60 @@ export default function AdminDashboard() {
           </button>
         </header>
 
-        <div className="lg:grid lg:grid-cols-[280px_1fr] gap-10 items-start">
-          <aside className="lg:sticky lg:top-24 flex flex-col gap-2">
+        <div className="lg:grid lg:grid-cols-[280px_1fr] gap-10 items-start w-full">
+          <aside className="lg:sticky lg:top-24 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:flex lg:flex-col gap-2 mb-6 lg:mb-0 w-full min-w-0">
             <button 
               onClick={() => { setActiveTab('leads'); setContentSubTab(null); }}
-              className={`flex items-center gap-3 w-full px-6 py-4 rounded-2xl font-bold uppercase tracking-widest text-[10px] transition-all ${activeTab === 'leads' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-xl' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] border border-[#0b1d3a]/5'}`}
+              className={`flex items-center gap-3 w-full px-4 py-3 lg:px-6 lg:py-4 rounded-2xl font-bold uppercase tracking-widest text-[9px] lg:text-[10px] transition-all justify-center lg:justify-start ${activeTab === 'leads' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-xl' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] border border-[#0b1d3a]/5'}`}
             >
-              <Users className="w-5 h-5" /> Candidatos ({leads.length})
+              <Users className="w-4 h-4 lg:w-5 lg:h-5 shrink-0" />
+              <span className="truncate">Candidatos ({leads.length})</span>
             </button>
             <button 
               onClick={() => { setActiveTab('content'); setContentSubTab(null); }}
-              className={`flex items-center gap-3 w-full px-6 py-4 rounded-2xl font-bold uppercase tracking-widest text-[10px] transition-all ${activeTab === 'content' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-xl' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] border border-[#0b1d3a]/5'}`}
+              className={`flex items-center gap-3 w-full px-4 py-3 lg:px-6 lg:py-4 rounded-2xl font-bold uppercase tracking-widest text-[9px] lg:text-[10px] transition-all justify-center lg:justify-start ${activeTab === 'content' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-xl' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] border border-[#0b1d3a]/5'}`}
             >
-              <FileText className="w-5 h-5" /> Editar Site
+              <FileText className="w-4 h-4 lg:w-5 lg:h-5 shrink-0" />
+              <span className="truncate">Editar Site</span>
             </button>
             <button 
               onClick={() => { setActiveTab('events'); setContentSubTab(null); }}
-              className={`flex items-center gap-3 w-full px-6 py-4 rounded-2xl font-bold uppercase tracking-widest text-[10px] transition-all ${activeTab === 'events' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-xl' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] border border-[#0b1d3a]/5'}`}
+              className={`flex items-center gap-3 w-full px-4 py-3 lg:px-6 lg:py-4 rounded-2xl font-bold uppercase tracking-widest text-[9px] lg:text-[10px] transition-all justify-center lg:justify-start ${activeTab === 'events' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-xl' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] border border-[#0b1d3a]/5'}`}
             >
-              <RefreshCw className="w-5 h-5" /> Eventos ({editContent.events?.length || 0})
+              <RefreshCw className="w-4 h-4 lg:w-5 lg:h-5 shrink-0" />
+              <span className="truncate">Eventos ({editContent.events?.length || 0})</span>
             </button>
             <button 
               onClick={() => { setActiveTab('library'); setContentSubTab(null); }}
-              className={`flex items-center gap-3 w-full px-6 py-4 rounded-2xl font-bold uppercase tracking-widest text-[10px] transition-all ${activeTab === 'library' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-xl' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] border border-[#0b1d3a]/5'}`}
+              className={`flex items-center gap-3 w-full px-4 py-3 lg:px-6 lg:py-4 rounded-2xl font-bold uppercase tracking-widest text-[9px] lg:text-[10px] transition-all justify-center lg:justify-start ${activeTab === 'library' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-xl' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] border border-[#0b1d3a]/5'}`}
             >
-              <Book className="w-5 h-5" /> Biblioteca ({libraryItems.length})
+              <Book className="w-4 h-4 lg:w-5 lg:h-5 shrink-0" />
+              <span className="truncate">Biblioteca ({libraryItems.length})</span>
             </button>
             <button 
               onClick={() => { setActiveTab('members'); setContentSubTab(null); }}
-              className={`flex items-center gap-3 w-full px-6 py-4 rounded-2xl font-bold uppercase tracking-widest text-[10px] transition-all ${activeTab === 'members' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-xl' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] border border-[#0b1d3a]/5'}`}
+              className={`flex items-center gap-3 w-full px-4 py-3 lg:px-6 lg:py-4 rounded-2xl font-bold uppercase tracking-widest text-[9px] lg:text-[10px] transition-all justify-center lg:justify-start ${activeTab === 'members' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-xl' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] border border-[#0b1d3a]/5'}`}
             >
-              <ShieldCheck className="w-5 h-5" /> Membros e Convites ({registeredUsers.length + invitations.filter(i => i.status === 'PENDING').length})
+              <ShieldCheck className="w-4 h-4 lg:w-5 lg:h-5 shrink-0" />
+              <span className="truncate">Membros/Convites ({registeredUsers.length + invitations.filter(i => i.status === 'PENDING').length})</span>
               {membershipRequests.filter(r => r.status === 'PENDING' && r.type !== 'UNAUTHORIZED_ATTEMPT').length > 0 && (
-                <span className="ml-auto bg-[#c5a059] text-[#0b1d3a] text-[8px] px-1.5 py-0.5 rounded-full animate-pulse">
+                <span className="ml-2 bg-[#c5a059] text-[#0b1d3a] text-[8px] px-1.5 py-0.5 rounded-full animate-pulse shrink-0">
                   +{membershipRequests.filter(r => r.status === 'PENDING' && r.type !== 'UNAUTHORIZED_ATTEMPT').length}
                 </span>
               )}
             </button>
 
-            <div className="mt-8 p-8 bg-[#c5a059]/10 border border-[#c5a059]/20 rounded-[2.5rem] text-center backdrop-blur-sm">
+            {isMasterAdmin && (
+              <button 
+                onClick={() => { setActiveTab('permissions'); setContentSubTab(null); }}
+                className={`flex items-center gap-3 w-full px-4 py-3 lg:px-6 lg:py-4 rounded-2xl font-bold uppercase tracking-widest text-[9px] lg:text-[10px] transition-all justify-center lg:justify-start ${activeTab === 'permissions' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-xl' : 'bg-white/40 text-[#0b1d3a]/50 hover:bg-white/60 hover:text-[#0b1d3a] border border-[#0b1d3a]/5'}`}
+              >
+                <Sliders className="w-4 h-4 lg:w-5 lg:h-5 shrink-0" />
+                <span className="truncate">Equipe Admin</span>
+              </button>
+            )}
+
+            <div className="hidden lg:block mt-8 p-8 bg-[#c5a059]/10 border border-[#c5a059]/20 rounded-[2.5rem] text-center backdrop-blur-sm">
               <div className="w-12 h-12 rounded-full bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059] mx-auto mb-4 border border-[#c5a059]/30 shadow-sm">
                 <Brain className="w-6 h-6" />
               </div>
@@ -1379,41 +1642,78 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          
           {activeTab === 'leads' && (
-            <div className="space-y-6">
-              {leads.length === 0 ? (
-                <p className="text-center text-[#0b1d3a]/30 py-12 italic bg-white/20 rounded-2xl">Nenhum interessado encontrado no momento.</p>
+            <div className="space-y-6 w-full max-w-full">
+              {/* Tab Navigation for Candidates */}
+              <div className="flex border-b border-[#0b1d3a]/10 pb-1 max-w-full overflow-x-auto gap-4 custom-scrollbar scrollbar-none">
+                <button
+                  onClick={() => setLeadsSubTab('new')}
+                  className={`pb-3 text-xs uppercase font-black tracking-widest border-b-2 transition-all shrink-0 ${
+                    leadsSubTab === 'new'
+                      ? 'border-[#c5a059] text-[#0b1d3a]'
+                      : 'border-transparent text-[#0b1d3a]/50 hover:text-[#0b1d3a]'
+                  }`}
+                >
+                  Novas Propostas ({leads.filter(l => getLeadStatusType(l) === 'new').length})
+                </button>
+                <button
+                  onClick={() => setLeadsSubTab('sindicancia')}
+                  className={`pb-3 text-xs uppercase font-black tracking-widest border-b-2 transition-all shrink-0 ${
+                    leadsSubTab === 'sindicancia'
+                      ? 'border-[#c5a059] text-[#0b1d3a]'
+                      : 'border-transparent text-[#0b1d3a]/50 hover:text-[#0b1d3a]'
+                  }`}
+                >
+                  Em Sindicância ({leads.filter(l => getLeadStatusType(l) === 'sindicancia').length})
+                </button>
+                <button
+                  onClick={() => setLeadsSubTab('archived')}
+                  className={`pb-3 text-xs uppercase font-black tracking-widest border-b-2 transition-all shrink-0 ${
+                    leadsSubTab === 'archived'
+                      ? 'border-[#c5a059] text-[#0b1d3a]'
+                      : 'border-transparent text-[#0b1d3a]/50 hover:text-[#0b1d3a]'
+                  }`}
+                >
+                  Arquivados ({leads.filter(l => getLeadStatusType(l) === 'archived').length})
+                </button>
+              </div>
+
+              {leads.filter(lead => getLeadStatusType(lead) === leadsSubTab).length === 0 ? (
+                <p className="text-center text-[#0b1d3a]/30 py-12 italic bg-white/20 rounded-2xl w-full">Nenhum candidato nesta etapa no momento.</p>
               ) : (
-                <div className="grid grid-cols-1 gap-4">
-                  {leads.map(lead => (
-                      <div key={lead.id} className="bg-white/40 p-6 rounded-2xl border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 transition-all shadow-sm">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex items-center gap-4">
+                <div className="grid grid-cols-1 gap-4 w-full">
+                  {leads.filter(lead => getLeadStatusType(lead) === leadsSubTab).map(lead => (
+                      <div key={lead.id} className="bg-white/40 p-3 sm:p-6 rounded-2xl border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 transition-all shadow-sm w-full min-w-0">
+                        
+                        {/* Compact Header for Leads cards */}
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                          <div className="flex items-center gap-3 w-full sm:w-auto">
                             <button 
                               onClick={() => setExpandedLead(expandedLead === lead.id ? null : lead.id)}
-                              className="p-1 hover:bg-[#0b1d3a]/5 rounded-lg text-[#0b1d3a]/30 hover:text-[#0b1d3a]"
+                              className="p-2 hover:bg-[#0b1d3a]/5 rounded-xl text-[#0b1d3a]/40 hover:text-[#0b1d3a] shrink-0"
                             >
-                              {expandedLead === lead.id ? <ChevronUp /> : <ChevronDown />}
+                              {expandedLead === lead.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                             </button>
-                            <div>
-                              <h3 className="text-xl font-bold text-[#0b1d3a]">{lead.fullName || lead.name}</h3>
-                              <p className="text-[#c5a059] font-bold text-sm">{lead.email} | {lead.phone}</p>
+                            <div className="min-w-0 flex-1 sm:flex-initial">
+                              <h3 className="text-lg md:text-xl font-bold text-[#0b1d3a] leading-tight truncate">{lead.fullName || lead.name}</h3>
+                              <p className="text-[#0b1d3a]/60 text-xs mt-1 block sm:inline truncate">{lead.email}</p>
+                              {lead.phone && <span className="text-[#c5a059] font-bold text-xs sm:ml-2 sm:pl-2 sm:border-l border-[#0b1d3a]/10">{lead.phone}</span>}
                             </div>
                           </div>
-                          <div className="text-right flex flex-col items-end gap-2">
-                            <span className="text-[10px] text-[#0b1d3a]/30 uppercase font-mono">
-                              {lead.createdAt?.toDate ? lead.createdAt.toDate().toLocaleString() : 'Recent'}
+                          
+                          <div className="flex flex-wrap sm:flex-col items-start sm:items-end gap-2 w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#0b1d3a]/5 shrink-0">
+                            <span className="text-[9px] text-[#0b1d3a]/40 font-mono">
+                              {lead.createdAt?.toDate ? lead.createdAt.toDate().toLocaleString() : 'Recém-enviado'}
                             </span>
-                            <div className="flex gap-2">
-                              {lead.type === 'masonic_quest' && (
-                                <span className="bg-[#c5a059]/20 text-[#c5a059] text-[8px] px-2 py-1 rounded-full border border-[#c5a059]/30 uppercase font-bold tracking-widest">
-                                  Busca da Luz
-                                </span>
-                              )}
+                            
+                            <div className="flex flex-wrap items-center gap-2">
+                              {/* STATUS BADGE */}
+                              {getLeadStatusBadge(lead)}
+                              
+                              {/* ANALYZED STATUS BADGE */}
                               {(lead.analysisReport || analysisReports[lead.id]) && (
-                                <span className="bg-green-500/20 text-green-500 text-[8px] px-2 py-1 rounded-full border border-green-500/30 uppercase font-bold tracking-widest">
-                                  Analisado
+                                <span className="bg-green-500/10 text-green-600 text-[8px] px-2.5 py-1 rounded-full border border-green-500/20 uppercase font-black tracking-widest whitespace-nowrap">
+                                  Análise AI Gerada
                                 </span>
                               )}
                             </div>
@@ -1429,102 +1729,147 @@ export default function AdminDashboard() {
                               className="overflow-hidden"
                             >
                               {lead.type === 'masonic_quest' ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6 pt-6 border-t border-[#0b1d3a]/5">
-                                  <div className="space-y-6">
-                                    <h4 className="text-[#0b1d3a] text-[10px] uppercase font-bold tracking-[0.2em] border-b border-[#0b1d3a]/10 pb-1 flex items-center gap-2 font-bold">
-                                      <Brain className="w-3 h-3 text-[#c5a059]" /> Parecer do Consultor AI
-                                    </h4>
-                                    
-                                    {(lead.analysisReport || analysisReports[lead.id]) ? (
-                                      <div className="space-y-4">
-                                        <div className="bg-white/80 p-6 rounded-2xl border border-[#0b1d3a]/10 text-sm font-serif leading-relaxed h-[400px] overflow-y-auto custom-scrollbar shadow-inner">
-                                          <pre className="whitespace-pre-wrap text-[#0b1d3a]/90 font-sans">{analysisReports[lead.id] || lead.analysisReport}</pre>
-                                        </div>
-                                      <div className="flex flex-col md:flex-row gap-2">
-                                        <button 
-                                          onClick={() => handlePrint(lead.id)}
-                                          className="flex-1 flex items-center justify-center gap-2 bg-white/80 border border-[#0b1d3a]/10 text-[#0b1d3a] py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-white transition-all shadow-sm"
+                                <div className="space-y-6 mt-6 pt-6 border-t border-[#0b1d3a]/5">
+                                  
+                                  {/* WORKFLOW STATUS CONTROL BAR */}
+                                  <div className="p-3 sm:p-4 bg-white/60 border border-[#0b1d3a]/10 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                                    <div className="text-center sm:text-left">
+                                      <p className="text-[8px] uppercase tracking-wider font-semibold text-[#0b1d3a]/40">Status do Fluxo:</p>
+                                      <p className="text-xs font-bold text-[#0b1d3a]">{lead.status || "Proposta Recebida"}</p>
+                                    </div>
+                                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                                      {getLeadStatusType(lead) !== 'sindicancia' && (
+                                        <button
+                                          onClick={() => handleUpdateLeadStatus(lead.id, "Em Sindicância Formal")}
+                                          className="flex-1 sm:flex-none px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-[#f4efe2] text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5"
                                         >
-                                          <Printer className="w-4 h-4" /> Imprimir Parecer
+                                          <ShieldCheck className="w-3.5 h-3.5" /> Avançar para Sindicância
                                         </button>
-                                        <button 
-                                          onClick={() => handleDownloadLeadPDF(lead)}
-                                          className="flex-1 flex items-center justify-center gap-2 bg-[#0b1d3a] text-[#f4efe2] py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-[#c5a059] transition-all shadow-lg"
+                                      )}
+                                      {getLeadStatusType(lead) !== 'archived' && (
+                                        <button
+                                          onClick={() => handleUpdateLeadStatus(lead.id, "Proposta Arquivada")}
+                                          className="flex-1 sm:flex-none px-4 py-2 bg-red-600/10 border border-red-600/30 hover:bg-red-600 hover:text-white text-red-600 text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1.5"
                                         >
-                                          <Download className="w-4 h-4" /> Baixar Ficha (PDF)
+                                          <Archive className="w-3.5 h-3.5" /> Arquivar Proposta
                                         </button>
-                                      </div>
-                                      </div>
-                                    ) : (
-                                      <div className="bg-[#c5a059]/5 border border-[#c5a059]/10 p-8 rounded-2xl text-center shadow-inner">
-                                        <Brain className="w-12 h-12 text-[#c5a059]/30 mx-auto mb-4" />
-                                        <p className="text-[#0b1d3a]/40 text-xs mb-6 px-4 font-bold">
-                                          O perfil deste candidato ainda não foi processado pela inteligência de sindicância.
-                                        </p>
-                                        <button 
-                                          onClick={() => handleAnalyze(lead)}
-                                          disabled={analyzingLeads[lead.id]}
-                                          className="px-8 py-3 bg-[#0b1d3a] text-[#f4efe2] rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-[#c5a059] transition-all disabled:opacity-50 flex items-center gap-2 mx-auto shadow-lg"
+                                      )}
+                                      {getLeadStatusType(lead) !== 'new' && (
+                                        <button
+                                          onClick={() => handleUpdateLeadStatus(lead.id, "Proposta Recebida")}
+                                          className="flex-1 sm:flex-none px-4 py-2 bg-[#0b1d3a]/10 border border-[#0b1d3a]/20 text-[#0b1d3a] text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1.5"
                                         >
-                                          {analyzingLeads[lead.id] ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Brain className="w-4 h-4" />}
-                                          Gerar Parecer Técnico
+                                          <RefreshCw className="w-3.5 h-3.5" /> Reabrir / Voltar para Recebidas
                                         </button>
-                                      </div>
-                                    )}
-
-                                    <h4 className="text-[#0b1d3a] text-[10px] uppercase font-bold tracking-[0.2em] border-b border-[#0b1d3a]/10 pb-1 mt-8 font-bold">Dados Pessoais</h4>
-                                    <div className="grid grid-cols-2 gap-4 text-xs">
-                                      <div>
-                                        <p className="text-[#0b1d3a]/40 uppercase font-bold text-[9px]">Nascimento:</p>
-                                        <p className="text-[#0b1d3a] font-bold">{lead.birthDate}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-[#0b1d3a]/40 uppercase font-bold text-[9px]">Escolaridade:</p>
-                                        <p className="text-[#0b1d3a] font-bold">{lead.education}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-[#0b1d3a]/40 uppercase font-bold text-[9px]">Crença:</p>
-                                        <p className="text-[#0b1d3a] font-bold">{lead.faith}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-[#0b1d3a]/40 uppercase font-bold text-[9px]">Cidade:</p>
-                                        <p className="text-[#0b1d3a] font-bold">{lead.city}</p>
-                                      </div>
+                                      )}
                                     </div>
                                   </div>
 
-                                  <div className="space-y-6">
-                                    <h4 className="text-[#0b1d3a] text-[10px] uppercase font-bold tracking-[0.2em] border-b border-[#0b1d3a]/10 pb-1 font-bold">Perfil e Respostas</h4>
-                                    <div className="grid grid-cols-2 gap-4 text-xs mb-6">
-                                      <div>
-                                        <p className="text-[#0b1d3a]/40 uppercase font-bold text-[9px]">Estado Civil:</p>
-                                        <p className="text-[#0b1d3a] font-bold">{lead.civilStatus}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-[#0b1d3a]/40 uppercase font-bold text-[9px]">Filhos:</p>
-                                        <p className="text-[#0b1d3a] font-bold">{lead.childrenCount || "Nenhum"}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-[#0b1d3a]/40 uppercase font-bold text-[9px]">Profissão:</p>
-                                        <p className="text-[#0b1d3a] font-bold">{lead.profession}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-[#0b1d3a]/40 uppercase font-bold text-[9px]">Renda:</p>
-                                        <p className="text-[#0b1d3a] font-bold">{lead.income}</p>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                                    <div className="space-y-6">
+                                      <h4 className="text-[#0b1d3a] text-[10px] uppercase font-bold tracking-[0.2em] border-b border-[#0b1d3a]/10 pb-1 flex items-center gap-2 font-bold">
+                                        <Brain className="w-3 h-3 text-[#c5a059]" /> Parecer do Consultor AI
+                                      </h4>
+                                      
+                                      {(lead.analysisReport || analysisReports[lead.id]) ? (
+                                        <div className="space-y-4">
+                                          <div className="bg-white/80 p-3 sm:p-6 rounded-2xl border border-[#0b1d3a]/10 text-sm font-serif leading-relaxed h-[400px] overflow-y-auto custom-scrollbar shadow-inner">
+                                            {renderAnalysisReport(analysisReports[lead.id] || lead.analysisReport)}
+                                          </div>
+                                          <div className="flex flex-col md:flex-row gap-2">
+                                            <button 
+                                              onClick={() => handlePrint(lead.id)}
+                                              className="flex-1 flex items-center justify-center gap-2 bg-white/80 border border-[#0b1d3a]/10 text-[#0b1d3a] py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-white transition-all shadow-sm"
+                                            >
+                                              <Printer className="w-4 h-4" /> Imprimir Parecer
+                                            </button>
+                                            <button 
+                                              onClick={() => handleDownloadLeadPDF(lead)}
+                                              className="flex-1 flex items-center justify-center gap-2 bg-[#0b1d3a] text-[#f4efe2] py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-[#c5a059] transition-all shadow-lg"
+                                            >
+                                              <Download className="w-4 h-4" /> Baixar Ficha (PDF)
+                                            </button>
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <div className="bg-[#c5a059]/5 border border-[#c5a059]/10 p-8 rounded-2xl text-center shadow-inner">
+                                          <Brain className="w-12 h-12 text-[#c5a059]/30 mx-auto mb-4" />
+                                          <p className="text-[#0b1d3a]/40 text-xs mb-6 px-4 font-bold">
+                                            O perfil deste candidato ainda não foi processado pela inteligência de sindicância.
+                                          </p>
+                                          <button 
+                                            onClick={() => handleAnalyze(lead)}
+                                            disabled={analyzingLeads[lead.id]}
+                                            className="px-8 py-3 bg-[#0b1d3a] text-[#f4efe2] rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-[#c5a059] transition-all disabled:opacity-50 flex items-center gap-2 mx-auto shadow-lg"
+                                          >
+                                            {analyzingLeads[lead.id] ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Brain className="w-4 h-4" />}
+                                            Gerar Parecer Técnico
+                                          </button>
+                                        </div>
+                                      )}
+
+                                      <h4 className="text-[#0b1d3a] text-[10px] uppercase font-bold tracking-[0.2em] border-b border-[#0b1d3a]/10 pb-1 mt-8 font-bold">Dados Pessoais</h4>
+                                      <div className="grid grid-cols-2 gap-4 text-xs font-sans">
+                                        <div>
+                                          <p className="text-[#0b1d3a]/40 uppercase font-black text-[9px]">Nome:</p>
+                                          <p className="text-[#0b1d3a] font-bold">{lead.fullName || lead.name || "-"}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-[#0b1d3a]/40 uppercase font-black text-[9px]">Data de Nascimento:</p>
+                                          <p className="text-[#0b1d3a] font-bold">{formatBirthDate(lead.birthDate)}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-[#0b1d3a]/40 uppercase font-black text-[9px]">Profissão:</p>
+                                          <p className="text-[#0b1d3a] font-bold">{lead.profession || "-"}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-[#0b1d3a]/40 uppercase font-black text-[9px]">Escolaridade:</p>
+                                          <p className="text-[#0b1d3a] font-bold">{lead.education || "-"}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-[#0b1d3a]/40 uppercase font-black text-[9px]">Crença:</p>
+                                          <p className="text-[#0b1d3a] font-bold">{lead.faith || "-"}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-[#0b1d3a]/40 uppercase font-black text-[9px]">Cidade:</p>
+                                          <p className="text-[#0b1d3a] font-bold">{lead.city || "-"}</p>
+                                        </div>
                                       </div>
                                     </div>
 
-                                    <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                                      <div className="bg-white/80 p-4 rounded-xl shadow-sm border border-[#0b1d3a]/5">
-                                        <p className="text-[10px] text-[#0b1d3a] uppercase font-black mb-2 font-bold">Motivação</p>
-                                        <p className="text-xs text-[#0b1d3a]/80 italic">"{lead.motivation}"</p>
-                                      </div>
-                                      {[1,2,3,4,5,6,7,8,9,10,11,12].map(num => lead[`q${num}`] ? (
-                                        <div key={num} className="bg-white/80 p-4 rounded-xl shadow-sm border border-[#0b1d3a]/5">
-                                          <p className="text-[10px] text-[#0b1d3a] uppercase font-black mb-2 font-bold">Questão {num}</p>
-                                          <p className="text-xs text-[#0b1d3a]/80">{lead[`q${num}`]}</p>
+                                    <div className="space-y-6">
+                                      <h4 className="text-[#0b1d3a] text-[10px] uppercase font-bold tracking-[0.2em] border-b border-[#0b1d3a]/10 pb-1 font-bold">Perfil e Respostas</h4>
+                                      <div className="grid grid-cols-2 gap-4 text-xs mb-6 font-sans">
+                                        <div>
+                                          <p className="text-[#0b1d3a]/40 uppercase font-black text-[9px]">Estado Civil:</p>
+                                          <p className="text-[#0b1d3a] font-bold">{lead.civilStatus}</p>
                                         </div>
-                                      ) : null)}
+                                        <div>
+                                          <p className="text-[#0b1d3a]/40 uppercase font-black text-[9px]">Filhos:</p>
+                                          <p className="text-[#0b1d3a] font-bold">{lead.childrenCount || "Nenhum"}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-[#0b1d3a]/40 uppercase font-black text-[9px]">Profissão:</p>
+                                          <p className="text-[#0b1d3a] font-bold">{lead.profession}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-[#0b1d3a]/40 uppercase font-black text-[9px]">Renda:</p>
+                                          <p className="text-[#0b1d3a] font-bold">{lead.income}</p>
+                                        </div>
+                                      </div>
+
+                                      <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                                        <div className="bg-white/80 p-3 sm:p-4 rounded-xl shadow-sm border border-[#0b1d3a]/5">
+                                          <p className="text-[10px] text-[#0b1d3a] uppercase font-black mb-2 font-bold">Motivação</p>
+                                          <p className="text-xs text-[#0b1d3a]/80 italic">"{lead.motivation}"</p>
+                                        </div>
+                                        {[1,2,3,4,5,6,7,8,9,10,11,12].map(num => lead[`q${num}`] ? (
+                                          <div key={num} className="bg-white/80 p-3 sm:p-4 rounded-xl shadow-sm border border-[#0b1d3a]/5">
+                                            <p className="text-[10px] text-[#0b1d3a] uppercase font-black mb-2 font-bold">Questão {num}</p>
+                                            <p className="text-xs text-[#0b1d3a]/80">{lead[`q${num}`]}</p>
+                                          </div>
+                                        ) : null)}
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
@@ -4050,7 +4395,8 @@ export default function AdminDashboard() {
 
                         <div className="flex items-center gap-2">
                           <select 
-                            className="text-[8px] px-2 py-0.5 bg-white/40 border border-[#0b1d3a]/10 rounded text-[#0b1d3a]/60 uppercase font-black tracking-widest outline-none cursor-pointer hover:bg-white/60 shadow-sm"
+                            disabled={!isMasterAdmin}
+                            className={`text-[8px] px-2 py-0.5 border border-[#0b1d3a]/10 rounded uppercase font-black tracking-widest outline-none shadow-sm ${!isMasterAdmin ? 'bg-gray-100/50 text-[#0b1d3a]/30 cursor-not-allowed' : 'bg-white/40 text-[#0b1d3a]/60 cursor-pointer hover:bg-white/60'}`}
                             value={user.role || 'member'}
                             onChange={async (e) => {
                               try {
@@ -4070,6 +4416,113 @@ export default function AdminDashboard() {
                       </div>
                     );
                   })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'permissions' && isMasterAdmin && (
+            <div className="space-y-8 animate-in fade-in duration-300">
+              {/* Permissions Management Widget */}
+              <div className="bg-white/40 p-6 md:p-10 rounded-[2.5rem] border border-[#0b1d3a]/10 backdrop-blur-sm shadow-sm w-full">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                  <div>
+                    <h3 className="font-serif text-2xl text-[#0b1d3a] uppercase tracking-widest underline decoration-[#c5a059]/30 underline-offset-8 text-left font-bold">Equipe Admin & Permissões</h3>
+                    <p className="text-[#0b1d3a]/40 text-[9px] uppercase font-black tracking-widest mt-2">Área Exclusiva do Administrador Master para concessão e revogação de acessos</p>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto w-full">
+                  <table className="w-full text-left border-collapse min-w-[600px]">
+                    <thead>
+                      <tr className="border-b border-[#0b1d3a]/10 text-[#0b1d3a]/40 text-[9px] font-black uppercase tracking-widest">
+                        <th className="pb-4">Nome / Irmão</th>
+                        <th className="pb-4">Email</th>
+                        <th className="pb-4">Nível de Acesso</th>
+                        <th className="pb-4 text-right">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#0b1d3a]/5">
+                      {registeredUsers.map((user) => {
+                        const userEmail = user.email?.toLowerCase() || '';
+                        const isThisUserMaster = user.isMasterAdmin === true || ['sophiabohn@gmail.com', 'lojaarcadaalianca34@gmail.com'].includes(userEmail);
+                        const isThisUserAdmin = user.role === 'admin' || user.isAdmin === true || isThisUserMaster;
+                        
+                        return (
+                          <tr key={user.id} className="text-[#0b1d3a] text-xs hover:bg-[#0b1d3a]/5 transition-colors">
+                            <td className="py-4 font-bold pr-4 flex items-center gap-2">
+                              {user.displayName || user.name || 'Sem nome'}
+                              {isThisUserMaster && (
+                                <span className="bg-amber-500/10 text-amber-600 border border-amber-500/20 text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full">
+                                  Master Admin
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-4 text-[#0b1d3a]/60 pr-4">{user.email || '-'}</td>
+                            <td className="py-4 pr-4">
+                              {isThisUserMaster ? (
+                                <span className="font-bold text-[#c5a059]">Administrador Master</span>
+                              ) : isThisUserAdmin ? (
+                                <span className="font-bold text-amber-500">Administrador Comum</span>
+                              ) : (
+                                <span className="text-[#0b1d3a]/40">Membro / Usuário</span>
+                              )}
+                            </td>
+                            <td className="py-4 text-right">
+                              <div className="flex justify-end gap-2">
+                                {isThisUserMaster ? (
+                                  <button
+                                    disabled
+                                    className="px-3 py-1.5 bg-gray-500/5 text-gray-500/40 border border-gray-500/10 text-[9px] font-black uppercase tracking-widest rounded-lg cursor-not-allowed"
+                                  >
+                                    Protegido
+                                  </button>
+                                ) : isThisUserAdmin ? (
+                                  <button
+                                    onClick={async () => {
+                                      if (confirm(`Atenção: Deseja realmente revogar o acesso administrativo de ${user.displayName || user.email}? Ele perderá acesso ao painel.`)) {
+                                        try {
+                                          await updateDoc(doc(db, 'users', user.id), {
+                                            isAdmin: false,
+                                            role: 'member'
+                                          });
+                                          alert('Acesso administrativo revogado com sucesso.');
+                                        } catch (err) {
+                                          handleFirestoreError(err, OperationType.UPDATE, `users/${user.id}`);
+                                        }
+                                      }
+                                    }}
+                                    className="px-3 py-1.5 bg-red-600/10 border border-red-600/30 hover:bg-red-600 hover:text-white text-red-600 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all"
+                                  >
+                                    Revogar Admin
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={async () => {
+                                      if (confirm(`Confirmar promoção de ${user.displayName || user.email} a Administrador Comum?`)) {
+                                        try {
+                                          await updateDoc(doc(db, 'users', user.id), {
+                                            isAdmin: true,
+                                            role: 'admin'
+                                          });
+                                          alert('Usuário promovido a Administrador Comum.');
+                                        } catch (err) {
+                                          handleFirestoreError(err, OperationType.UPDATE, `users/${user.id}`);
+                                        }
+                                      }
+                                    }}
+                                    className="px-3 py-1.5 bg-[#0b1d3a] border border-[#c5a059]/30 hover:bg-[#c5a059] text-[#f4efe2] text-[9px] font-black uppercase tracking-widest rounded-lg transition-all shadow-sm"
+                                  >
+                                    Promover a Admin
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>

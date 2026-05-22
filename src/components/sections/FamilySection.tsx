@@ -37,7 +37,7 @@ export default function FamilySection() {
   ];
 
   return (
-    <section className="py-24 bg-aged-beige relative overflow-hidden">
+    <section id="espaco-familia" className="py-24 bg-aged-beige relative overflow-hidden">
       <div className="absolute inset-0 bg-[#c5a059]/5 mix-blend-color pointer-events-none" />
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">

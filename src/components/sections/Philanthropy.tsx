@@ -10,7 +10,7 @@ export default function Philanthropy() {
   const stats = content.philanthropy.stats || [];
 
   return (
-    <section id="social" className="py-24 bg-aged-beige relative overflow-hidden">
+    <section id="acoes-sociais" className="py-24 bg-aged-beige relative overflow-hidden">
       <div className="absolute inset-0 bg-[#c5a059]/5 mix-blend-overlay pointer-events-none" />
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">

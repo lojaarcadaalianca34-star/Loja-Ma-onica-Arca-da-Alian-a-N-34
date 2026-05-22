@@ -144,25 +144,25 @@ export default function ProfessionalBoard() {
   return (
     <div className="space-y-8">
       {/* Search and Tabs */}
-      <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
-        <div className="flex bg-white/40 p-1 rounded-2xl border border-[#0b1d3a]/10 shadow-sm">
+      <div className="flex flex-col lg:flex-row gap-6 items-center justify-between w-full">
+        <div className="flex flex-col sm:flex-row bg-[#0b1d3a]/5 sm:bg-white/40 p-1 rounded-2xl border border-[#0b1d3a]/10 shadow-sm w-full lg:w-auto gap-1">
           <button 
             onClick={() => setActiveTab('SERVICE')}
-            className={`px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'SERVICE' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-lg border border-[#c5a059]/30' : 'text-[#0b1d3a]/40 hover:text-[#0b1d3a]'}`}
+            className={`px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 w-full sm:w-auto ${activeTab === 'SERVICE' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-lg border border-[#c5a059]/30' : 'text-[#0b1d3a]/60 hover:text-[#0b1d3a]'}`}
           >
-            <Handshake className="w-4 h-4" /> Vamos nos Ajudar
+            <Handshake className="w-4 h-4 shrink-0" /> Vamos nos Ajudar
           </button>
           <button 
             onClick={() => setActiveTab('JOB')}
-            className={`px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'JOB' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-lg border border-[#c5a059]/30' : 'text-[#0b1d3a]/40 hover:text-[#0b1d3a]'}`}
+            className={`px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 w-full sm:w-auto ${activeTab === 'JOB' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-lg border border-[#c5a059]/30' : 'text-[#0b1d3a]/60 hover:text-[#0b1d3a]'}`}
           >
-            <Briefcase className="w-4 h-4" /> Vagas de Emprego
+            <Briefcase className="w-4 h-4 shrink-0" /> Vagas de Emprego
           </button>
           <button 
             onClick={() => setActiveTab('RESUME')}
-            className={`px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'RESUME' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-lg border border-[#c5a059]/30' : 'text-[#0b1d3a]/40 hover:text-[#0b1d3a]'}`}
+            className={`px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 w-full sm:w-auto ${activeTab === 'RESUME' ? 'bg-[#0b1d3a] text-[#f4efe2] shadow-lg border border-[#c5a059]/30' : 'text-[#0b1d3a]/60 hover:text-[#0b1d3a]'}`}
           >
-            <UserCircle className="w-4 h-4" /> Currículos / Talentos
+            <UserCircle className="w-4 h-4 shrink-0" /> Currículos / Talentos
           </button>
         </div>
 

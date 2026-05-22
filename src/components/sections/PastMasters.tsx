@@ -13,7 +13,7 @@ export default function PastMasters() {
   if (masters.length === 0 && !content.mastersSection?.masters) return null;
 
   return (
-    <section id="galeria" className="py-24 bg-aged-beige overflow-hidden">
+    <section id="galeria-honra" className="py-24 bg-aged-beige overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         {/* Atual Gestão */}
         <div className="mb-24 px-4 lg:px-0">

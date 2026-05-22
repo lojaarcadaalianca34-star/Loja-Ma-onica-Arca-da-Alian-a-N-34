@@ -7,12 +7,13 @@ import Logo from '../ui/Logo';
 import { auth, logout } from '@/src/lib/firebase';
 
 const navLinks = [
-  { name: 'Home', href: '#home', icon: Globe },
+  { name: 'Home', href: '/#hero', icon: Globe },
   { name: 'Sobre Nós', href: '/sobre', icon: Landmark },
-  { name: 'Ações Sociais', href: '#social', icon: Heart },
-  { name: 'Past Masters', href: '#galeria', icon: Users },
+  { name: 'Ações Sociais', href: '/#acoes-sociais', icon: Heart },
+  { name: 'Past Masters', href: '/#galeria-honra', icon: Users },
+  { name: 'Família / Paramaçônicas', href: '/#espaco-familia', icon: Users },
   { name: 'Eventos', href: '/eventos', icon: BookOpen },
-  { name: 'Galeria', href: '#galeria-fotos', icon: BookOpen },
+  { name: 'Galeria', href: '/#galeria-fotos', icon: BookOpen },
 ];
 
 export default function Navbar() {
@@ -25,6 +26,19 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('/#') || href.startsWith('#')) {
+      const targetId = href.substring(href.indexOf('#') + 1);
+      if (location.pathname === '/') {
+        e.preventDefault();
+        const element = document.getElementById(targetId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -65,26 +79,27 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-6 lg:gap-8 ml-auto">
+          <div className="hidden md:flex items-center gap-1.5 lg:gap-3 xl:gap-5 ml-auto">
             {navLinks.map((link) => (
               <a 
                 key={link.name} 
                 href={link.href}
-                className="text-sm font-serif uppercase tracking-widest text-[#c5a059] hover:text-white transition-colors"
+                onClick={(e) => handleNavClick(e, link.href)}
+                className="text-[8px] lg:text-[10px] xl:text-[11px] font-serif uppercase tracking-wider xl:tracking-widest text-[#c5a059] hover:text-white transition-colors whitespace-nowrap px-1 lg:px-2"
               >
                 {link.name}
               </a>
             ))}
-            <div className="flex items-center gap-3 ml-4">
+            <div className="flex items-center gap-2 ml-2 lg:ml-4">
               <Link 
                 to="/area-restrita"
-                className="px-5 py-2.5 bg-[#c5a059] text-[#0b1d3a] rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-[#c5a059]/90 transition-all shadow-md"
+                className="px-3 py-2 lg:px-5 lg:py-2.5 bg-[#c5a059] text-[#0b1d3a] rounded-full text-[9px] lg:text-[10px] font-black uppercase tracking-widest hover:bg-[#c5a059]/90 transition-all shadow-md whitespace-nowrap"
               >
                 Área Restrita
               </Link>
               <Link 
                 to="/admin"
-                className="p-2 text-white/20 hover:text-[#c5a059] transition-colors"
+                className="p-1.5 text-white/20 hover:text-[#c5a059] transition-colors"
                 title="Administração"
               >
                 <Shield className="w-4 h-4" />
@@ -126,7 +141,10 @@ export default function Navbar() {
                 <a 
                   key={link.name} 
                   href={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={(e) => {
+                    setIsMobileMenuOpen(false);
+                    handleNavClick(e, link.href);
+                  }}
                   className="flex items-center gap-4 text-[#f4efe2] p-4 bg-white/5 rounded-xl border border-white/5 active:bg-[#c5a059]/10 active:border-[#c5a059]/30 transition-all"
                 >
                   <link.icon className="w-5 h-5 text-[#c5a059]" />

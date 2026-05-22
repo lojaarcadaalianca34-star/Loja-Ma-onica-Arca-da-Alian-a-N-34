@@ -7,10 +7,10 @@ export default function WelcomeBanner() {
   const { welcomeBanner } = homeContent;
 
   return (
-    <section className="relative h-[80vh] min-h-[600px] flex flex-col items-center justify-center overflow-hidden border-b border-[#c5a059]/20 bg-masonic-dark">
+    <section id="hero" className="relative h-[80vh] min-h-[600px] flex flex-col items-center justify-center overflow-hidden border-t border-[#c5a059] border-b border-[#c5a059] bg-masonic-dark">
       {/* Background with Animation */}
       <div className="absolute inset-0 z-0">
-        {welcomeBanner.backgroundImage && (
+        {(welcomeBanner.backgroundImage || "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1920&q=80") && (
           <motion.div 
             initial={{ scale: 1.1 }}
             animate={{ 
@@ -22,9 +22,9 @@ export default function WelcomeBanner() {
               repeat: Infinity, 
               ease: "easeInOut" 
             }}
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            className="absolute inset-0 bg-cover bg-[center_35%] bg-no-repeat"
             style={{ 
-              backgroundImage: `url("${welcomeBanner.backgroundImage}")`,
+              backgroundImage: `url("${welcomeBanner.backgroundImage || "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1920&q=80"}")`,
               filter: 'brightness(0.9) contrast(1.1)'
             }}
           />
@@ -50,14 +50,14 @@ export default function WelcomeBanner() {
     welcomeBanner.subTitle.align === 'justify' ? 'text-justify' : 'text-left'
   }`}
   style={{
-    // Névoa escura e suave atrás do texto para desgrudar ele da foto clara de fundo
-    textShadow: '0 4px 10px rgba(0, 0, 0, 0.5)'
+    // Sombreado dourado quase transparente combinado com um fundo escuro suave para máxima nitidez
+    textShadow: '0 0 12px rgba(197, 160, 89, 0.6), 0 2px 5px rgba(0, 0, 0, 0.8)'
   }}
 >
   {welcomeBanner.subTitle.text}
 </motion.h2>
           
-          <h1 className={`font-cinzel text-4xl md:text-6xl lg:text-8xl font-bold gold-text tracking-normal uppercase drop-shadow-2xl leading-none w-full [-webkit-text-stroke:0.6px_#0b1d3a] [text-stroke:0.6px_#0b1d3a] ${
+          <h1 className={`font-cinzel text-4xl md:text-6xl lg:text-8xl font-bold gold-text tracking-normal uppercase drop-shadow-2xl leading-none w-full [-webkit-text-stroke:0.6px_#c5a059] [text-stroke:0.6px_#c5a059] ${
   welcomeBanner.title.align === 'center' ? 'text-center' :
   welcomeBanner.title.align === 'right' ? 'text-right' :
   welcomeBanner.title.align === 'justify' ? 'text-justify' : 'text-left'
