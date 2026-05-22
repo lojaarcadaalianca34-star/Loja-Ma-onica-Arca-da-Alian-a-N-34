@@ -91,10 +91,21 @@ async function startServer() {
       const result = await ai.models.generateContent({
         model: "gemini-3.5-flash",
         contents: prompt,
+        config: {
+          responseMimeType: "application/json"
+        }
       });
       const text = result.text || "";
-      const cleanJson = text.replace(/```json|```/g, "").trim();
-      res.status(200).json(JSON.parse(cleanJson));
+      
+      // Safe JSON extraction
+      let jsonStr = text.trim();
+      const firstCurly = jsonStr.indexOf("{");
+      const lastCurly = jsonStr.lastIndexOf("}");
+      if (firstCurly !== -1 && lastCurly !== -1 && lastCurly > firstCurly) {
+        jsonStr = jsonStr.substring(firstCurly, lastCurly + 1);
+      }
+      
+      res.status(200).json(JSON.parse(jsonStr));
     } catch (error) {
       console.error("AI Analysis failed:", error);
       res.status(500).json({ error: String(error) });
