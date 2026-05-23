@@ -34,10 +34,29 @@ app.use(express.json());
 
   // API Routes
   app.post("/api/analyze-candidate", async (req, res) => {
-    const { formData } = req.body;
-    
+    // 3. VALIDAÇÃO DA CHAVE NO CÓDIGO
     if (!process.env.GEMINI_API_KEY) {
-      return res.status(200).json({ error: "Gemini Key missing" });
+      console.error("Critial Error: GEMINI_API_KEY is not defined in the environment variables!");
+      return res.status(400).json({ error: "A chave da API não foi carregada no servidor" });
+    }
+
+    // 1. REVISÃO DO PARSER E PAYLOAD
+    let body = req.body;
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      } catch (e: any) {
+        console.error("Falha ao fazer o parse manual do corpo como JSON string:", e);
+      }
+    }
+
+    const formData = body?.formData;
+    if (!formData) {
+      console.error("Payload vazio ou ausente recebido:", body);
+      return res.status(400).json({
+        error: "Erro de Payload: O corpo da requisição ou o campo 'formData' está ausente ou vazio no servidor.",
+        receivedBody: req.body
+      });
     }
 
     // Calculate age deterministically based on the reference year 2026
@@ -84,6 +103,7 @@ app.use(express.json());
       }
     `;
 
+    // 2. LOG DE ERRO FORÇADO (CONSOLE & FRONTEND)
     try {
       const ai = getAi();
       const result = await ai.models.generateContent({
@@ -104,9 +124,12 @@ app.use(express.json());
       }
       
       res.status(200).json(JSON.parse(jsonStr));
-    } catch (error) {
-      console.error("AI Analysis failed:", error);
-      res.status(500).json({ error: String(error) });
+    } catch (error: any) {
+      console.error("🛑 CRITICAL BACKEND ERROR: AI Analysis failed with details:", error);
+      res.status(500).json({
+        error: error?.message || String(error),
+        stack: error?.stack || null
+      });
     }
   });
 
