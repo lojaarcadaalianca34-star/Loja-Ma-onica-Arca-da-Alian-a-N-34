@@ -67,7 +67,7 @@ export const defaultHomeContent: HomeContent = {
   welcomeBanner: {
     title: { text: "ARCA DA ALIANÇA Nº 34", align: "center" },
     subTitle: { text: "Bem vindo à Loja Maçônica", align: "center" },
-    backgroundImage: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1920&q=80"
+    backgroundImage: ""
   },
   hero: {
     title: { text: "A.R.L.S. Arca da Aliança nº 34", align: "center" },
@@ -405,7 +405,7 @@ const defaultContent: SiteContent = {
   },
   gallery: [],
   welcomeBanner: {
-    backgroundImage: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1920&q=80',
+    backgroundImage: '',
     title: 'ARCA DA ALIANÇA Nº 34',
     subTitle: 'Bem vindo à Loja Maçônica'
   },

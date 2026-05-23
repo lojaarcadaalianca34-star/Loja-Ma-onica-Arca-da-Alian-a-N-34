@@ -10,7 +10,7 @@ export default function WelcomeBanner() {
     <section id="hero" className="relative h-[80vh] min-h-[600px] flex flex-col items-center justify-center overflow-hidden border-t border-[#c5a059] border-b border-[#c5a059] bg-masonic-dark">
       {/* Background with Animation */}
       <div className="absolute inset-0 z-0">
-        {(welcomeBanner.backgroundImage || "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1920&q=80") && (
+        {welcomeBanner.backgroundImage && (
           <motion.div 
             initial={{ scale: 1.1 }}
             animate={{ 
@@ -24,7 +24,7 @@ export default function WelcomeBanner() {
             }}
             className="absolute inset-0 bg-cover bg-[center_35%] bg-no-repeat"
             style={{ 
-              backgroundImage: `url("${welcomeBanner.backgroundImage || "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1920&q=80"}")`,
+              backgroundImage: `url("${welcomeBanner.backgroundImage}")`,
               filter: 'brightness(0.9) contrast(1.1)'
             }}
           />

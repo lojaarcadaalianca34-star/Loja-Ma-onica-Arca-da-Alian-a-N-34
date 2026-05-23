@@ -776,6 +776,13 @@ export default function MemberDashboard() {
                                          body: tableRows,
                                          headStyles: { fillColor: [11, 29, 58], textColor: [197, 160, 89] },
                                        });
+
+                                       const finalY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY : 150;
+                                       doc.setFont('helvetica', 'italic');
+                                       doc.setFontSize(10);
+                                       const footerText = 'Este documento deve ser lido em reunião, na próxima sessão com a finalidade de constar em ata a deliberação feita na Arca Digital.';
+                                       const splitFooter = doc.splitTextToSize(footerText, 170);
+                                       doc.text(splitFooter, 20, finalY + 15, { align: 'justify' });
                                      }
                                      doc.save(`relatorio-${action.title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
                                    }}
