@@ -28,11 +28,9 @@ function getAi(): GoogleGenAI {
   return aiClient;
 }
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+const app = express();
 
-  app.use(express.json());
+app.use(express.json());
 
   // API Routes
   app.post("/api/analyze-candidate", async (req, res) => {
@@ -270,12 +268,14 @@ async function startServer() {
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
+    (async () => {
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+      });
+      app.use(vite.middlewares);
+    })();
+  } else if (!process.env.VERCEL) {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
@@ -283,9 +283,11 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
+  if (!process.env.VERCEL) {
+    const PORT = 3000;
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  }
 
-startServer();
+  export default app;
