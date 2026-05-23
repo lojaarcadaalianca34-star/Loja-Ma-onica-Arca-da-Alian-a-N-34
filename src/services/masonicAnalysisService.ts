@@ -21,7 +21,16 @@ export async function analyzeCandidate(formData: any): Promise<CandidateAnalysis
     });
 
     if (!response.ok) {
-      throw new Error(`AI analysis server returned status: ${response.status}`);
+      let errMsg = `AI analysis server returned status: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData && errorData.error) {
+          errMsg = errorData.error;
+        }
+      } catch (e) {
+        // use default error message if body is not JSON
+      }
+      throw new Error(errMsg);
     }
 
     const data = await response.json();

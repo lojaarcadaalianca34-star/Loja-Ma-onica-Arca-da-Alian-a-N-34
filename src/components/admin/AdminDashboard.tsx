@@ -942,7 +942,8 @@ export default function AdminDashboard() {
       });
     } catch (error) {
       console.error('Error analyzing lead:', error);
-      alert('Erro ao analisar candidato. Verifique a chave da API Gemini.');
+      const msg = error instanceof Error ? error.message : String(error);
+      alert(`Erro ao analisar candidato: ${msg}`);
     } finally {
       setAnalyzingLeads(prev => ({ ...prev, [lead.id]: false }));
     }
