@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import { Resend } from "resend";
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
@@ -292,7 +291,8 @@ app.use(express.json());
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     (async () => {
-      const vite = await createViteServer({
+      const { createServer: createDynamicViteServer } = await import("vite");
+      const vite = await createDynamicViteServer({
         server: { middlewareMode: true },
         appType: "spa",
       });
