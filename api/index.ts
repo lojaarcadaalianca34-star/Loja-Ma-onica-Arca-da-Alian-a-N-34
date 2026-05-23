@@ -1,6 +1,5 @@
-import app from "../server";
+import app from "../server.js";
 
 export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
 
 export default app;
