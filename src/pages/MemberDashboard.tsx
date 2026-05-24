@@ -202,7 +202,6 @@ export default function MemberDashboard() {
   const [socialType, setSocialType] = useState<'decision' | 'poll' | 'philanthropy'>('decision');
   const [pollOptions, setPollOptions] = useState<string[]>(['', '']);
   const [isSubmittingSocial, setIsSubmittingSocial] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [newItemType, setNewItemType] = useState<'LINK' | 'PDF'>('LINK');
 
   useEffect(() => {
@@ -389,7 +388,7 @@ export default function MemberDashboard() {
 
       <main className="flex-1 pt-24 md:pt-28 pb-20 px-4 md:px-6 w-full max-w-full">
         <div className="max-w-7xl mx-auto w-full">
-          {/* Header Section (Compressed and Mobile-Optimized) */}
+          {/* Header Section */}
           <div className="relative mb-6 p-0.5 rounded-[1.8rem] bg-gradient-to-br from-[#c5a059]/20 via-transparent to-[#0b1d3a]/5 overflow-hidden w-full">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 md:p-6 bg-white rounded-[1.6rem] border border-white/40 w-full text-center sm:text-left">
               <div className="flex flex-row items-center gap-4 min-w-0 w-full sm:w-auto">
@@ -406,9 +405,9 @@ export default function MemberDashboard() {
               </div>
 
               <div className="flex flex-row items-center justify-between sm:justify-end gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0 border-t sm:border-t-0 border-[#0b1d3a]/5 pt-3 sm:pt-0">
-                <button 
-                  onClick={() => setActiveTab('profile')}
-                  className="group relative flex-1 sm:flex-initial flex items-center gap-2.5 p-1.5 pr-4 sm:pr-6 bg-[#0b1d3a]/5 sm:bg-white border border-[#c5a059]/10 sm:border-[#c5a059]/20 rounded-xl hover:border-[#c5a059] transition-all min-w-0"
+                {/* WIDGET DO PERFIL - AGORA APENAS INFORMATIVO E SEM CLIQUE (CORREÇÃO DE REDUNDÂNCIA) */}
+                <div 
+                  className="group relative flex-1 sm:flex-initial flex items-center gap-2.5 p-1.5 pr-4 sm:pr-6 bg-[#0b1d3a]/5 sm:bg-white border border-[#c5a059]/10 sm:border-[#c5a059]/20 rounded-xl min-w-0"
                 >
                   <div className="w-8 h-8 rounded-lg bg-[#0b1d3a]/5 overflow-hidden border border-[#c5a059]/10 shrink-0">
                     {userData?.photoURL ? (
@@ -424,12 +423,13 @@ export default function MemberDashboard() {
                   
                   <AnimatePresence>
                     {isSuperAdmin && (
-                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-[#c5a059] rounded-full flex items-center justify-center border border-white shadow-md hover:scale-105" title="Modo Administrador Ativo">
+                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-[#c5a059] rounded-full flex items-center justify-center border border-white shadow-md" title="Modo Administrador Ativo">
                         <Shield className="w-2.5 h-2.5 text-[#0b1d3a]" />
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </button>
+                </div>
+                
                 <button onClick={handleLogout} className="flex items-center gap-1.5 px-3 py-2.5 sm:p-3 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-xl text-[#0b1d3a] hover:text-red-500 transition-colors uppercase tracking-[0.2em] text-[8px] sm:text-[9px] font-black shrink-0">
                   <LogOut className="w-3.5 h-3.5" /> <span>Sair</span>
                 </button>
@@ -471,7 +471,8 @@ export default function MemberDashboard() {
              })}
           </div>
 
-          <AnimatePresence mode="wait">
+          {/* RENDERIZAÇÃO ESTÁVEL SEM ANIMATEPRESENCE NO CORPO (CORREÇÃO DE BUGS E SOBREPOSIÇÕES) */}
+          <div className="w-full relative">
             {activeTab === 'welcome' && (
               <div key="welcome" className="animate-fade-in space-y-12 w-full max-w-full overflow-hidden">
                 {/* Welcome Card */}
@@ -558,7 +559,6 @@ export default function MemberDashboard() {
                       </div>
                       <button onClick={() => setActiveTab('members')} className="w-fit px-6 py-2 border border-[#c5a059]/30 rounded-full text-[10px] font-black uppercase tracking-widest text-[#0b1d3a] hover:bg-[#c5a059] transition-all">Ver em Tela Cheia</button>
                     </div>
-                    {/* TROCADO DE MOTION.DIV PARA DIV NORMAL NOS CARDS DA LISTA PARA SALVAR O CELULAR */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 w-full">
                       {registeredUsers.filter(u => u.status !== 'PENDING').slice(0, 12).map((member) => (
                         <div 
@@ -814,7 +814,6 @@ export default function MemberDashboard() {
                   </div>
                 </div>
 
-                {/* TROCADO DE MOTION.DIV PARA DIV NORMAL NOS CARDS DA LISTA PARA SALVAR O CELULAR */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 w-full">
                   {registeredUsers.filter(u => u.status !== 'PENDING').map((member) => (
                     <div 
@@ -963,7 +962,7 @@ export default function MemberDashboard() {
                  </div>
               </div>
             )}
-          </AnimatePresence>
+          </div>
         </div>
       </main>
 
@@ -1107,7 +1106,6 @@ export default function MemberDashboard() {
   );
 }
 
-{/* TROCADO DE MOTION.DIV PARA DIV NORMAL NESTE CARD PARA SALVAR O PROCESSAMENTO DO CELULAR */}
 function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComments, onShare, onDelete, onEdit }: any) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');

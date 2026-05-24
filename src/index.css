@@ -44,22 +44,18 @@
   animation: fadeIn 0.25s ease-out forwards;
 }
 
-/* 🛡️ RENDERIZAÇÃO LIMPA E SEM RASGOS */
-html, body, #root {
-  height: 100%;
+/* 🛡️ RENDERIZAÇÃO LIMPA E NATIVA (CORREÇÃO MOBILE DEFINITIVA) */
+html, body {
+  min-height: 100vh; /* Substituído o height: 100% que quebrava o Android */
   margin: 0;
   padding: 0;
-  /* Removemos a trava global de overflow que estava engasgando o Android */
-}
-
-body {
   background-color: var(--color-aged-beige);
   color: var(--color-navy-blue);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Garante que imagens e backgrounds não criem rastros em animações específicas caso necessário, sem aplicar ao universo de tags */
+/* Garante que imagens e backgrounds não criem rastros em animações específicas */
 .will-animate {
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;
@@ -81,16 +77,8 @@ body {
   border-image: linear-gradient(to bottom, #f4efe2, var(--color-masonic-gold)) 1;
 }
 
-/* 🛡️ PREVENT VISUAL DEFECTS ON PHONES AND TABLETS (CHROME/ANDROID COMPOSITION STICKY FIX) */
+/* 🛡️ DESATIVA FILTROS PESADOS E TRAVAS DE ROLAGEM NO CELULAR */
 @media (max-width: 1024px) {
-  /* Prevent horizontal screen leakage safely on touch viewports */
-  #root {
-    overflow-x: hidden;
-    position: relative;
-  }
-  
-  /* Disable backdrop-filter and -webkit-backdrop-filter globally below 1024px width */
-  /* to prevent chromium rasterization color lines, floating duplicated elements, and letters bug */
   * {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
