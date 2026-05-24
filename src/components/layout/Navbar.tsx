@@ -27,6 +27,24 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Bloqueia scroll do body quando menu mobile está aberto
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [isMobileMenuOpen]);
+
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith('/#') || href.startsWith('#')) {
       const targetId = href.substring(href.indexOf('#') + 1);
@@ -56,10 +74,10 @@ export default function Navbar() {
 
   return (
     <>
-      {/* 1. BARRA DO TOPO FIXA - LIMPA E LEVE */}
-      <nav 
+      {/* NAVBAR FIXA - sem backdrop-blur no mobile para evitar glitch no Android Chrome */}
+      <nav
         className={cn(
-          "fixed top-0 left-0 right-0 z-[150] transition-[padding,box-shadow,background-color] duration-300 px-4 md:px-6 bg-[#0b1d3a] border-b border-[#c5a059]/20",
+          "fixed top-0 left-0 right-0 z-[150] transition-[padding,box-shadow] duration-300 px-4 md:px-6 bg-[#0b1d3a] border-b border-[#c5a059]/20",
           isScrolled ? "py-2 shadow-2xl" : "py-3"
         )}
       >
@@ -81,8 +99,8 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1.5 lg:gap-3 xl:gap-5 ml-auto">
             {navLinks.map((link) => (
-              <a 
-                key={link.name} 
+              <a
+                key={link.name}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
                 className="text-[8px] lg:text-[10px] xl:text-[11px] font-serif uppercase tracking-wider xl:tracking-widest text-[#c5a059] hover:text-white transition-colors whitespace-nowrap px-1 lg:px-2"
@@ -91,13 +109,13 @@ export default function Navbar() {
               </a>
             ))}
             <div className="flex items-center gap-2 ml-2 lg:ml-4">
-              <Link 
+              <Link
                 to="/area-restrita"
                 className="px-3 py-2 lg:px-5 lg:py-2.5 bg-[#c5a059] text-[#0b1d3a] rounded-full text-[9px] lg:text-[10px] font-black uppercase tracking-widest hover:bg-[#c5a059]/90 transition-colors shadow-md whitespace-nowrap"
               >
                 Área Restrita
               </Link>
-              <Link 
+              <Link
                 to="/admin"
                 className="p-1.5 text-white/20 hover:text-[#c5a059] transition-colors"
                 title="Administração"
@@ -107,17 +125,17 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile Toggle Button */}
-          <div className="flex items-center gap-3 md:hidden z-[160]">
+          {/* Botão mobile */}
+          <div className="flex items-center gap-3 md:hidden" style={{ zIndex: 160 }}>
             {user && (
-              <button 
+              <button
                 onClick={handleLogout}
                 className="p-2 text-[#c5a059]/50 hover:text-[#c5a059] transition-colors"
               >
                 <LogOut className="w-5 h-5" />
               </button>
             )}
-            <button 
+            <button
               className="p-2 text-[#c5a059] bg-white/5 rounded-lg border border-white/10"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
@@ -127,21 +145,35 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* 2. MENU MOBILE EXTRAÍDO - INDEPENDENTE E FLUTUANTE */}
+      {/* MENU MOBILE - renderizado no body, sem transform/filter para evitar glitch Android Chrome */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="fixed inset-0 bg-[#0b1d3a] z-[145] md:hidden flex flex-col pt-24 px-6 overflow-y-auto"
-            style={{ willChange: 'opacity, transform', WebkitOverflowScrolling: 'touch' }}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 145,
+              backgroundColor: '#0b1d3a',
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              display: 'flex',
+              flexDirection: 'column',
+              paddingTop: '96px',
+              paddingLeft: '24px',
+              paddingRight: '24px',
+            }}
           >
             <div className="flex flex-col gap-3 pb-8">
               {navLinks.map((link) => (
-                <a 
-                  key={link.name} 
+                <a
+                  key={link.name}
                   href={link.href}
                   onClick={(e) => {
                     setIsMobileMenuOpen(false);
@@ -153,9 +185,9 @@ export default function Navbar() {
                   <span className="font-sans font-bold uppercase tracking-widest text-xs">{link.name}</span>
                 </a>
               ))}
-              
+
               <div className="grid grid-cols-2 gap-3 mt-4">
-                <Link 
+                <Link
                   to="/area-restrita"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="bg-[#0b1d3a] border border-[#c5a059]/30 text-[#f4efe2] font-black p-4 rounded-xl text-[10px] uppercase tracking-widest text-center flex items-center justify-center gap-2 transition-colors hover:bg-[#c5a059]/10"
@@ -163,7 +195,7 @@ export default function Navbar() {
                   <Shield className="w-4 h-4" />
                   Membros
                 </Link>
-                <Link 
+                <Link
                   to="/admin"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="bg-white/5 border border-white/10 text-[#c5a059] font-black p-4 rounded-xl text-[10px] uppercase tracking-widest text-center transition-colors hover:bg-white/10"
