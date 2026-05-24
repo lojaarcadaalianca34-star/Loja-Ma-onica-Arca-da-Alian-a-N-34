@@ -46,14 +46,13 @@ html, body, #root {
 body {
   background-color: var(--color-aged-beige);
   color: var(--color-navy-blue);
-  /* Aceleração de Hardware: Força o celular a desenhar a tela sem "rasgar" */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transform: translateZ(0); 
 }
 
-/* Garante que imagens e backgrounds não criem rastros fantasmas */
-* {
+/* Garante que imagens e backgrounds não criem rastros em animações específicas caso necessário, sem aplicar ao universo de tags */
+.will-animate {
+  transform: translateZ(0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
