@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Landmark, Users, Heart, BookOpen, Shield, Globe, LogOut } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
@@ -19,7 +18,9 @@ const navLinks = [
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
   const location = useLocation();
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -27,22 +28,22 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Bloqueia scroll do body quando menu mobile está aberto
+  useEffect(() => {
+    return auth.onAuthStateChanged(setUser);
+  }, []);
+
+  // Abre/fecha menu com CSS puro — sem Framer Motion no mobile (causa glitch no Android Chrome)
   useEffect(() => {
     if (isMobileMenuOpen) {
+      setMenuVisible(true);
       document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
     } else {
+      // Pequeno delay para a transição de saída
+      const t = setTimeout(() => setMenuVisible(false), 200);
       document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
+      return () => clearTimeout(t);
     }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-    };
+    return () => { document.body.style.overflow = ''; };
   }, [isMobileMenuOpen]);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -67,14 +68,11 @@ export default function Navbar() {
     }
   };
 
-  const [user, setUser] = useState<any>(null);
-  useEffect(() => {
-    return auth.onAuthStateChanged(setUser);
-  }, []);
+  const closeMenu = () => setIsMobileMenuOpen(false);
 
   return (
     <>
-      {/* NAVBAR FIXA - sem backdrop-blur no mobile para evitar glitch no Android Chrome */}
+      {/* NAVBAR FIXA */}
       <nav
         className={cn(
           "fixed top-0 left-0 right-0 z-[150] transition-[padding,box-shadow] duration-300 px-4 md:px-6 bg-[#0b1d3a] border-b border-[#c5a059]/20",
@@ -82,10 +80,10 @@ export default function Navbar() {
         )}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-3 group shrink-0" onClick={() => setIsMobileMenuOpen(false)}>
-            <Logo className="w-8 h-8 md:w-10 md:h-10 group-hover:scale-110 transition-transform" />
+          <Link to="/" className="flex items-center gap-3 group shrink-0" onClick={closeMenu}>
+            <Logo className="w-8 h-8 md:w-10 md:h-10" />
             <div className="hidden sm:block">
-              <h1 className="font-serif text-sm md:text-lg font-bold text-[#c5a059] leading-tight uppercase tracking-wider flex items-center gap-2">
+              <h1 className="font-serif text-sm md:text-lg font-bold text-[#c5a059] leading-tight uppercase tracking-wider">
                 Arca da Aliança Nº 34
               </h1>
               <p className="text-[8px] md:text-[9px] text-[#c5a059]/70 uppercase tracking-[0.4em] mt-0.5">Guará / DF</p>
@@ -115,29 +113,23 @@ export default function Navbar() {
               >
                 Área Restrita
               </Link>
-              <Link
-                to="/admin"
-                className="p-1.5 text-white/20 hover:text-[#c5a059] transition-colors"
-                title="Administração"
-              >
+              <Link to="/admin" className="p-1.5 text-white/20 hover:text-[#c5a059] transition-colors" title="Administração">
                 <Shield className="w-4 h-4" />
               </Link>
             </div>
           </div>
 
-          {/* Botão mobile */}
-          <div className="flex items-center gap-3 md:hidden" style={{ zIndex: 160 }}>
+          {/* Botões Mobile */}
+          <div className="flex items-center gap-3 md:hidden" style={{ zIndex: 160, position: 'relative' }}>
             {user && (
-              <button
-                onClick={handleLogout}
-                className="p-2 text-[#c5a059]/50 hover:text-[#c5a059] transition-colors"
-              >
+              <button onClick={handleLogout} className="p-2 text-[#c5a059]/50 hover:text-[#c5a059] transition-colors">
                 <LogOut className="w-5 h-5" />
               </button>
             )}
             <button
               className="p-2 text-[#c5a059] bg-white/5 rounded-lg border border-white/10"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Menu"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -145,68 +137,103 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* MENU MOBILE - renderizado no body, sem transform/filter para evitar glitch Android Chrome */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 145,
-              backgroundColor: '#0b1d3a',
-              overflowY: 'auto',
-              WebkitOverflowScrolling: 'touch',
-              display: 'flex',
-              flexDirection: 'column',
-              paddingTop: '96px',
-              paddingLeft: '24px',
-              paddingRight: '24px',
-            }}
-          >
-            <div className="flex flex-col gap-3 pb-8">
-              {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => {
-                    setIsMobileMenuOpen(false);
-                    handleNavClick(e, link.href);
-                  }}
-                  className="flex items-center gap-4 text-[#f4efe2] p-4 bg-white/5 rounded-xl border border-white/5 active:bg-[#c5a059]/10 active:border-[#c5a059]/30 transition-colors"
-                >
-                  <link.icon className="w-5 h-5 text-[#c5a059]" />
-                  <span className="font-sans font-bold uppercase tracking-widest text-xs">{link.name}</span>
-                </a>
-              ))}
+      {/* MENU MOBILE — CSS puro, sem Framer Motion, sem transform, sem filter */}
+      {menuVisible && (
+        <div
+          className="md:hidden"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 145,
+            backgroundColor: '#0b1d3a',
+            overflowY: 'auto',
+            paddingTop: '80px',
+            paddingLeft: '24px',
+            paddingRight: '24px',
+            opacity: isMobileMenuOpen ? 1 : 0,
+            transition: 'opacity 0.2s ease',
+            pointerEvents: isMobileMenuOpen ? 'auto' : 'none',
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '32px' }}>
+            {navLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.href}
+                onClick={(e) => {
+                  closeMenu();
+                  handleNavClick(e, link.href);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px',
+                  color: '#f4efe2',
+                  padding: '16px',
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                  textDecoration: 'none',
+                }}
+              >
+                <link.icon style={{ width: '20px', height: '20px', color: '#c5a059', flexShrink: 0 }} />
+                <span style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '12px' }}>
+                  {link.name}
+                </span>
+              </a>
+            ))}
 
-              <div className="grid grid-cols-2 gap-3 mt-4">
-                <Link
-                  to="/area-restrita"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="bg-[#0b1d3a] border border-[#c5a059]/30 text-[#f4efe2] font-black p-4 rounded-xl text-[10px] uppercase tracking-widest text-center flex items-center justify-center gap-2 transition-colors hover:bg-[#c5a059]/10"
-                >
-                  <Shield className="w-4 h-4" />
-                  Membros
-                </Link>
-                <Link
-                  to="/admin"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="bg-white/5 border border-white/10 text-[#c5a059] font-black p-4 rounded-xl text-[10px] uppercase tracking-widest text-center transition-colors hover:bg-white/10"
-                >
-                  Admin
-                </Link>
-              </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '16px' }}>
+              <Link
+                to="/area-restrita"
+                onClick={closeMenu}
+                style={{
+                  backgroundColor: '#0b1d3a',
+                  border: '1px solid rgba(197,160,89,0.3)',
+                  color: '#f4efe2',
+                  fontWeight: 900,
+                  padding: '16px',
+                  borderRadius: '12px',
+                  fontSize: '10px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  textAlign: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  textDecoration: 'none',
+                }}
+              >
+                <Shield style={{ width: '16px', height: '16px' }} />
+                Membros
+              </Link>
+              <Link
+                to="/admin"
+                onClick={closeMenu}
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#c5a059',
+                  fontWeight: 900,
+                  padding: '16px',
+                  borderRadius: '12px',
+                  fontSize: '10px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                }}
+              >
+                Admin
+              </Link>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      )}
     </>
   );
 }
