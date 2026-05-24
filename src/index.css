@@ -77,10 +77,33 @@ html, body {
   border-image: linear-gradient(to bottom, #f4efe2, var(--color-masonic-gold)) 1;
 }
 
-/* 🛡️ DESATIVA FILTROS PESADOS E TRAVAS DE ROLAGEM NO CELULAR */
+/* 🛡️ DESATIVA FILTROS PESADOS E TRAVAS DE ROLAGEM NO CELULAR E PREVINE GHOST LAYERS E BLACK BOXES */
 @media (max-width: 1024px) {
   * {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    will-change: auto !important;
+  }
+
+  .gold-text {
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: initial !important;
+    background-clip: initial !important;
+    color: var(--color-masonic-gold) !important;
+  }
+
+  /* Desativa efeitos de hover de transformações no mobile para evitar camadas duplicadas fixas */
+  .hover\:-translate-y-1:hover {
+    transform: none !important;
+  }
+  .hover\:-translate-y-0\.5:hover {
+    transform: none !important;
+  }
+  .hover\:scale-110:hover {
+    transform: none !important;
+  }
+  .hover\:scale-105:hover {
+    transform: none !important;
   }
 }

@@ -428,7 +428,7 @@ export default function MemberDashboard() {
           </div>
 
           {/* Navigation Grid */}
-          <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2 mb-8 w-full max-w-full">
+          <div className="flex flex-wrap gap-2 mb-8 w-full max-w-full">
              {[
                { id: 'welcome', label: 'Escrutínio de Atividades', icon: LayoutDashboard },
                { id: 'library', label: 'Biblioteca Ritualística', icon: BookMarked },
@@ -448,7 +448,7 @@ export default function MemberDashboard() {
                        setActiveTab(tab.id as any);
                      }
                    }}
-                   className={`flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 md:gap-2 px-1.5 py-2.5 sm:px-4 sm:py-3.5 md:px-6 md:py-4 rounded-xl text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-wider transition-all w-full md:w-auto shadow-sm border min-w-0 overflow-hidden ${
+                   className={`flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 md:gap-2 px-1.5 py-2.5 sm:px-4 sm:py-3.5 md:px-6 md:py-4 rounded-xl text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-wider transition-colors duration-150 w-[calc(50%-4px)] md:w-auto shadow-sm border min-w-0 overflow-hidden ${
                      activeTab === tab.id 
                        ? 'bg-[#c5a059] text-[#0b1d3a] border-[#c5a059]' 
                        : 'bg-[#0b1d3a] text-white border-[#c5a059]/30 hover:bg-[#c5a059]/10 hover:text-[#c5a059]'
