@@ -59,7 +59,7 @@ export default function Navbar() {
       {/* 1. BARRA DO TOPO FIXA - LIMPA E LEVE */}
       <nav 
         className={cn(
-          "fixed top-0 left-0 right-0 z-[150] transition-[padding,box-shadow,background-color] duration-300 px-4 md:px-6 bg-[#0b1d3a] md:bg-[#0b1d3a]/95 border-b border-[#c5a059]/20 md:backdrop-blur-sm",
+          "fixed top-0 left-0 right-0 z-[150] transition-[padding,box-shadow,background-color] duration-300 px-4 md:px-6 bg-[#0b1d3a] border-b border-[#c5a059]/20",
           isScrolled ? "py-2 shadow-2xl" : "py-3"
         )}
       >
@@ -131,10 +131,12 @@ export default function Navbar() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#0b1d3a] z-[140] md:hidden flex flex-col pt-24 px-6 overflow-y-auto"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="fixed inset-0 bg-[#0b1d3a] z-[145] md:hidden flex flex-col pt-24 px-6 overflow-y-auto"
+            style={{ willChange: 'opacity, transform', WebkitOverflowScrolling: 'touch' }}
           >
             <div className="flex flex-col gap-3 pb-8">
               {navLinks.map((link) => (
