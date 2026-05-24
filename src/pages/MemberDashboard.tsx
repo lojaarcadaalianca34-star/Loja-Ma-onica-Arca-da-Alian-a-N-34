@@ -427,15 +427,15 @@ export default function MemberDashboard() {
             </div>
           </div>
 
-          {/* Navigation Grid */}
-          <div className="flex flex-wrap gap-2 mb-8 w-full max-w-full">
+          {/* Navigation Grid - CORRIGIDO: grid fixo 3x2 no mobile, sem overflow-hidden */}
+          <div className="grid grid-cols-3 md:flex md:flex-wrap gap-2 mb-8 w-full">
              {[
-               { id: 'welcome', label: 'Escrutínio de Atividades', icon: LayoutDashboard },
-               { id: 'library', label: 'Biblioteca Ritualística', icon: BookMarked },
-               { id: 'professional', label: 'O Forja Profissional (B2B)', icon: Handshake },
-               { id: 'social', label: 'Painel de Decisões Sociais', icon: Heart },
-               { id: 'members', label: 'Quadro de Obreiros', icon: Users },
-               { id: 'profile', label: 'Dados Pessoais', icon: UserCircle }
+               { id: 'welcome', label: 'Atividades', icon: LayoutDashboard },
+               { id: 'library', label: 'Biblioteca', icon: BookMarked },
+               { id: 'professional', label: 'Forja B2B', icon: Handshake },
+               { id: 'social', label: 'Decisões', icon: Heart },
+               { id: 'members', label: 'Obreiros', icon: Users },
+               { id: 'profile', label: 'Meu Perfil', icon: UserCircle }
              ].map((tab) => {
                const TabIcon = tab.icon; 
                return (
@@ -448,14 +448,14 @@ export default function MemberDashboard() {
                        setActiveTab(tab.id as any);
                      }
                    }}
-                   className={`flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 md:gap-2 px-1.5 py-2.5 sm:px-4 sm:py-3.5 md:px-6 md:py-4 rounded-xl text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-wider transition-colors duration-150 w-[calc(50%-4px)] md:w-auto shadow-sm border min-w-0 overflow-hidden ${
+                   className={`flex flex-col items-center justify-center text-center gap-1 md:gap-2 px-2 py-3 md:px-6 md:py-4 rounded-xl text-[8px] md:text-[10px] font-black uppercase tracking-wider border md:w-auto shadow-sm ${
                      activeTab === tab.id 
                        ? 'bg-[#c5a059] text-[#0b1d3a] border-[#c5a059]' 
-                       : 'bg-[#0b1d3a] text-white border-[#c5a059]/30 hover:bg-[#c5a059]/10 hover:text-[#c5a059]'
+                       : 'bg-[#0b1d3a] text-white border-[#c5a059]/30'
                    }`}
                  >
-                   <TabIcon className="w-3.5 h-3.5 flex-shrink-0 text-[#c5a059]" />
-                   <span className="break-words max-w-full leading-tight block">{tab.label}</span>
+                   <TabIcon className="w-4 h-4 flex-shrink-0 text-[#c5a059]" />
+                   <span className="leading-tight">{tab.label}</span>
                  </button>
                );
              })}
