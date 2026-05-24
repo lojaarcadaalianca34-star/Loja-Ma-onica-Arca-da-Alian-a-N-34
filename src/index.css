@@ -31,8 +31,17 @@
   100% { transform: scale(1); }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .animate-kenburns {
   animation: kenburns 30s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
 }
 
 /* 🛡️ RENDERIZAÇÃO LIMPA E SEM RASGOS */

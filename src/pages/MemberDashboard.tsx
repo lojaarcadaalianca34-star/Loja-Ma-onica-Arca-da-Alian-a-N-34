@@ -473,7 +473,7 @@ export default function MemberDashboard() {
 
           <AnimatePresence mode="wait">
             {activeTab === 'welcome' && (
-              <motion.div key="welcome" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-12 w-full max-w-full overflow-hidden">
+              <div key="welcome" className="animate-fade-in space-y-12 w-full max-w-full overflow-hidden">
                 {/* Welcome Card */}
                 <div className="relative w-full">
                   <div className="absolute inset-0 bg-[#fdf6e3] rounded-[2rem] shadow-2xl" />
@@ -589,11 +589,11 @@ export default function MemberDashboard() {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {activeTab === 'library' && (
-              <motion.div key="library" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full">
+              <div key="library" className="animate-fade-in w-full">
                 <div className="flex flex-col sm:flex-row gap-4 mb-8 items-center w-full">
                   <div className="relative w-full flex-1 group">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0b1d3a]/30 group-focus-within:text-[#0b1d3a] transition-colors" />
@@ -624,17 +624,17 @@ export default function MemberDashboard() {
                     />
                   ))}
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {activeTab === 'professional' && (
-              <motion.div key="professional" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full">
+              <div key="professional" className="animate-fade-in w-full">
                 <ProfessionalBoard />
-              </motion.div>
+              </div>
             )}
 
             {activeTab === 'social' && (
-              <motion.div key="social" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-8 w-full">
+              <div key="social" className="animate-fade-in space-y-8 w-full">
                  <div className="p-5 md:p-10 bg-white border border-[#0b1d3a]/10 rounded-[2rem] md:rounded-[3.5rem] shadow-sm w-full">
                     <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center mb-8 md:mb-10 text-center md:text-left w-full">
                        <div className="w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-3xl bg-[#0b1d3a]/10 border border-[#0b1d3a]/20 flex items-center justify-center text-[#0b1d3a] flex-shrink-0">
@@ -799,11 +799,11 @@ export default function MemberDashboard() {
                        ))}
                     </div>
                  </div>
-              </motion.div>
+              </div>
             )}
 
             {activeTab === 'members' && (
-              <motion.div key="members" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8 w-full">
+              <div key="members" className="animate-fade-in space-y-8 w-full">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#0b1d3a]/10 pb-4 gap-3 w-full">
                   <div className="text-left">
                     <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#0b1d3a] uppercase tracking-widest">Soberano Quadro de Obreiros</h2>
@@ -846,11 +846,11 @@ export default function MemberDashboard() {
                     </div>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {activeTab === 'profile' && (
-              <motion.div key="profile" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="max-w-4xl mx-auto space-y-8 w-full">
+              <div key="profile" className="animate-fade-in max-w-4xl mx-auto space-y-8 w-full">
                  {(isEditingSomeoneElse || (targetUid && targetUid !== auth.currentUser?.uid)) && (
                    <div className={`${isSuperAdmin ? 'bg-[#c5a059]' : 'bg-[#0b1d3a]'} p-4 rounded-xl flex items-center justify-between shadow-xl w-full`}>
                      <p className={`${isSuperAdmin ? 'text-[#0b1d3a]' : 'text-[#f4efe2]'} font-black uppercase tracking-wider text-[9px] truncate`}>
@@ -961,7 +961,7 @@ export default function MemberDashboard() {
                       </div>
                     </div>
                  </div>
-              </motion.div>
+              </div>
             )}
           </AnimatePresence>
         </div>

@@ -190,7 +190,7 @@ export default function RegisterPage() {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-xl p-10 bg-white/40 border border-[#0b1d3a]/10 rounded-[2.5rem] backdrop-blur-xl shadow-2xl relative overflow-hidden"
+          className="w-full max-w-xl p-10 bg-white md:bg-white/40 border border-[#0b1d3a]/10 rounded-[2.5rem] md:backdrop-blur-xl shadow-2xl relative overflow-hidden"
         >
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#c5a059]/5 rounded-full blur-3xl" />
           

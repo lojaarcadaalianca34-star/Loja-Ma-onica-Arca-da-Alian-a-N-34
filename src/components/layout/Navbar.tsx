@@ -59,7 +59,7 @@ export default function Navbar() {
       {/* 1. BARRA DO TOPO FIXA - LIMPA E LEVE */}
       <nav 
         className={cn(
-          "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 px-4 md:px-6 bg-[#0b1d3a]/95 border-b border-[#c5a059]/20 backdrop-blur-sm",
+          "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 px-4 md:px-6 bg-[#0b1d3a] md:bg-[#0b1d3a]/95 border-b border-[#c5a059]/20 md:backdrop-blur-sm",
           isScrolled ? "py-2 shadow-2xl" : "py-3"
         )}
       >
