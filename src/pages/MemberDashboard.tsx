@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import ProfessionalBoard from '../components/restricted/ProfessionalBoard';
+import LibraryItemCard from '../components/restricted/LibraryItemCard';
 import { 
   BookMarked, Lock, FileText, Download, Shield, Eye, LogOut, 
   Search, Filter, Plus, MessageSquare, Send, Share2, Clipboard, 
@@ -20,8 +21,6 @@ import {
   serverTimestamp, deleteDoc, doc, Timestamp,
   limit, where, updateDoc, getDoc
 } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { storage } from '../lib/firebase';
 
 interface LibraryItem {
   id: string;
@@ -34,15 +33,6 @@ interface LibraryItem {
   url?: string;
   addedBy: string;
   addedByEmail?: string;
-  createdAt: any;
-}
-
-interface Comment {
-  id: string;
-  itemId: string;
-  userId: string;
-  userName: string;
-  text: string;
   createdAt: any;
 }
 
@@ -383,7 +373,7 @@ export default function MemberDashboard() {
   const isEditingSomeoneElse = !!targetUid && isSuperAdmin && targetUid !== auth.currentUser?.uid;
 
   return (
-    <div className="min-h-screen bg-aged-beige flex flex-col font-sans overflow-x-hidden w-full selection:bg-[#c5a059]/30 selection:text-[#0b1d3a]">
+    <div className="min-h-screen bg-[#f4efe2] flex flex-col font-sans overflow-x-hidden w-full selection:bg-[#c5a059]/30 selection:text-[#0b1d3a]">
       <Navbar />
 
       <main className="flex-1 pt-24 md:pt-28 pb-20 px-4 md:px-6 w-full max-w-full">
@@ -411,7 +401,7 @@ export default function MemberDashboard() {
                 >
                   <div className="w-8 h-8 rounded-lg bg-[#0b1d3a]/5 overflow-hidden border border-[#c5a059]/10 shrink-0">
                     {userData?.photoURL ? (
-                      <img src={userData.photoURL} alt="" className="w-full h-full object-cover" />
+                      <img src={userData.photoURL} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-[#c5a059] font-serif text-sm">{userData?.displayName?.[0] || 'I'}</div>
                     )}
@@ -471,7 +461,7 @@ export default function MemberDashboard() {
              })}
           </div>
 
-          {/* RENDERIZAÇÃO ESTÁVEL SEM ANIMATEPRESENCE NO CORPO (CORREÇÃO DE BUGS E SOBREPOSIÇÕES) */}
+          {/* RENDERIZAÇÃO ESTÁVEL DO CORPO */}
           <div className="w-full relative">
             {activeTab === 'welcome' && (
               <div key="welcome" className="animate-fade-in space-y-12 w-full max-w-full overflow-hidden">
@@ -569,7 +559,7 @@ export default function MemberDashboard() {
                           <div className="relative w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 sm:mb-3 flex-shrink-0">
                             <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden shadow-inner">
                               {member.photoURL ? (
-                                <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover" />
+                                <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-lg sm:text-xl font-serif">
                                   {member.displayName?.[0] || 'I'}
@@ -761,39 +751,64 @@ export default function MemberDashboard() {
                                      doc.text('Relatório Oficial de Atividades', 105, 28, { align: 'center' });
                                      doc.line(20, 32, 190, 32);
 
-                                     if (action.type === 'poll') {
-                                       const winner = action.options.reduce((prev: any, current: any) => (prev.count > current.count) ? prev : current);
-                                       const ritualText = `ARLS Arca da Aliança Nº 34 — Relatório de Deliberação Digital. Tema "${action.title}", objetivo "${action.description}". A Oficina deliberou por: "${winner.text}".`;
-                                       const splitText = doc.splitTextToSize(ritualText, 170);
-                                       doc.text(splitText, 20, 45, { align: 'justify' });
+                                     doc.setFontSize(12);
+                                     doc.text(`Ação: ${action.title}`, 20, 42);
+                                     doc.setFontSize(10);
+                                     doc.setFont('helvetica', 'normal');
+                                     doc.text(`Tipo: ${action.type === 'poll' ? 'Escrutínio (Enquete)' : 'Projeto de Filantropia'}`, 20, 48);
+                                     doc.text(`Status: ${action.status || 'Ativo'}`, 20, 54);
+                                     doc.text(`Criador por: ${action.creatorName || 'Irmão'}`, 20, 60);
 
-                                       const tableRows = Object.entries(action.votes || {}).map(([uid, optIdx]: [string, any]) => [
-                                         registeredUsers.find(u => u.id === uid)?.displayName || 'Ir. Obreiro',
-                                         action.options[optIdx]?.text || 'N/A'
+                                     if (action.type === 'poll' && action.options) {
+                                       const total = action.options.reduce((acc: number, cur: any) => acc + (cur.count || 0), 0);
+                                       const tableData = action.options.map((opt: any) => [
+                                         opt.text, 
+                                         opt.count || 0, 
+                                         total > 0 ? `${Math.round((opt.count / total) * 100)}%` : '0%'
                                        ]);
-
                                        autoTable(doc, {
-                                         startY: 100,
-                                         head: [['Irmão', 'Voto']],
-                                         body: tableRows,
-                                         headStyles: { fillColor: [11, 29, 58], textColor: [197, 160, 89] },
+                                         startY: 68,
+                                         head: [['Opção de Voto', 'Total de Votos', 'Percentual']],
+                                         body: tableData,
+                                         theme: 'striped',
+                                         headStyles: { fillColor: [11, 29, 58] }
                                        });
-
-                                       const finalY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY : 150;
-                                       doc.setFont('helvetica', 'italic');
-                                       doc.setFontSize(10);
-                                       const footerText = 'Este documento deve ser lido em reunião, na próxima sessão com a finalidade de constar em ata a deliberação feita na Arca Digital.';
-                                       const splitFooter = doc.splitTextToSize(footerText, 170);
-                                       doc.text(splitFooter, 20, finalY + 15, { align: 'justify' });
+                                     } else {
+                                       const tableData = [
+                                         ['Meta de Arrecadação', `R$ ${action.goal?.toLocaleString() || '0,00'}`],
+                                         ['Total Arrecadado', `R$ ${action.current?.toLocaleString() || '0,00'}`],
+                                         ['Progresso', `${Math.round(((action.current || 0) / (action.goal || 1)) * 100)}%`]
+                                       ];
+                                       autoTable(doc, {
+                                         startY: 68,
+                                         head: [['Métrica de Suporte', 'Valor']],
+                                         body: tableData,
+                                         theme: 'striped',
+                                         headStyles: { fillColor: [11, 29, 58] }
+                                       });
                                      }
-                                     doc.save(`relatorio-${action.title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
+
+                                     doc.save(`projeto_${action.id}.pdf`);
                                    }}
-                                   className="flex-1 py-2 bg-white border border-[#0b1d3a]/10 rounded-lg text-[#0b1d3a] font-black uppercase text-[8px] tracking-wider hover:bg-[#c5a059] transition-all"
+                                   className="p-2 bg-white border border-[#0b1d3a]/10 rounded-lg text-[#c5a059] hover:bg-green-600 hover:text-white transition-all shrink-0"
+                                   title="Baixar Relatório PDF"
                                  >
-                                     PDF Oficial
+                                    <Download className="w-3.5 h-3.5" />
                                  </button>
                                )}
-                               <button className="flex-1 py-2 bg-white border border-[#0b1d3a]/10 rounded-lg text-[#0b1d3a]/40 font-black uppercase text-[8px] tracking-wider">Detalhes</button>
+                               {hasElevatedAccess && (
+                                 <button 
+                                   onClick={() => {
+                                     if (window.confirm('Excluir esta ação permanentemente do painel social?')) {
+                                       deleteDoc(doc(db, 'social_actions', action.id));
+                                     }
+                                   }}
+                                   className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all shrink-0 ml-auto"
+                                   title="Excluir Ação"
+                                 >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                 </button>
+                               )}
                             </div>
                          </div>
                        ))}
@@ -804,18 +819,15 @@ export default function MemberDashboard() {
 
             {activeTab === 'members' && (
               <div key="members" className="animate-fade-in space-y-8 w-full">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#0b1d3a]/10 pb-4 gap-3 w-full">
-                  <div className="text-left">
-                    <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#0b1d3a] uppercase tracking-widest">Soberano Quadro de Obreiros</h2>
-                    <p className="text-[#0b1d3a]/60 text-xs italic font-serif">"Eis quão bom e quão suave é que os irmãos vivam em união."</p>
-                  </div>
-                  <div className="text-[9px] uppercase font-black tracking-wider text-[#c5a059] bg-[#c5a059]/10 px-4 py-2 rounded-full border border-[#c5a059]/20 w-fit shrink-0">
-                    {registeredUsers.length} Irmãos Cadastrados
+                <div className="flex flex-col md:flex-row items-center gap-4 w-full">
+                  <div className="relative w-full flex-1 group">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0b1d3a]/30 group-focus-within:text-[#0b1d3a] transition-colors" />
+                    <input type="text" placeholder="Buscar irmão por nome..." className="w-full bg-white border border-[#0b1d3a]/10 rounded-2xl p-4 pl-12 text-[#0b1d3a] text-xs outline-none focus:border-[#c5a059]/50 shadow-sm" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 w-full">
-                  {registeredUsers.filter(u => u.status !== 'PENDING').map((member) => (
+                  {registeredUsers.filter(u => u.status !== 'PENDING' && (u.displayName || '').toLowerCase().includes(searchTerm.toLowerCase())).map((member) => (
                     <div 
                       key={member.id}
                       onClick={() => navigate(`/area-restrita?uid=${member.id}&tab=profile`)}
@@ -824,7 +836,7 @@ export default function MemberDashboard() {
                       <div className="relative w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-3 sm:mb-4 flex-shrink-0">
                         <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden shadow-inner">
                           {member.photoURL ? (
-                            <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover" />
+                            <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-2xl sm:text-3xl font-serif">
                               {member.displayName?.[0] || 'I'}
@@ -868,7 +880,7 @@ export default function MemberDashboard() {
                          <div className="relative">
                             <div className="w-32 h-44 rounded-2xl bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden relative shadow-md">
                                {editProfileData.photoURL ? (
-                                 <img src={editProfileData.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                                 <img src={editProfileData.photoURL} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                ) : (
                                  <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-5xl font-serif">
                                    {editProfileData.displayName?.[0] || 'I'}
@@ -1102,85 +1114,6 @@ export default function MemberDashboard() {
       </AnimatePresence>
 
       <Footer />
-    </div>
-  );
-}
-
-function LibraryItemCard({ item, index, isHighlighted, isExpanded, onToggleComments, onShare, onDelete, onEdit }: any) {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (!isExpanded) return;
-    const q = query(collection(db, 'library_comments'), where('itemId', '==', item.id), orderBy('createdAt', 'asc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setComments(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Comment[]);
-    }, console.error);
-    return () => unsubscribe();
-  }, [isExpanded, item.id]);
-
-  return (
-    <div className={`bg-white p-5 md:p-8 rounded-2xl md:rounded-[2rem] border ${isHighlighted ? 'border-[#c5a059]' : 'border-[#0b1d3a]/10'} relative flex flex-col group transition-all hover:border-[#c5a059]/30 shadow-md text-left`}>
-      {onDelete && (
-        <div className="absolute top-4 right-4 flex gap-1.5">
-           <button onClick={onEdit} className="p-1.5 bg-[#0b1d3a]/5 text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] rounded-md transition-all">
-             <Edit className="w-3.5 h-3.5" />
-           </button>
-           <button onClick={onDelete} className="p-1.5 bg-red-50/5 text-red-600 hover:bg-red-50 hover:text-white rounded-md transition-all">
-             <Trash2 className="w-3.5 h-3.5" />
-           </button>
-        </div>
-      )}
-      <div className="flex items-start justify-between mb-4">
-        <div className="p-2.5 bg-[#c5a059]/10 rounded-xl text-[#c5a059] shadow-inner"><BookOpen className="w-5 h-5" /></div>
-        <span className="text-[8px] font-black uppercase tracking-widest px-2.5 py-0.5 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-full text-[#c5a059]">{item.fileType}</span>
-      </div>
-      <h3 className="font-cinzel text-base md:text-xl font-bold text-[#0b1d3a] mb-1 leading-tight group-hover:text-[#c5a059] transition-colors">{item.title}</h3>
-      <p className="text-[#c5a059]/80 text-[9px] uppercase tracking-wider font-black mb-3">{item.category}</p>
-      <p className="text-[#0b1d3a]/80 text-xs italic leading-relaxed mb-6 flex-1 font-serif">"{item.description || "Sem descrição disponível."}"</p>
-      
-      <div className="pt-3 border-t border-[#0b1d3a]/5 flex items-center justify-between mt-auto">
-         <div className="flex items-center gap-1 min-w-0">
-           <span className="text-[8px] text-[#0b1d3a]/30 uppercase font-black shrink-0">Por:</span>
-           <span className="text-[9px] text-[#c5a059] uppercase font-black truncate">{item.author || "Anônimo"}</span>
-         </div>
-         <div className="flex gap-1.5 shrink-0">
-            <button onClick={onToggleComments} className="p-2 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-lg text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all relative">
-               <MessageSquare className="w-3.5 h-3.5" />
-               {comments.length > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#c5a059] text-[#0b1d3a] text-[8px] flex items-center justify-center rounded-full font-black">{comments.length}</span>}
-            </button>
-            <a href={item.url} target="_blank" rel="noopener noreferrer" className="p-2 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-lg text-[#c5a059] hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all"><Eye className="w-3.5 h-3.5" /></a>
-         </div>
-      </div>
-      <button onClick={onShare} className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 text-[#0b1d3a] rounded-xl text-[9px] font-black uppercase tracking-wider hover:bg-[#c5a059] hover:text-[#0b1d3a] transition-all"><MessageSquare className="w-3.5 h-3.5" /> Compartilhar</button>
-
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="mt-4 pt-4 border-t border-[#0b1d3a]/10 overflow-hidden">
-             <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar mb-3">
-                {comments.map(c => (
-                  <div key={c.id} className="p-2.5 bg-[#0b1d3a]/5 rounded-xl border border-[#0b1d3a]/10">
-                    <p className="text-[8px] font-black text-[#c5a059] uppercase tracking-wider mb-0.5">{c.userName}</p>
-                    <p className="text-xs text-[#0b1d3a]/80 font-medium">{c.text}</p>
-                  </div>
-                ))}
-             </div>
-             <form className="relative" onSubmit={async e => {
-               e.preventDefault();
-               if (!newComment.trim() || isSubmitting) return;
-               setIsSubmitting(true);
-               try {
-                 await addDoc(collection(db, 'library_comments'), { itemId: item.id, userId: auth.currentUser!.uid, userName: auth.currentUser!.displayName || 'Irmão', text: newComment, createdAt: serverTimestamp() });
-                 setNewComment('');
-               } finally { setIsSubmitting(false); }
-             }}>
-                <input className="w-full bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 p-2.5 pr-8 rounded-xl text-xs text-[#0b1d3a] font-bold outline-none placeholder-[#0b1d3a]/30" placeholder="Sua contribuição..." value={newComment} onChange={e => setNewComment(e.target.value)} />
-                <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-[#c5a059] hover:text-[#0b1d3a] transition-colors"><Send className="w-3.5 h-3.5" /></button>
-             </form>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

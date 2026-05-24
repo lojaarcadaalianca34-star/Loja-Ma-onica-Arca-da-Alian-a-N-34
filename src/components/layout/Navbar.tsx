@@ -59,7 +59,7 @@ export default function Navbar() {
       {/* 1. BARRA DO TOPO FIXA - LIMPA E LEVE */}
       <nav 
         className={cn(
-          "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 px-4 md:px-6 bg-[#0b1d3a] md:bg-[#0b1d3a]/95 border-b border-[#c5a059]/20 md:backdrop-blur-sm",
+          "fixed top-0 left-0 right-0 z-[100] transition-[padding,box-shadow,background-color] duration-300 px-4 md:px-6 bg-[#0b1d3a] md:bg-[#0b1d3a]/95 border-b border-[#c5a059]/20 md:backdrop-blur-sm",
           isScrolled ? "py-2 shadow-2xl" : "py-3"
         )}
       >
@@ -93,7 +93,7 @@ export default function Navbar() {
             <div className="flex items-center gap-2 ml-2 lg:ml-4">
               <Link 
                 to="/area-restrita"
-                className="px-3 py-2 lg:px-5 lg:py-2.5 bg-[#c5a059] text-[#0b1d3a] rounded-full text-[9px] lg:text-[10px] font-black uppercase tracking-widest hover:bg-[#c5a059]/90 transition-all shadow-md whitespace-nowrap"
+                className="px-3 py-2 lg:px-5 lg:py-2.5 bg-[#c5a059] text-[#0b1d3a] rounded-full text-[9px] lg:text-[10px] font-black uppercase tracking-widest hover:bg-[#c5a059]/90 transition-colors shadow-md whitespace-nowrap"
               >
                 Área Restrita
               </Link>
@@ -145,7 +145,7 @@ export default function Navbar() {
                     setIsMobileMenuOpen(false);
                     handleNavClick(e, link.href);
                   }}
-                  className="flex items-center gap-4 text-[#f4efe2] p-4 bg-white/5 rounded-xl border border-white/5 active:bg-[#c5a059]/10 active:border-[#c5a059]/30 transition-all"
+                  className="flex items-center gap-4 text-[#f4efe2] p-4 bg-white/5 rounded-xl border border-white/5 active:bg-[#c5a059]/10 active:border-[#c5a059]/30 transition-colors"
                 >
                   <link.icon className="w-5 h-5 text-[#c5a059]" />
                   <span className="font-sans font-bold uppercase tracking-widest text-xs">{link.name}</span>
@@ -156,7 +156,7 @@ export default function Navbar() {
                 <Link 
                   to="/area-restrita"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="bg-[#0b1d3a] border border-[#c5a059]/30 text-[#f4efe2] font-black p-4 rounded-xl text-[10px] uppercase tracking-widest text-center flex items-center justify-center gap-2"
+                  className="bg-[#0b1d3a] border border-[#c5a059]/30 text-[#f4efe2] font-black p-4 rounded-xl text-[10px] uppercase tracking-widest text-center flex items-center justify-center gap-2 transition-colors hover:bg-[#c5a059]/10"
                 >
                   <Shield className="w-4 h-4" />
                   Membros
@@ -164,7 +164,7 @@ export default function Navbar() {
                 <Link 
                   to="/admin"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="bg-white/5 border border-white/10 text-[#c5a059] font-black p-4 rounded-xl text-[10px] uppercase tracking-widest text-center"
+                  className="bg-white/5 border border-white/10 text-[#c5a059] font-black p-4 rounded-xl text-[10px] uppercase tracking-widest text-center transition-colors hover:bg-white/10"
                 >
                   Admin
                 </Link>
