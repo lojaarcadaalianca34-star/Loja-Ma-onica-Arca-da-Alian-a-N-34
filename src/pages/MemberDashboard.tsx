@@ -458,7 +458,7 @@ export default function MemberDashboard() {
                        setActiveTab(tab.id as any);
                      }
                    }}
-                   className={`flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 md:gap-2 px-2 py-3 md:px-6 md:py-4 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-wider transition-all w-full md:w-auto shadow-sm border min-w-0 overflow-hidden ${
+                   className={`flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 md:gap-2 px-1.5 py-2.5 sm:px-4 sm:py-3.5 md:px-6 md:py-4 rounded-xl text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-wider transition-all w-full md:w-auto shadow-sm border min-w-0 overflow-hidden ${
                      activeTab === tab.id 
                        ? 'bg-[#c5a059] text-[#0b1d3a] border-[#c5a059]' 
                        : 'bg-[#0b1d3a] text-white border-[#c5a059]/30 hover:bg-[#c5a059]/10 hover:text-[#c5a059]'
@@ -559,19 +559,19 @@ export default function MemberDashboard() {
                       <button onClick={() => setActiveTab('members')} className="w-fit px-6 py-2 border border-[#c5a059]/30 rounded-full text-[10px] font-black uppercase tracking-widest text-[#0b1d3a] hover:bg-[#c5a059] transition-all">Ver em Tela Cheia</button>
                     </div>
                     {/* TROCADO DE MOTION.DIV PARA DIV NORMAL NOS CARDS DA LISTA PARA SALVAR O CELULAR */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4 w-full">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 w-full">
                       {registeredUsers.filter(u => u.status !== 'PENDING').slice(0, 12).map((member) => (
                         <div 
                           key={member.id}
                           onClick={() => navigate(`/area-restrita?uid=${member.id}&tab=profile`)}
-                          className="bg-white p-4 rounded-2xl border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 hover:-translate-y-1 transition-all cursor-pointer shadow-sm group text-center"
+                          className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 hover:-translate-y-1 transition-all cursor-pointer shadow-sm group text-center flex flex-col justify-between h-full min-w-0"
                         >
-                          <div className="relative w-16 h-16 mx-auto mb-3">
+                          <div className="relative w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 sm:mb-3 flex-shrink-0">
                             <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden shadow-inner">
                               {member.photoURL ? (
                                 <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover" />
                               ) : (
-                                <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-xl font-serif">
+                                <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-lg sm:text-xl font-serif">
                                   {member.displayName?.[0] || 'I'}
                                 </div>
                               )}
@@ -580,8 +580,10 @@ export default function MemberDashboard() {
                               <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-md" />
                             )}
                           </div>
-                          <h4 className="font-serif text-[11px] font-bold text-[#0b1d3a] group-hover:text-[#c5a059] transition-colors truncate">{member.displayName || 'Ir. Obreiro'}</h4>
-                          <p className="text-[7px] text-[#c5a059] font-black uppercase tracking-widest truncate">{member.currentRole || member.role || 'Membro'}</p>
+                          <div className="min-w-0">
+                            <h4 className="font-serif text-[10px] sm:text-[11px] font-bold text-[#0b1d3a] group-hover:text-[#c5a059] transition-colors truncate">{member.displayName || 'Ir. Obreiro'}</h4>
+                            <p className="text-[6px] sm:text-[7px] text-[#c5a059] font-black uppercase tracking-widest truncate">{member.currentRole || member.role || 'Membro'}</p>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -813,30 +815,32 @@ export default function MemberDashboard() {
                 </div>
 
                 {/* TROCADO DE MOTION.DIV PARA DIV NORMAL NOS CARDS DA LISTA PARA SALVAR O CELULAR */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4 w-full">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 w-full">
                   {registeredUsers.filter(u => u.status !== 'PENDING').map((member) => (
                     <div 
                       key={member.id}
                       onClick={() => navigate(`/area-restrita?uid=${member.id}&tab=profile`)}
-                      className="bg-white p-6 rounded-[2rem] border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 hover:-translate-y-1 transition-all cursor-pointer shadow-sm group text-center w-full"
+                      className="bg-white p-3 sm:p-5 rounded-xl sm:rounded-[2rem] border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 hover:-translate-y-1 transition-all cursor-pointer shadow-sm group text-center w-full flex flex-col justify-between h-full min-w-0"
                     >
-                      <div className="relative w-24 h-24 mx-auto mb-4">
+                      <div className="relative w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-3 sm:mb-4 flex-shrink-0">
                         <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden shadow-inner">
                           {member.photoURL ? (
                             <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-3xl font-serif">
+                            <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-2xl sm:text-3xl font-serif">
                               {member.displayName?.[0] || 'I'}
                             </div>
                           )}
                         </div>
                         {member.isOnline && (
-                          <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-md" />
+                          <div className="absolute bottom-1 right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-green-500 rounded-full border-2 border-white shadow-md" />
                         )}
                       </div>
-                      <h3 className="font-serif text-base font-bold text-[#0b1d3a] group-hover:text-[#c5a059] transition-colors line-clamp-1">{member.displayName || 'Ir. Obreiro'}</h3>
-                      <p className="text-[9px] text-[#c5a059] font-black uppercase tracking-[0.2em] mb-2">{member.currentRole || member.role || 'Membro'}</p>
-                      <div className="mt-4 pt-4 border-t border-[#0b1d3a]/5 flex items-center justify-center gap-2 text-[8px] font-black uppercase tracking-widest text-[#0b1d3a]/30 group-hover:text-[#c5a059] transition-colors">
+                      <div className="min-w-0 flex-1 flex flex-col justify-center">
+                        <h3 className="font-serif text-[11px] sm:text-base font-bold text-[#0b1d3a] group-hover:text-[#c5a059] transition-colors line-clamp-1">{member.displayName || 'Ir. Obreiro'}</h3>
+                        <p className="text-[7px] sm:text-[9px] text-[#c5a059] font-black uppercase tracking-widest sm:tracking-[0.2em] mb-1 sm:mb-2 truncate">{member.currentRole || member.role || 'Membro'}</p>
+                      </div>
+                      <div className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-[#0b1d3a]/5 flex items-center justify-center gap-1 sm:gap-2 text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-[#0b1d3a]/30 group-hover:text-[#c5a059] transition-colors flex-shrink-0">
                         Ver Perfil Completo <span>→</span>
                       </div>
                     </div>
