@@ -81,11 +81,18 @@ body {
   border-image: linear-gradient(to bottom, #f4efe2, var(--color-masonic-gold)) 1;
 }
 
-/* 🛡️ PREVENÇÃO DE QUEBRA VISUAL EM CELULARES */
-@media (max-width: 768px) {
-  /* Impede que itens vazem a tela para o lado sem fritar a renderização do eixo Y */
+/* 🛡️ PREVENT VISUAL DEFECTS ON PHONES AND TABLETS (CHROME/ANDROID COMPOSITION STICKY FIX) */
+@media (max-width: 1024px) {
+  /* Prevent horizontal screen leakage safely on touch viewports */
   #root {
     overflow-x: hidden;
     position: relative;
+  }
+  
+  /* Disable backdrop-filter and -webkit-backdrop-filter globally below 1024px width */
+  /* to prevent chromium rasterization color lines, floating duplicated elements, and letters bug */
+  * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }
