@@ -3569,7 +3569,21 @@ export default function AdminDashboard() {
 
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#0b1d3a]/5">
                                      <div>
-                                      <label className="block text-[10px] text-[#0b1d3a]/60 mb-1 font-bold">Nome da Cunhada</label>
+                                      <div className="flex justify-between items-center mb-1">
+                                         <label className="block text-[10px] text-[#0b1d3a]/60 font-medium">Nome da Cunhada</label>
+                                         {master.firstLady?.name && (
+                                           <button 
+                                             type="button"
+                                             onClick={() => {
+                                               const newMasters = editContent.masters.map((m, i) => i === index ? { ...m, firstLady: { ...(m.firstLady || { biography: '', photo: '' }), name: '' } } : m);
+                                               setEditContent({...editContent, masters: newMasters});
+                                             }}
+                                             className="text-red-600 hover:text-red-800 text-[10px] uppercase font-bold"
+                                           >
+                                             Excluir Nome
+                                           </button>
+                                         )}
+                                       </div>
                                       <input 
                                         className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-2 text-[#0b1d3a] text-sm focus:border-[#c5a059]"
                                         value={master.firstLady?.name || ''}
@@ -3580,7 +3594,21 @@ export default function AdminDashboard() {
                                       />
                                     </div>
                                     <div>
-                                      <label className="block text-[10px] text-[#0b1d3a]/60 mb-1 font-bold">URL Foto Cunhada</label>
+                                      <div className="flex justify-between items-center mb-1">
+                                         <label className="block text-[10px] text-[#0b1d3a]/60 font-medium">URL Foto Cunhada</label>
+                                         {master.firstLady?.photo && (
+                                           <button 
+                                             type="button"
+                                             onClick={() => {
+                                               const newMasters = editContent.masters.map((m, i) => i === index ? { ...m, firstLady: { ...(m.firstLady || { name: '', biography: '' }), photo: '' } } : m);
+                                               setEditContent({...editContent, masters: newMasters});
+                                             }}
+                                             className="text-red-600 hover:text-red-800 text-[10px] uppercase font-bold"
+                                           >
+                                             Excluir Foto
+                                           </button>
+                                         )}
+                                       </div>
                                       <input 
                                         className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-2 text-[#0b1d3a] text-xs focus:border-[#c5a059] outline-none"
                                         placeholder="Link direto (.jpg, .png)"
