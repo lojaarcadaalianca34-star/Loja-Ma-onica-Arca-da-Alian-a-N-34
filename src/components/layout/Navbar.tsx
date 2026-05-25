@@ -127,13 +127,15 @@ export default function Navbar() {
           onClick={() => setIsOpen(false)}
           style={{
             position: 'fixed', inset: 0,
-            zIndex: 997,
-            backgroundColor: 'rgba(0,0,0,0.5)',
+            zIndex: 99998,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            transform: 'translate3d(0, 0, 0)',
+            WebkitTransform: 'translate3d(0, 0, 0)',
           }}
         />
       )}
 
-      {/* MENU MOBILE — sem animação Framer Motion, sem transform, sem filter */}
+      {/* MENU MOBILE — sem animação Framer Motion, sem filter */}
       <div
         ref={menuRef}
         style={{
@@ -142,7 +144,7 @@ export default function Navbar() {
           left: 0,
           right: 0,
           bottom: 0,
-          zIndex: 998,
+          zIndex: 99999,
           backgroundColor: '#0b1d3a',
           overflowY: 'auto',
           paddingTop: '80px',
@@ -150,7 +152,9 @@ export default function Navbar() {
           paddingRight: '24px',
           // Visibilidade controlada só por display — sem opacity animation
           display: isOpen ? 'block' : 'none',
-          // Sem transform, sem will-change, sem filter — evita glitch Android Chrome
+          // Força aceleração de hardware 3D para criar um novo contexto de renderização (Stacking Context) acima de qualquer elemento animado na página original
+          transform: 'translate3d(0, 0, 0)',
+          WebkitTransform: 'translate3d(0, 0, 0)',
         }}
         className="md:hidden"
       >
