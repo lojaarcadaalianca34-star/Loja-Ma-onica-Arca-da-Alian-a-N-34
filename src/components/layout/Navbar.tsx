@@ -6,13 +6,13 @@ import Logo from '../ui/Logo';
 import { auth, logout } from '@/src/lib/firebase';
 
 const navLinks = [
-  { name: 'Home', href: '/', icon: Globe },
-  { name: 'Sobre Nós', href: '/sobre', icon: Landmark },
-  { name: 'Ações Sociais', href: '/acoes-sociais', icon: Heart },
-  { name: 'Past Masters', href: '/galeria-honra', icon: Users },
-  { name: 'Família / Paramaçônicas', href: '/', icon: Users },
-  { name: 'Eventos', href: '/eventos', icon: BookOpen },
-  { name: 'Galeria', href: '/', icon: BookOpen },
+  { name: 'Sobre Nós', lines: ['Sobre', 'Nós'], href: '/sobre', icon: Landmark },
+  { name: 'Seja um de Nós', lines: ['Seja um', 'de Nós'], href: '/quero-participar', icon: Shield },
+  { name: 'Ações Sociais', lines: ['Ações', 'Sociais'], href: '/acoes-sociais', icon: Heart },
+  { name: 'Past Masters', lines: ['Past', 'Masters'], href: '/galeria-honra', icon: Users },
+  { name: 'Família / Paramaçônicas', lines: ['Família /', 'Paramaçônicas'], href: '/', icon: Users },
+  { name: 'Eventos', lines: ['Eventos'], href: '/eventos', icon: BookOpen },
+  { name: 'Galeria', lines: ['Galeria'], href: '/', icon: BookOpen },
 ];
 
 export default function Navbar() {
@@ -86,8 +86,10 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-1.5 lg:gap-3 xl:gap-5 ml-auto">
             {navLinks.map((link) => (
               <a key={link.name} href={link.href}
-                className="text-[8px] lg:text-[10px] xl:text-[11px] font-serif uppercase tracking-wider xl:tracking-widest text-[#c5a059] hover:text-white transition-colors whitespace-nowrap px-1 lg:px-2">
-                {link.name}
+                className="flex flex-col items-center justify-center text-center text-[7px] lg:text-[9px] xl:text-[10.5px] font-serif uppercase tracking-wider xl:tracking-widest text-[#c5a059] hover:text-white transition-colors px-1 lg:px-2 leading-tight">
+                {link.lines.map((line, idx) => (
+                  <span key={idx} className="block">{line}</span>
+                ))}
               </a>
             ))}
             <div className="flex items-center gap-2 ml-2 lg:ml-4">
