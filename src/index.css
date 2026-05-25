@@ -77,12 +77,24 @@ html, body {
   border-image: linear-gradient(to bottom, #f4efe2, var(--color-masonic-gold)) 1;
 }
 
-/* 🛡️ DESATIVA FILTROS PESADOS E TRAVAS DE ROLAGEM NO CELULAR E PREVINE GHOST LAYERS E BLACK BOXES */
+/* 🛡️ DESATIVA FILTROS PESADOS, SOMBRAS E TRANSIÇÕES COMPLEXAS NO CELULAR PARA SANAR GLITCHES DE RASTERIZAÇÃO */
 @media (max-width: 1024px) {
   * {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
     will-change: auto !important;
+    transition: none !important;
+    -webkit-transition: none !important;
+  }
+
+  /* Aplica isolamento de camada de hardware (GPU Layer Boundary) em elementos arredondados e imagens para prevenir estática lateral */
+  .rounded-full, .rounded-xl, .rounded-2xl, .rounded-\[1\.6rem\], .rounded-\[1\.8rem\], .rounded-\[2rem\], .rounded-\[2\.5rem\], .rounded-\[3rem\], .rounded-\[3\.5rem\], img {
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
   }
 
   .gold-text {
@@ -93,17 +105,9 @@ html, body {
     color: var(--color-masonic-gold) !important;
   }
 
-  /* Desativa efeitos de hover de transformações no mobile para evitar camadas duplicadas fixas */
-  .hover\:-translate-y-1:hover {
-    transform: none !important;
-  }
-  .hover\:-translate-y-0\.5:hover {
-    transform: none !important;
-  }
-  .hover\:scale-110:hover {
-    transform: none !important;
-  }
-  .hover\:scale-105:hover {
-    transform: none !important;
+  /* Desativa efeitos de hover de transformações no mobile para evitar camadas duplicacas ou congeladas */
+  .hover\:-translate-y-1:hover, .hover\:-translate-y-0\.5:hover, .hover\:scale-110:hover, .hover\:scale-105:hover {
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
   }
 }
