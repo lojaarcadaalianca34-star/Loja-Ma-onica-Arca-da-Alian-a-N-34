@@ -49,10 +49,13 @@ function PresenceTracker() {
         // Update presence on login/mount
         const updatePresence = async (isOnline: boolean) => {
           try {
-            await updateDoc(userRef, {
-              isOnline,
-              lastSeen: serverTimestamp()
-            });
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+              await updateDoc(userRef, {
+                isOnline,
+                lastSeen: serverTimestamp()
+              });
+            }
           } catch (e) {
             console.error("Error updating presence:", e);
           }
