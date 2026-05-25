@@ -6,8 +6,8 @@ import Logo from '../ui/Logo';
 import { auth, logout } from '@/src/lib/firebase';
 
 const navLinks = [
-  { name: 'Home', href: '/', icon: Globe },
   { name: 'Sobre Nós', href: '/sobre', icon: Landmark },
+  { name: 'Seja um de Nós', href: '/quero-participar', icon: Shield },
   { name: 'Ações Sociais', href: '/acoes-sociais', icon: Heart },
   { name: 'Past Masters', href: '/galeria-honra', icon: Users },
   { name: 'Família / Paramaçônicas', href: '/#espaco-familia', icon: Users },
@@ -118,7 +118,7 @@ export default function Navbar() {
       <div
         className="md:hidden"
         style={{
-          display: isOpen ? 'flex' : 'none',
+          display: 'flex',
           flexDirection: 'column',
           position: 'fixed',
           top: 0, left: 0, right: 0, bottom: 0,
@@ -128,6 +128,10 @@ export default function Navbar() {
           paddingLeft: '20px',
           paddingRight: '20px',
           overflowY: 'auto',
+          visibility: isOpen ? 'visible' : 'hidden',
+          pointerEvents: isOpen ? 'auto' : 'none',
+          opacity: isOpen ? 1 : 0,
+          transition: 'opacity 0.15s ease-out, visibility 0.15s',
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingBottom: '40px', paddingTop: '12px' }}>
