@@ -379,7 +379,7 @@ export default function MemberDashboard() {
       <main className="flex-1 pt-24 md:pt-28 pb-20 px-4 md:px-6 w-full max-w-full">
         <div className="max-w-7xl mx-auto w-full">
           {/* Header Section */}
-          <div className="relative mb-6 p-0.5 rounded-[1.8rem] bg-gradient-to-br from-[#c5a059]/20 via-transparent to-[#0b1d3a]/5 overflow-hidden w-full">
+          <div className="relative mb-6 p-0.5 rounded-[1.8rem] border border-[#c5a059]/20 w-full">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 md:p-6 bg-white rounded-[1.6rem] border border-white/40 w-full text-center sm:text-left">
               <div className="flex flex-row items-center gap-4 min-w-0 w-full sm:w-auto">
                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#0b1d3a] border-2 border-[#c5a059]/20 flex items-center justify-center text-[#c5a059] shadow-lg relative overflow-hidden group shrink-0">
@@ -464,11 +464,11 @@ export default function MemberDashboard() {
           {/* RENDERIZAÇÃO ESTÁVEL DO CORPO */}
           <div className="w-full relative">
             {activeTab === 'welcome' && (
-              <div key="welcome" className="animate-fade-in space-y-12 w-full max-w-full overflow-hidden">
+              <div key="welcome" className="space-y-12 w-full max-w-full">
                 {/* Welcome Card */}
                 <div className="relative w-full">
                   <div className="absolute inset-0 bg-[#fdf6e3] rounded-[2rem] shadow-2xl" />
-                  <div className="relative p-5 md:p-10 bg-[#f4e4bc] rounded-[2rem] border-2 border-[#d4b068] overflow-hidden text-center w-full">
+                  <div className="relative p-5 md:p-10 bg-[#f4e4bc] rounded-[2rem] border-2 border-[#d4b068] text-center w-full">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none">
                       <Shield className="w-[300px] h-[300px] md:w-[400px] md:h-[400px] text-[#8b5e34]" />
                     </div>
@@ -583,7 +583,7 @@ export default function MemberDashboard() {
             )}
 
             {activeTab === 'library' && (
-              <div key="library" className="animate-fade-in w-full">
+              <div key="library" className="w-full">
                 <div className="flex flex-col sm:flex-row gap-4 mb-8 items-center w-full">
                   <div className="relative w-full flex-1 group">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0b1d3a]/30 group-focus-within:text-[#0b1d3a] transition-colors" />
@@ -618,13 +618,13 @@ export default function MemberDashboard() {
             )}
 
             {activeTab === 'professional' && (
-              <div key="professional" className="animate-fade-in w-full">
+              <div key="professional" className="w-full">
                 <ProfessionalBoard />
               </div>
             )}
 
             {activeTab === 'social' && (
-              <div key="social" className="animate-fade-in space-y-8 w-full">
+              <div key="social" className="space-y-8 w-full">
                  <div className="p-5 md:p-10 bg-white border border-[#0b1d3a]/10 rounded-[2rem] md:rounded-[3.5rem] shadow-sm w-full">
                     <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center mb-8 md:mb-10 text-center md:text-left w-full">
                        <div className="w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-3xl bg-[#0b1d3a]/10 border border-[#0b1d3a]/20 flex items-center justify-center text-[#0b1d3a] flex-shrink-0">
@@ -644,7 +644,7 @@ export default function MemberDashboard() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                        {socialItems.map((action) => (
-                         <div key={action.id} className="p-6 md:p-8 bg-white border border-[#0b1d3a]/10 rounded-[2rem] hover:border-[#c5a059]/30 transition-all group relative overflow-hidden text-left w-full">
+                         <div key={action.id} className="p-6 md:p-8 bg-white border border-[#0b1d3a]/10 rounded-[2rem] group relative text-left w-full">
                             <div className="flex justify-between items-start mb-6 gap-2 w-full">
                                <div className="flex flex-col gap-1 min-w-0 w-full">
                                   <span className={`px-2.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider w-fit block ${
@@ -818,7 +818,7 @@ export default function MemberDashboard() {
             )}
 
             {activeTab === 'members' && (
-              <div key="members" className="animate-fade-in space-y-8 w-full">
+              <div key="members" className="space-y-8 w-full">
                 <div className="flex flex-col md:flex-row items-center gap-4 w-full">
                   <div className="relative w-full flex-1 group">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0b1d3a]/30 group-focus-within:text-[#0b1d3a] transition-colors" />
@@ -861,7 +861,7 @@ export default function MemberDashboard() {
             )}
 
             {activeTab === 'profile' && (
-              <div key="profile" className="animate-fade-in max-w-4xl mx-auto space-y-8 w-full">
+              <div key="profile" className="max-w-4xl mx-auto space-y-8 w-full">
                  {(isEditingSomeoneElse || (targetUid && targetUid !== auth.currentUser?.uid)) && (
                    <div className={`${isSuperAdmin ? 'bg-[#c5a059]' : 'bg-[#0b1d3a]'} p-4 rounded-xl flex items-center justify-between shadow-xl w-full`}>
                      <p className={`${isSuperAdmin ? 'text-[#0b1d3a]' : 'text-[#f4efe2]'} font-black uppercase tracking-wider text-[9px] truncate`}>
