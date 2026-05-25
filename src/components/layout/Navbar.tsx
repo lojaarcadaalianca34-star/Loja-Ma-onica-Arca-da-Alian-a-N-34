@@ -114,7 +114,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Menu mobile — sem Framer Motion, sem transform, sem filter, sem opacity animation */}
+      {/* Menu mobile — sem Framer Motion, sem transform, sem filter, com remoção imediata para evitar ghosting na GPU */}
       <div
         className="md:hidden"
         style={{
@@ -122,12 +122,16 @@ export default function Navbar() {
           flexDirection: 'column',
           position: 'fixed',
           top: 0, left: 0, right: 0, bottom: 0,
-          zIndex: 998,
+          zIndex: 99999, // Fica perfeitamente no topo de qualquer elemento
           backgroundColor: '#0b1d3a',
           paddingTop: '72px',
           paddingLeft: '20px',
           paddingRight: '20px',
           overflowY: 'auto',
+          visibility: isOpen ? 'visible' : 'hidden',
+          pointerEvents: isOpen ? 'auto' : 'none',
+          opacity: isOpen ? 1 : 0,
+          transition: isOpen ? 'opacity 0.15s ease-out' : 'none', // Remove transição no fechamento para apagar instantaneamente sem deixar "fantasmas"
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingBottom: '40px', paddingTop: '12px' }}>
@@ -152,7 +156,7 @@ export default function Navbar() {
           ))}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '8px' }}>
-            <button onClick={() => goTo('/area-restrita')} style={{
+            <button onClick={() => goTo('/area-restrita?tab=members')} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
               backgroundColor: '#132a4e', border: '1px solid rgba(197,160,89,0.4)',
               color: '#f4efe2', fontWeight: 900, padding: '16px', borderRadius: '12px',
