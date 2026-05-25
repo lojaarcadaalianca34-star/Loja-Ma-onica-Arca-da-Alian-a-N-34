@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Compass, Shield, Landmark, ChevronDown } from 'lucide-react';
 import { useContent } from '@/src/context/ContentContext';
@@ -8,6 +8,15 @@ import Logo from '@/src/components/ui/Logo';
 export default function Hero() {
   const { homeContent } = useContent();
   const { hero } = homeContent;
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <section id="home" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-aged-beige">
@@ -49,10 +58,10 @@ export default function Hero() {
           <div className="absolute inset-0 bg-[#c5a059]/5 hidden md:block md:blur-[80px] rounded-full animate-pulse" />
           
           <motion.div
-            animate={{ 
+            animate={isMobile ? undefined : { 
               scale: [1, 1.05, 1],
             }}
-            transition={{ 
+            transition={isMobile ? undefined : { 
               duration: 4, 
               repeat: Infinity, 
               ease: "easeInOut" 
@@ -118,8 +127,8 @@ export default function Hero() {
       </div>
 
       <motion.button 
-        animate={{ y: [0, 10, 0] }}
-        transition={{ repeat: Infinity, duration: 2 }}
+        animate={isMobile ? undefined : { y: [0, 10, 0] }}
+        transition={isMobile ? undefined : { repeat: Infinity, duration: 2 }}
         onClick={() => document.getElementById('biblioteca')?.scrollIntoView({ behavior: 'smooth' })}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[#c5a059]/60 hover:text-[#c5a059] transition-colors z-20 cursor-pointer p-4"
         aria-label="Rolar para Biblioteca"

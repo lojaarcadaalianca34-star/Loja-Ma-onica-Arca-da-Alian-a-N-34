@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useContent } from '@/src/context/ContentContext';
 
 export default function WelcomeBanner() {
   const { homeContent } = useContent();
   const { welcomeBanner } = homeContent;
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <section id="hero" className="relative h-[80vh] min-h-[600px] flex flex-col items-center justify-center overflow-hidden border-t border-[#c5a059] border-b border-[#c5a059] bg-masonic-dark">
@@ -13,11 +22,11 @@ export default function WelcomeBanner() {
         {welcomeBanner.backgroundImage && (
           <motion.div 
             initial={{ scale: 1.1 }}
-            animate={{ 
+            animate={isMobile ? undefined : { 
               scale: [1, 1.1, 1],
               rotate: [0, 1, 0]
             }}
-            transition={{ 
+            transition={isMobile ? undefined : { 
               duration: 20, 
               repeat: Infinity, 
               ease: "easeInOut" 
@@ -25,7 +34,7 @@ export default function WelcomeBanner() {
             className="absolute inset-0 bg-cover bg-[center_35%] bg-no-repeat"
             style={{ 
               backgroundImage: `url("${welcomeBanner.backgroundImage}")`,
-              filter: 'brightness(0.9) contrast(1.1)'
+              filter: isMobile ? 'none' : 'brightness(0.9) contrast(1.1)'
             }}
           />
         )}
