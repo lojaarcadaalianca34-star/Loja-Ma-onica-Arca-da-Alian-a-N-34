@@ -3632,6 +3632,35 @@ export default function AdminDashboard() {
                                         </div>
                                       )}
                                     </div>
+
+                                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                                      <div>
+                                        <label className="block text-[10px] text-[#0b1d3a]/60 mb-1 font-bold">Título / Status da Primeira Dama</label>
+                                        <select 
+                                          className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-2 text-[#0b1d3a] text-sm focus:border-[#c5a059] outline-none"
+                                          value={master.firstLady?.role || (master.role?.toLowerCase().includes('atual') || master.period?.includes('2026') ? 'atual' : 'ex')}
+                                          onChange={e => {
+                                            const newMasters = editContent.masters.map((m, i) => i === index ? { ...m, firstLady: { ...(m.firstLady || { name: '', biography: '', photo: '' }), role: e.target.value } } : m);
+                                            setEditContent({...editContent, masters: newMasters});
+                                          }}
+                                        >
+                                          <option value="ex">Ex Primeira Dama</option>
+                                          <option value="atual">Primeira Dama Atual (Ano Corrente 2026)</option>
+                                        </select>
+                                      </div>
+                                      <div>
+                                        <label className="block text-[10px] text-[#0b1d3a]/60 mb-1 font-bold">Biografia / Frase da Primeira Dama</label>
+                                        <input 
+                                          className="w-full bg-white/80 border border-[#0b1d3a]/10 rounded-lg p-2 text-[#0b1d3a] text-sm focus:border-[#c5a059] outline-none"
+                                          placeholder="Ex: Pioneira nas ações de integração social..."
+                                          value={master.firstLady?.biography || ''}
+                                          onChange={e => {
+                                            const newMasters = editContent.masters.map((m, i) => i === index ? { ...m, firstLady: { ...(m.firstLady || { name: '', photo: '' }), biography: e.target.value } } : m);
+                                            setEditContent({...editContent, masters: newMasters});
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
                                   </div>
 
                                   <div className="pt-4 flex justify-end">

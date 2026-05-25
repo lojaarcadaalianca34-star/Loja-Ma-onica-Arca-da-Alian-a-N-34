@@ -14,6 +14,9 @@ export default function MasterDetailPage() {
   const mastersData = [...(content.masters || []), ...(content.mastersSection?.masters || [])];
   const master = mastersData.find(m => m.id === id);
 
+  const isCurrentFirstLady = master?.firstLady?.role === 'atual' || 
+    (master && !master.firstLady?.role && (master.role?.toLowerCase().includes('atual') || master.period?.includes('2026')));
+
   if (!master) {
     return (
       <div className="min-h-screen bg-masonic-dark flex flex-col items-center justify-center p-6 text-center">
@@ -109,7 +112,7 @@ export default function MasterDetailPage() {
                        <div className="w-12 h-12 rounded-full bg-[#c5a059]/10 flex items-center justify-center">
                           <Heart className="text-[#c5a059] w-6 h-6 fill-[#c5a059]/20" />
                        </div>
-                       <span className="text-[#c5a059] text-xs md:text-sm uppercase font-black tracking-[0.3em] font-sans">{(master.role?.toLowerCase().includes('atual') || master.period?.includes('2026')) ? "Cunhada / Primeira Dama" : "Cunhada / Ex Primeira Dama"}</span>
+                       <span className="text-[#c5a059] text-xs md:text-sm uppercase font-black tracking-[0.3em] font-sans">{isCurrentFirstLady ? "Primeira Dama Atual" : "Ex Primeira Dama"}</span>
                     </div>
                     <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
                        <div className="w-32 h-44 flex-shrink-0 rounded-2xl border-2 border-[#c5a059]/20 overflow-hidden bg-white/5">
