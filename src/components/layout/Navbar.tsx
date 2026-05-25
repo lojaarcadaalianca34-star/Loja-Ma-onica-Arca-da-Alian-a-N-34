@@ -59,7 +59,7 @@ export default function Navbar() {
   return (
     <>
       <nav className={cn(
-        "fixed top-0 left-0 right-0 z-[999] px-4 md:px-6 bg-[#0b1d3a] border-b border-[#c5a059]/20 transition-[padding,box-shadow] duration-300",
+        "fixed top-0 left-0 right-0 z-[100000] px-4 md:px-6 bg-[#0b1d3a] border-b border-[#c5a059]/20 transition-[padding,box-shadow] duration-300",
         isScrolled ? "py-2 shadow-2xl" : "py-3"
       )}>
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
@@ -122,16 +122,12 @@ export default function Navbar() {
           flexDirection: 'column',
           position: 'fixed',
           top: 0, left: 0, right: 0, bottom: 0,
-          zIndex: 99999, // Fica perfeitamente no topo de qualquer elemento
+          zIndex: 99999, // Abaixo do 100000 do navbar para que o botão de fechar fique perfeitamente clicável
           backgroundColor: '#0b1d3a',
-          paddingTop: '72px',
+          paddingTop: '80px', // Mais espaço para descolar do navbar
           paddingLeft: '20px',
           paddingRight: '20px',
           overflowY: 'auto',
-          visibility: isOpen ? 'visible' : 'hidden',
-          pointerEvents: isOpen ? 'auto' : 'none',
-          opacity: isOpen ? 1 : 0,
-          transition: isOpen ? 'opacity 0.15s ease-out' : 'none', // Remove transição no fechamento para apagar instantaneamente sem deixar "fantasmas"
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingBottom: '40px', paddingTop: '12px' }}>
@@ -156,14 +152,14 @@ export default function Navbar() {
           ))}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '8px' }}>
-            <button onClick={() => goTo('/area-restrita?tab=members')} style={{
+            <button onClick={() => goTo('/area-restrita')} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
               backgroundColor: '#132a4e', border: '1px solid rgba(197,160,89,0.4)',
               color: '#f4efe2', fontWeight: 900, padding: '16px', borderRadius: '12px',
               fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer',
             }}>
               <Shield style={{ width: '16px', height: '16px' }} />
-              Membros
+              Área Restrita
             </button>
             <button onClick={() => goTo('/admin')} style={{
               backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
