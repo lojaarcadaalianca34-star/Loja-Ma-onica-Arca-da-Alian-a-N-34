@@ -50,7 +50,20 @@ export default function PastMastersPage() {
                   map.set(m.id, m);
                 }
               });
-              return Array.from(map.values()).reverse();
+
+              const getStartYear = (period: string) => {
+                const match = period ? period.match(/\d{4}/) : null;
+                return match ? parseInt(match[0], 10) : 0;
+              };
+
+              return Array.from(map.values()).sort((a: any, b: any) => {
+                const yearA = getStartYear(a.period || '');
+                const yearB = getStartYear(b.period || '');
+                if (yearA !== yearB) {
+                  return yearB - yearA; // Newest / latest year first, oldest goes to the bottom
+                }
+                return (b.id || '').localeCompare(a.id || '');
+              });
             })().map((master: any, index: number) => (
               <motion.div
                 key={master.id}

@@ -8,7 +8,21 @@ export default function PastMasters() {
   const { content } = useContent();
 
   const management = content.management || [];
-  const masters = [...(content.masters || []), ...(content.mastersSection?.masters || [])].filter((v, i, a) => a.findIndex(t => t.id === v.id) === i).reverse();
+  const getStartYear = (period: string) => {
+    const match = period ? period.match(/\d{4}/) : null;
+    return match ? parseInt(match[0], 10) : 0;
+  };
+
+  const masters = [...(content.masters || []), ...(content.mastersSection?.masters || [])]
+    .filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
+    .sort((a, b) => {
+      const yearA = getStartYear(a.period || '');
+      const yearB = getStartYear(b.period || '');
+      if (yearA !== yearB) {
+        return yearB - yearA;
+      }
+      return (b.id || '').localeCompare(a.id || '');
+    });
 
   if (masters.length === 0 && !content.mastersSection?.masters) return null;
 
