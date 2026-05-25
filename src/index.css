@@ -89,14 +89,6 @@ html, body {
     -webkit-transition: none !important;
   }
 
-  /* Aplica isolamento de camada de hardware (GPU Layer Boundary) em elementos arredondados e imagens para prevenir estática lateral */
-  .rounded-full, .rounded-xl, .rounded-2xl, .rounded-\[1\.6rem\], .rounded-\[1\.8rem\], .rounded-\[2rem\], .rounded-\[2\.5rem\], .rounded-\[3rem\], .rounded-\[3\.5rem\], img {
-    -webkit-backface-visibility: hidden !important;
-    backface-visibility: hidden !important;
-    transform: translate3d(0, 0, 0) !important;
-    -webkit-transform: translate3d(0, 0, 0) !important;
-  }
-
   .gold-text {
     background: none !important;
     -webkit-background-clip: initial !important;
