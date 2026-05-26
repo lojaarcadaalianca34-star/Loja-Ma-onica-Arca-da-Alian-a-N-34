@@ -5,11 +5,9 @@
   --color-gold-50: #fffdf2;
   --color-gold-100: #fff9d9;
   --color-gold-200: #fff3a6;
-  --color-gold-300: #ffec73;
-  --color-gold-400: #ffe540;
-  --color-gold-500: #c5a059;
+  --color-gold-300: #fff3a6;
   --color-gold-400: #d4b068;
-  --color-gold-300: #e3c077;
+  --color-gold-500: #c5a059;
   --color-gold-600: #b6904a;
 
   --color-masonic-blue: #0b1d3a;
@@ -44,44 +42,73 @@
   animation: fadeIn 0.25s ease-out forwards;
 }
 
-/* =========================================================
-   🛡️ A CURA DEFINITIVA PARA O RASGO/BORRÃO NO ANDROID
-   ========================================================= */
 html, body {
-  /* Força a cor bege diretamente no navegador */
   background-color: #f4efe2 !important;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 #root {
-  /* Concreta a cor de fundo e impede o celular de criar buracos transparentes */
   background-color: #f4efe2 !important;
   min-height: 100vh;
   min-height: 100dvh;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .masonic-gradient {
   background: var(--color-aged-beige);
 }
 
-.gold-border {
-  border-image: linear-gradient(to bottom, #f4efe2, var(--color-masonic-gold)) 1;
-}
-
-/* Garante estabilidade de renderização do overflow no viewport */
-html, body, #root {
-  overflow-x: hidden;
-  position: relative;
-  width: 100%;
-}
-
-/* Custom class for gold styling if needed */
 .gold-text {
   background: linear-gradient(to bottom, #d4b068, #c5a059);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.gold-border {
+  border-image: linear-gradient(to bottom, #f4efe2, var(--color-masonic-gold)) 1;
+}
+
+/* =====================================================
+   CORREÇÃO DO GLITCH NO ANDROID CHROME
+   Problema: elementos com position:fixed dentro de
+   containers com transform criam stacking contexts
+   separados que o Android Chrome renderiza errado.
+   Solução: isolar o menu mobile num stacking context
+   limpo usando isolation:isolate no root.
+   ===================================================== */
+
+/* Impede que qualquer transform no body/root
+   quebre o stacking context dos elementos fixed */
+body > #root {
+  isolation: isolate;
+}
+
+/* No mobile, desativa backdrop-filter que causa
+   o glitch de estática/tearing no Android Chrome */
+@media (max-width: 1023px) {
+  * {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* Remove backdrop-filter de todos os elementos no mobile */
+  [class*="backdrop-blur"],
+  [class*="backdrop-filter"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Impede criação de camadas GPU extras em elementos fixed */
+  .fixed {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: auto !important;
+  }
 }
