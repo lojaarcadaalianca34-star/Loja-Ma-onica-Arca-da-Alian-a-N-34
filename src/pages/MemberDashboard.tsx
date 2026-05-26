@@ -412,13 +412,11 @@ export default function MemberDashboard() {
                     <p className="text-[7px] font-bold text-[#c5a059] uppercase tracking-widest truncate">{userData?.currentRole || userData?.role || 'Membro'}</p>
                   </div>
                   
-                  <AnimatePresence>
-                    {isSuperAdmin && (
-                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-[#c5a059] rounded-full flex items-center justify-center border border-white shadow-md" title="Modo Administrador Ativo">
-                        <Shield className="w-2.5 h-2.5 text-[#0b1d3a]" />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {isSuperAdmin && (
+                    <div className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-[#c5a059] rounded-full flex items-center justify-center border border-white shadow-sm" title="Modo Administrador Ativo">
+                      <Shield className="w-2.5 h-2.5 text-[#0b1d3a]" />
+                    </div>
+                  )}
                 </div>
                 
                 <button onClick={handleLogout} className="flex items-center gap-1.5 px-3 py-2.5 sm:p-3 bg-[#0b1d3a]/5 border border-[#0b1d3a]/10 rounded-xl text-[#0b1d3a] hover:text-red-500 transition-colors uppercase tracking-[0.2em] text-[8px] sm:text-[9px] font-black shrink-0">
@@ -480,29 +478,26 @@ export default function MemberDashboard() {
             {activeTab === 'welcome' && (
               <div key="welcome" className="space-y-12 w-full max-w-full">
                 {/* Welcome Card */}
-                <div className="relative p-5 md:p-10 bg-[#f4e4bc] rounded-[2rem] border-2 border-[#d4b068] text-center w-full shadow-md">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none">
-                      <Shield className="w-[300px] h-[300px] md:w-[400px] md:h-[400px] text-[#8b5e34]" />
-                    </div>
-                    <div className="relative z-10 max-w-3xl mx-auto space-y-6 w-full">
-                       <h2 className="font-serif text-xl md:text-4xl text-[#5d4037] font-bold italic tracking-tight uppercase break-words max-w-full">
-                         Saudações Fraternais, <br className="sm:hidden" /> Ir. {userData?.displayName?.split(' ')[0]}
-                       </h2>
-                       <div className="h-0.5 w-16 bg-[#d4b068] mx-auto" />
-                       <p className="font-serif text-[#5d4037]/90 text-xs md:text-lg leading-relaxed italic text-justify px-2 md:px-4">Seja bem-vindo ao Círculo Fechado da A.R.L.S. Arca da Aliança nº 34. Este ambiente digital foi erguido para que a nossa fraternidade não se limite apenas às nossas sessões físicas.</p>
-                       <div className="pt-4 flex items-center justify-center gap-8">
-                         <div className="text-center">
-                           <p className="text-xl md:text-2xl font-serif font-black text-[#8b5e34]">{registeredUsers.length}</p>
-                           <p className="text-[8px] uppercase font-black tracking-widest text-[#8b5e34]/60">Irmãos no Quadro</p>
-                         </div>
-                         <div className="w-px h-8 bg-[#d4b068]/30" />
-                         <div className="text-center">
-                           <p className="text-xl md:text-2xl font-serif font-black text-green-700">{onlineUsers.length}</p>
-                           <p className="text-[8px] uppercase font-black tracking-widest text-green-700/60">Em Loja Virtual</p>
-                         </div>
-                       </div>
-                    </div>
-                  </div>
+                <div className="p-5 md:p-10 bg-[#f4e4bc] rounded-[2rem] border-2 border-[#d4b068] text-center w-full shadow-none md:shadow-md">
+                   <div className="max-w-3xl mx-auto space-y-6 w-full">
+                      <h2 className="font-serif text-xl md:text-4xl text-[#5d4037] font-bold italic tracking-tight uppercase break-words max-w-full">
+                        Saudações Fraternais, <br className="sm:hidden" /> Ir. {userData?.displayName?.split(' ')[0]}
+                      </h2>
+                      <div className="h-0.5 w-16 bg-[#d4b068] mx-auto" />
+                      <p className="font-serif text-[#5d4037]/90 text-xs md:text-lg leading-relaxed italic text-justify px-2 md:px-4">Seja bem-vindo ao Círculo Fechado da A.R.L.S. Arca da Aliança nº 34. Este ambiente digital foi erguido para que a nossa fraternidade não se limite apenas às nossas sessões físicas.</p>
+                      <div className="pt-4 flex items-center justify-center gap-8">
+                        <div className="text-center">
+                          <p className="text-xl md:text-2xl font-serif font-black text-[#8b5e34]">{registeredUsers.length}</p>
+                          <p className="text-[8px] uppercase font-black tracking-widest text-[#8b5e34]/60">Irmãos no Quadro</p>
+                        </div>
+                        <div className="w-px h-8 bg-[#d4b068]/30" />
+                        <div className="text-center">
+                          <p className="text-xl md:text-2xl font-serif font-black text-green-700">{onlineUsers.length}</p>
+                          <p className="text-[8px] uppercase font-black tracking-widest text-green-700/60">Em Loja Virtual</p>
+                        </div>
+                      </div>
+                   </div>
+                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 w-full">
                   <div className="space-y-6 w-full">
