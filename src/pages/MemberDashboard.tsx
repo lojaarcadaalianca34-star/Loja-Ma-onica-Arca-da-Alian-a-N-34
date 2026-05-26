@@ -413,7 +413,7 @@ export default function MemberDashboard() {
                   
                   <AnimatePresence>
                     {isSuperAdmin && (
-                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-[#c5a059] rounded-full flex items-center justify-center border border-white shadow-md" title="Modo Administrador Ativo">
+                      <motion.div key="superadmin-badge" initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-[#c5a059] rounded-full flex items-center justify-center border border-white shadow-md" title="Modo Administrador Ativo">
                         <Shield className="w-2.5 h-2.5 text-[#0b1d3a]" />
                       </motion.div>
                     )}
@@ -981,9 +981,15 @@ export default function MemberDashboard() {
       {/* Add Item Modal */}
       <AnimatePresence>
         {showAddModal && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <motion.div 
+            key="add-item-modal-container"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+          >
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowAddModal(false)} className="fixed inset-0 bg-[#0b1d3a]/95 text-white" />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-xl bg-[#f4efe2] rounded-[2.5rem] border border-[#c5a059]/30 shadow-2xl p-6 md:p-10">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-xl bg-[#f4efe2] rounded-[2.5rem] border border-[#c5a059]/30 shadow-2xl p-6 md:p-10 z-10">
                <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#0b1d3a] mb-6 uppercase tracking-widest text-center">Adicionar à <span className="text-[#c5a059]">Biblioteca</span></h2>
                <form className="space-y-4" onSubmit={(e) => {
                  e.preventDefault();
@@ -1035,16 +1041,22 @@ export default function MemberDashboard() {
                   </div>
                </form>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
       {/* Social Modal */}
       <AnimatePresence>
         {showSocialModal && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <motion.div 
+            key="social-modal-container"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+          >
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowSocialModal(false)} className="fixed inset-0 bg-[#0b1d3a]/95 text-white" />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-xl bg-[#f4efe2] rounded-[2.5rem] border border-[#c5a059]/30 shadow-2xl p-6 md:p-8 max-h-[90vh] overflow-y-auto">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-xl bg-[#f4efe2] rounded-[2.5rem] border border-[#c5a059]/30 shadow-2xl p-6 md:p-8 max-h-[90vh] overflow-y-auto z-10">
                <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#0b1d3a] mb-6 uppercase tracking-widest text-center">Nova Ação <span className="text-[#c5a059]">{socialType === 'poll' ? 'de Escrutínio' : 'Filantrópica'}</span></h2>
                
                <form onSubmit={handleCreateSocialAction} className="space-y-4">
@@ -1109,7 +1121,7 @@ export default function MemberDashboard() {
                   </div>
                </form>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
 

@@ -266,6 +266,7 @@ export default function MemberLoginPage() {
           <AnimatePresence>
             {showRequestModal && (
               <motion.div 
+                key="request-access-modal"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

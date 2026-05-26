@@ -308,7 +308,13 @@ export default function ProfessionalBoard() {
       {/* Modal */}
       <AnimatePresence>
         {showAddModal && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
+          <motion.div 
+            key="professional-board-modal-container"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex items-center justify-center p-6"
+          >
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -320,7 +326,7 @@ export default function ProfessionalBoard() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-lg bg-white border border-[#0b1d3a]/10 rounded-[2rem] overflow-hidden shadow-2xl"
+              className="relative w-full max-w-lg bg-white border border-[#0b1d3a]/10 rounded-[2rem] overflow-hidden shadow-2xl z-10"
             >
               <div className="p-8 border-b border-[#0b1d3a]/5 flex items-center justify-between">
                 <h2 className="font-serif text-xl font-bold text-[#0b1d3a] uppercase tracking-wider">
@@ -463,7 +469,7 @@ export default function ProfessionalBoard() {
                 </button>
               </form>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
