@@ -93,22 +93,10 @@ body > #root {
 /* No mobile, desativa backdrop-filter que causa
    o glitch de estática/tearing no Android Chrome */
 @media (max-width: 1023px) {
-  * {
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
-
   /* Remove backdrop-filter de todos os elementos no mobile */
   [class*="backdrop-blur"],
   [class*="backdrop-filter"] {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-  }
-
-  /* Impede criação de camadas GPU extras em elementos fixed */
-  .fixed {
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    will-change: auto !important;
   }
 }
