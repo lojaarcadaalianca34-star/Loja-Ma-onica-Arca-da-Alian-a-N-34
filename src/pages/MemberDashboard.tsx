@@ -428,8 +428,8 @@ export default function MemberDashboard() {
             </div>
           </div>
 
-          {/* Navigation Grid - CORRIGIDO: grid fixo 3x2 no mobile, sem overflow-hidden */}
-          <div className="grid grid-cols-3 md:flex md:flex-wrap gap-2 mb-8 w-full">
+          {/* Navigation Grid - sem shadow, sem border-radius complexo no mobile */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '32px' }} className="md:flex md:flex-wrap">
              {[
                { id: 'welcome', label: 'Atividades', icon: LayoutDashboard },
                { id: 'library', label: 'Biblioteca', icon: BookMarked },
@@ -438,7 +438,8 @@ export default function MemberDashboard() {
                { id: 'members', label: 'Obreiros', icon: Users },
                { id: 'profile', label: 'Meu Perfil', icon: UserCircle }
              ].map((tab) => {
-               const TabIcon = tab.icon; 
+               const TabIcon = tab.icon;
+               const isActive = activeTab === tab.id;
                return (
                  <button
                    key={tab.id}
@@ -449,14 +450,26 @@ export default function MemberDashboard() {
                        setActiveTab(tab.id as any);
                      }
                    }}
-                   className={`flex flex-col items-center justify-center text-center gap-1 md:gap-2 px-2 py-3 md:px-6 md:py-4 rounded-xl text-[8px] md:text-[10px] font-black uppercase tracking-wider border md:w-auto shadow-sm ${
-                     activeTab === tab.id 
-                       ? 'bg-[#c5a059] text-[#0b1d3a] border-[#c5a059]' 
-                       : 'bg-[#0b1d3a] text-white border-[#c5a059]/30'
-                   }`}
+                   style={{
+                     display: 'flex',
+                     flexDirection: 'column',
+                     alignItems: 'center',
+                     justifyContent: 'center',
+                     gap: '4px',
+                     padding: '12px 8px',
+                     borderRadius: '12px',
+                     fontSize: '8px',
+                     fontWeight: 900,
+                     textTransform: 'uppercase',
+                     letterSpacing: '0.05em',
+                     border: `1px solid ${isActive ? '#c5a059' : 'rgba(197,160,89,0.3)'}`,
+                     backgroundColor: isActive ? '#c5a059' : '#0b1d3a',
+                     color: isActive ? '#0b1d3a' : 'white',
+                     cursor: 'pointer',
+                   }}
                  >
-                   <TabIcon className="w-4 h-4 flex-shrink-0 text-[#c5a059]" />
-                   <span className="leading-tight">{tab.label}</span>
+                   <TabIcon style={{ width: '16px', height: '16px', color: isActive ? '#0b1d3a' : '#c5a059', flexShrink: 0 }} />
+                   <span>{tab.label}</span>
                  </button>
                );
              })}
