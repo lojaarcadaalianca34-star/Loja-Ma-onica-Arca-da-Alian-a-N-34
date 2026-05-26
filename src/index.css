@@ -54,6 +54,9 @@ html, body {
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  max-width: 100vw;
+  overflow-x: hidden;
+  position: relative;
 }
 
 #root {
@@ -61,6 +64,8 @@ html, body {
   background-color: #f4efe2 !important;
   min-height: 100vh;
   min-height: 100dvh;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 .masonic-gradient {
@@ -80,12 +85,6 @@ html, body {
 
 /* Limpa filtros pesados que causam glitches de GPU no celular */
 @media (max-width: 1024px) {
-  /* Desativa os filtros de desfoque de fundo no celular para prevenir zebra/glitch rasterizado */
-  * {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-
   .gold-text {
     background: none !important;
     -webkit-background-clip: initial !important;

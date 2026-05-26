@@ -557,9 +557,9 @@ export default function MemberDashboard() {
                           className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 hover:-translate-y-1 transition-all cursor-pointer shadow-sm group text-center flex flex-col justify-between h-full min-w-0"
                         >
                           <div className="relative w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 sm:mb-3 flex-shrink-0">
-                            <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden shadow-inner">
+                            <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 shadow-inner">
                               {member.photoURL ? (
-                                <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover rounded-full" referrerPolicy="no-referrer" />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-lg sm:text-xl font-serif">
                                   {member.displayName?.[0] || 'I'}
@@ -834,9 +834,9 @@ export default function MemberDashboard() {
                       className="bg-white p-3 sm:p-5 rounded-xl sm:rounded-[2rem] border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 hover:-translate-y-1 transition-all cursor-pointer shadow-sm group text-center w-full flex flex-col justify-between h-full min-w-0"
                     >
                       <div className="relative w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-3 sm:mb-4 flex-shrink-0">
-                        <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden shadow-inner">
+                        <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 shadow-inner">
                           {member.photoURL ? (
-                            <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                            <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover rounded-full" referrerPolicy="no-referrer" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-2xl sm:text-3xl font-serif">
                               {member.displayName?.[0] || 'I'}
@@ -878,9 +878,9 @@ export default function MemberDashboard() {
                     <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-start text-center md:text-left w-full">
                       <div className="flex flex-col items-center gap-4 w-full md:w-48 text-center shrink-0">
                          <div className="relative">
-                            <div className="w-32 h-44 rounded-2xl bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden relative shadow-md">
+                            <div className="w-32 h-44 rounded-2xl bg-[#c5a059]/10 border-2 border-[#c5a059]/20 relative shadow-md">
                                {editProfileData.photoURL ? (
-                                 <img src={editProfileData.photoURL} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                 <img src={editProfileData.photoURL} alt="Profile" className="w-full h-full object-cover rounded-2xl" referrerPolicy="no-referrer" />
                                ) : (
                                  <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-5xl font-serif">
                                    {editProfileData.displayName?.[0] || 'I'}
