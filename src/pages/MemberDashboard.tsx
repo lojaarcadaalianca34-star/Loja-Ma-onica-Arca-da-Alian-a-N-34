@@ -480,9 +480,7 @@ export default function MemberDashboard() {
             {activeTab === 'welcome' && (
               <div key="welcome" className="space-y-12 w-full max-w-full">
                 {/* Welcome Card */}
-                <div className="relative w-full">
-                  <div className="absolute inset-0 bg-[#fdf6e3] rounded-[2rem] shadow-2xl" />
-                  <div className="relative p-5 md:p-10 bg-[#f4e4bc] rounded-[2rem] border-2 border-[#d4b068] text-center w-full">
+                <div className="relative p-5 md:p-10 bg-[#f4e4bc] rounded-[2rem] border-2 border-[#d4b068] text-center w-full shadow-md">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none">
                       <Shield className="w-[300px] h-[300px] md:w-[400px] md:h-[400px] text-[#8b5e34]" />
                     </div>
@@ -505,7 +503,6 @@ export default function MemberDashboard() {
                        </div>
                     </div>
                   </div>
-                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 w-full">
                   <div className="space-y-6 w-full">
