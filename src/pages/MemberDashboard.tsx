@@ -36,6 +36,57 @@ interface LibraryItem {
   createdAt: any;
 }
 
+// ============================================================
+// COMPONENTES EXTERNOS - fora do MemberDashboard para evitar
+// re-criação a cada render (era a causa do bug de duplicação)
+// ============================================================
+
+function RecentProfessionalFeed({ items, onNavigate }: { items: any[], onNavigate: () => void }) {
+  return (
+    <div className="space-y-4">
+      {items.length === 0 && <p className="text-[10px] text-[#0b1d3a]/30 uppercase italic">Nenhuma atividade recente</p>}
+      {items.map(item => (
+        <div key={item.id} className="p-4 bg-white/60 border border-[#0b1d3a]/5 rounded-2xl flex items-center gap-4 cursor-pointer" onClick={onNavigate}>
+          <div className="w-10 h-10 rounded-xl bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059]">
+            {item.type === 'SERVICE' ? <Building className="w-5 h-5" /> : item.type === 'JOB' ? <Briefcase className="w-5 h-5" /> : <UserCircle className="w-5 h-5" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-xs font-bold text-[#0b1d3a] truncate">{item.title}</h4>
+            <p className="text-[8px] text-[#0b1d3a]/60 uppercase font-black tracking-widest">{item.company || item.authorName} • {item.type}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LibraryDiscussionFeed({ items, onNavigate, onProfileClick }: { items: any[], onNavigate: () => void, onProfileClick: (uid: string) => void }) {
+  return (
+    <div className="space-y-4">
+      {items.length === 0 && <p className="text-[10px] text-[#0b1d3a]/30 uppercase italic">Nenhum debate recente</p>}
+      {items.map(item => (
+        <div key={item.id} className="p-4 bg-white/60 border border-[#0b1d3a]/5 rounded-2xl flex items-center gap-4 cursor-pointer" onClick={onNavigate}>
+          <div className="w-10 h-10 rounded-xl bg-[#0b1d3a]/5 flex items-center justify-center text-[#0b1d3a]">
+            <MessageSquare className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-xs font-bold text-[#0b1d3a] truncate">{item.title}</h4>
+            <div className="flex items-center gap-1">
+              <p className="text-[8px] text-[#c5a059] uppercase font-black tracking-widest">Debates abertos por:</p>
+              <button
+                onClick={(e) => { e.stopPropagation(); if (item.addedBy) onProfileClick(item.addedBy); }}
+                className="text-[8px] text-[#0b1d3a] uppercase font-black tracking-widest hover:underline hover:text-[#c5a059]"
+              >
+                {item.author || 'Membro'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function MemberDashboard() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -93,58 +144,8 @@ export default function MemberDashboard() {
     return () => unsubscribe();
   }, []);
 
-  const RecentProfessionalFeed = () => (
-    <div className="space-y-4">
-      {recentProfessional.length === 0 && <p className="text-[10px] text-[#0b1d3a]/30 uppercase italic">Nenhuma atividade recente</p>}
-      {recentProfessional.map(item => (
-        <div key={item.id} className="p-4 bg-white/60 border border-[#0b1d3a]/5 rounded-2xl flex items-center gap-4 group cursor-pointer hover:border-[#c5a059]/30 transition-all" onClick={() => setActiveTab('professional')}>
-          <div className="w-10 h-10 rounded-xl bg-[#c5a059]/10 flex items-center justify-center text-[#c5a059]">
-            {item.type === 'SERVICE' ? <Building className="w-5 h-5" /> : item.type === 'JOB' ? <Briefcase className="w-5 h-5" /> : <UserCircle className="w-5 h-5" />}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-xs font-bold text-[#0b1d3a] truncate">{item.title}</h4>
-            <p className="text-[8px] text-[#0b1d3a]/60 uppercase font-black tracking-widest">{item.company || item.authorName} • {item.type}</p>
-          </div>
-          <div className="text-[#c5a059]">
-            <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  const LibraryDiscussionFeed = () => (
-    <div className="space-y-4">
-      {discussedLibrary.length === 0 && <p className="text-[10px] text-[#0b1d3a]/30 uppercase italic">Nenhum debate recente</p>}
-      {discussedLibrary.map(item => (
-        <div key={item.id} className="p-4 bg-white/60 border border-[#0b1d3a]/5 rounded-2xl flex items-center gap-4 group cursor-pointer hover:border-[#c5a059]/30 transition-all" onClick={() => setActiveTab('library')}>
-          <div className="w-10 h-10 rounded-xl bg-[#0b1d3a]/5 flex items-center justify-center text-[#0b1d3a]">
-            <MessageSquare className="w-5 h-5" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-xs font-bold text-[#0b1d3a] truncate">{item.title}</h4>
-            <div className="flex items-center gap-1">
-              <p className="text-[8px] text-[#c5a059] uppercase font-black tracking-widest">Debates abertos por:</p>
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (item.addedBy) {
-                    navigate(`/area-restrita?uid=${item.addedBy}&tab=profile`);
-                  }
-                }}
-                className="text-[8px] text-[#0b1d3a] uppercase font-black tracking-widest hover:underline hover:text-[#c5a059] transition-all"
-              >
-                {item.author || 'Membro'}
-              </button>
-            </div>
-          </div>
-          <div className="text-[#c5a059]">
-            <ChevronDown className="w-4 h-4 -rotate-90 opacity-0 group-hover:opacity-100 transition-opacity" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+  // RecentProfessionalFeed e LibraryDiscussionFeed foram movidos para FORA do componente
+  // para evitar re-criação a cada render (causa do bug de duplicação)
 
   useEffect(() => {
     if (!auth.currentUser) return;
@@ -413,7 +414,7 @@ export default function MemberDashboard() {
                   
                   <AnimatePresence>
                     {isSuperAdmin && (
-                      <motion.div key="superadmin-badge" initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-[#c5a059] rounded-full flex items-center justify-center border border-white shadow-md" title="Modo Administrador Ativo">
+                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-[#c5a059] rounded-full flex items-center justify-center border border-white shadow-md" title="Modo Administrador Ativo">
                         <Shield className="w-2.5 h-2.5 text-[#0b1d3a]" />
                       </motion.div>
                     )}
@@ -501,7 +502,7 @@ export default function MemberDashboard() {
                       </h3>
                       <button onClick={() => setActiveTab('professional')} className="text-[10px] uppercase font-black tracking-widest text-[#c5a059] hover:underline">Ver Todos</button>
                     </div>
-                    <RecentProfessionalFeed />
+                    <RecentProfessionalFeed items={recentProfessional} onNavigate={() => setActiveTab('professional')} />
                   </div>
 
                   <div className="space-y-6 w-full">
@@ -511,7 +512,7 @@ export default function MemberDashboard() {
                       </h3>
                       <button onClick={() => setActiveTab('library')} className="text-[10px] uppercase font-black tracking-widest text-[#c5a059] hover:underline">Ir para Biblioteca</button>
                     </div>
-                    <LibraryDiscussionFeed />
+                    <LibraryDiscussionFeed items={discussedLibrary} onNavigate={() => setActiveTab('library')} onProfileClick={(uid) => navigate(`/area-restrita?uid=${uid}&tab=profile`)} />
                   </div>
                 </div>
 
@@ -557,9 +558,9 @@ export default function MemberDashboard() {
                           className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 hover:-translate-y-1 transition-all cursor-pointer shadow-sm group text-center flex flex-col justify-between h-full min-w-0"
                         >
                           <div className="relative w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 sm:mb-3 flex-shrink-0">
-                            <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 shadow-inner">
+                            <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden shadow-inner">
                               {member.photoURL ? (
-                                <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover rounded-full" referrerPolicy="no-referrer" />
+                                <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-lg sm:text-xl font-serif">
                                   {member.displayName?.[0] || 'I'}
@@ -834,9 +835,9 @@ export default function MemberDashboard() {
                       className="bg-white p-3 sm:p-5 rounded-xl sm:rounded-[2rem] border border-[#0b1d3a]/5 hover:border-[#c5a059]/30 hover:-translate-y-1 transition-all cursor-pointer shadow-sm group text-center w-full flex flex-col justify-between h-full min-w-0"
                     >
                       <div className="relative w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-3 sm:mb-4 flex-shrink-0">
-                        <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 shadow-inner">
+                        <div className="w-full h-full rounded-full bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden shadow-inner">
                           {member.photoURL ? (
-                            <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover rounded-full" referrerPolicy="no-referrer" />
+                            <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-2xl sm:text-3xl font-serif">
                               {member.displayName?.[0] || 'I'}
@@ -878,9 +879,9 @@ export default function MemberDashboard() {
                     <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-start text-center md:text-left w-full">
                       <div className="flex flex-col items-center gap-4 w-full md:w-48 text-center shrink-0">
                          <div className="relative">
-                            <div className="w-32 h-44 rounded-2xl bg-[#c5a059]/10 border-2 border-[#c5a059]/20 relative shadow-md">
+                            <div className="w-32 h-44 rounded-2xl bg-[#c5a059]/10 border-2 border-[#c5a059]/20 overflow-hidden relative shadow-md">
                                {editProfileData.photoURL ? (
-                                 <img src={editProfileData.photoURL} alt="Profile" className="w-full h-full object-cover rounded-2xl" referrerPolicy="no-referrer" />
+                                 <img src={editProfileData.photoURL} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                ) : (
                                  <div className="w-full h-full flex items-center justify-center text-[#c5a059] text-5xl font-serif">
                                    {editProfileData.displayName?.[0] || 'I'}
@@ -981,15 +982,9 @@ export default function MemberDashboard() {
       {/* Add Item Modal */}
       <AnimatePresence>
         {showAddModal && (
-          <motion.div 
-            key="add-item-modal-container"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
-          >
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowAddModal(false)} className="fixed inset-0 bg-[#0b1d3a]/95 text-white" />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-xl bg-[#f4efe2] rounded-[2.5rem] border border-[#c5a059]/30 shadow-2xl p-6 md:p-10 z-10">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-xl bg-[#f4efe2] rounded-[2.5rem] border border-[#c5a059]/30 shadow-2xl p-6 md:p-10">
                <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#0b1d3a] mb-6 uppercase tracking-widest text-center">Adicionar à <span className="text-[#c5a059]">Biblioteca</span></h2>
                <form className="space-y-4" onSubmit={(e) => {
                  e.preventDefault();
@@ -1041,22 +1036,16 @@ export default function MemberDashboard() {
                   </div>
                </form>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
       {/* Social Modal */}
       <AnimatePresence>
         {showSocialModal && (
-          <motion.div 
-            key="social-modal-container"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
-          >
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowSocialModal(false)} className="fixed inset-0 bg-[#0b1d3a]/95 text-white" />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-xl bg-[#f4efe2] rounded-[2.5rem] border border-[#c5a059]/30 shadow-2xl p-6 md:p-8 max-h-[90vh] overflow-y-auto z-10">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-xl bg-[#f4efe2] rounded-[2.5rem] border border-[#c5a059]/30 shadow-2xl p-6 md:p-8 max-h-[90vh] overflow-y-auto">
                <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#0b1d3a] mb-6 uppercase tracking-widest text-center">Nova Ação <span className="text-[#c5a059]">{socialType === 'poll' ? 'de Escrutínio' : 'Filantrópica'}</span></h2>
                
                <form onSubmit={handleCreateSocialAction} className="space-y-4">
@@ -1121,7 +1110,7 @@ export default function MemberDashboard() {
                   </div>
                </form>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
