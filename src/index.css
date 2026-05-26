@@ -44,15 +44,24 @@
   animation: fadeIn 0.25s ease-out forwards;
 }
 
-/* 🛡️ RENDERIZAÇÃO LIMPA E NATIVA (CORREÇÃO MOBILE DEFINITIVA) */
+/* =========================================================
+   🛡️ A CURA DEFINITIVA PARA O RASGO/BORRÃO NO ANDROID
+   ========================================================= */
 html, body {
-  min-height: 100vh;
+  /* Força a cor bege diretamente no navegador */
+  background-color: #f4efe2 !important;
   margin: 0;
   padding: 0;
-  background-color: var(--color-aged-beige);
-  color: var(--color-navy-blue);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  /* Concreta a cor de fundo e impede o celular de criar buracos transparentes */
+  background-color: #f4efe2 !important;
+  min-height: 100vh;
+  /* O SEGREDO MÁGICO: proíbe a placa de vídeo do celular de arrastar os pixels para fora do limite */
+  contain: paint;
 }
 
 .masonic-gradient {
@@ -70,7 +79,7 @@ html, body {
   border-image: linear-gradient(to bottom, #f4efe2, var(--color-masonic-gold)) 1;
 }
 
-/* 🛡️ DESATIVA FILTROS E GRADIENTES COMPLEXOS NO CELULAR PARA SANAR GLITCHES DE RASTERIZAÇÃO */
+/* Limpa filtros pesados que causam glitches de GPU no celular */
 @media (max-width: 1024px) {
   .gold-text {
     background: none !important;
@@ -78,13 +87,5 @@ html, body {
     -webkit-text-fill-color: initial !important;
     background-clip: initial !important;
     color: var(--color-masonic-gold) !important;
-  }
-
-  /* Desativa efeitos 3D e de transformação no mobile para evitar que a placa de vídeo do celular (GPU) congele a tela */
-  * {
-    transform: none !important;
-    -webkit-transform: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 }

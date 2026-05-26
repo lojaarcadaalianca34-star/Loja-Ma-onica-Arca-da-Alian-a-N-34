@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Landmark, Users, Heart, BookOpen, Shield, LogOut, UserPlus } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
@@ -25,24 +26,6 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Trava de segurança simples para evitar rolagem dupla no mobile
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-    };
-  }, [isMobileMenuOpen]);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith('/#') || href.startsWith('#')) {
@@ -94,7 +77,6 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop Nav */}
           <div className="hidden md:flex items-center justify-end flex-1 gap-1 lg:gap-1.5 xl:gap-3 ml-auto">
             {navLinks.map((link, idx) => (
               <a 
@@ -126,7 +108,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile Toggle Button */}
           <div className="flex items-center gap-3 md:hidden z-[10000]">
             {user && (
               <button 
@@ -146,7 +127,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* MENU MOBILE NATIVO SÓLIDO (Sem Framer Motion, Sem Animações que quebram o Android) */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-[#0b1d3a] z-[9990] md:hidden flex flex-col pt-24 px-6 h-[100dvh] overflow-y-auto w-full">
           <div className="flex flex-col gap-3 pb-8">
