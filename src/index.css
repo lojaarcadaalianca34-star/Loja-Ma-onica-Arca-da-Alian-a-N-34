@@ -46,22 +46,13 @@
 
 /* 🛡️ RENDERIZAÇÃO LIMPA E NATIVA (CORREÇÃO MOBILE DEFINITIVA) */
 html, body {
-  min-height: 100vh; /* Substituído o height: 100% que quebrava o Android */
-  max-width: 100vw;
-  overflow-x: hidden;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
   background-color: var(--color-aged-beige);
   color: var(--color-navy-blue);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Garante que imagens e backgrounds não criem rastros em animações específicas */
-.will-animate {
-  transform: translateZ(0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
 }
 
 .masonic-gradient {
@@ -89,9 +80,11 @@ html, body {
     color: var(--color-masonic-gold) !important;
   }
 
-  /* Desativa efeitos de hover de transformações no mobile para evitar camadas duplicacas ou congeladas */
-  .hover\:-translate-y-1:hover, .hover\:-translate-y-0\.5:hover, .hover\:scale-110:hover, .hover\:scale-105:hover {
-    transform: translate3d(0, 0, 0) !important;
-    -webkit-transform: translate3d(0, 0, 0) !important;
+  /* Desativa efeitos 3D e de transformação no mobile para evitar que a placa de vídeo do celular (GPU) congele a tela */
+  * {
+    transform: none !important;
+    -webkit-transform: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }
