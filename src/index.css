@@ -67,60 +67,21 @@ html, body {
   background: var(--color-aged-beige);
 }
 
-.gold-text {
-  background: linear-gradient(to bottom, #f4efe2, var(--color-masonic-gold));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 .gold-border {
   border-image: linear-gradient(to bottom, #f4efe2, var(--color-masonic-gold)) 1;
 }
 
 /* Garante estabilidade de renderização do overflow no viewport */
 html, body, #root {
-  overflow-x: hidden !important;
+  overflow-x: hidden;
   position: relative;
   width: 100%;
 }
 
-/* Limpa filtros pesados que causam glitches de GPU no celular */
-@media (max-width: 1024px) {
-  /* 1. Desativa Backdrop Blur e Filtros de Desfoque no celular (A cura definitiva para zebra banding e riscos horizontais) */
-  *, *::before, *::after {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-
-  /* 2. Impede o hover e 3D de ativar transições de escala/movimentação no celular, prevenindo ghosts/duplicatas na GPU */
-  * {
-    -webkit-transform-style: flat !important;
-    transform-style: flat !important;
-    -webkit-backface-visibility: visible !important;
-    backface-visibility: visible !important;
-    perspective: none !important;
-    -webkit-perspective: none !important;
-  }
-
-  *:hover, 
-  .hover\:-translate-y-1:hover, 
-  .hover\:scale-105:hover, 
-  .hover\:scale-110:hover, 
-  .hover\:translate-x-1:hover,
-  .group:hover .group-hover\:translate-x-1,
-  .group:hover .group-hover\:-translate-y-1 {
-    transform: none !important;
-    transition-duration: 0s !important;
-    transition: none !important;
-  }
-
-  /* 3. Desativa efeitos de gradiente de texto complexos que acionam rastreamento instável no Chrome Android */
-  .gold-text {
-    background: none !important;
-    -webkit-background-clip: initial !important;
-    -webkit-text-fill-color: initial !important;
-    background-clip: initial !important;
-    color: var(--color-masonic-gold) !important;
-  }
+/* Custom class for gold styling if needed */
+.gold-text {
+  background: linear-gradient(to bottom, #d4b068, #c5a059);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
