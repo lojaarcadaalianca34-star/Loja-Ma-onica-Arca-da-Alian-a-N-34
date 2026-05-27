@@ -36,7 +36,7 @@ import SocialActionsPage from './pages/SocialActionsPage';
 import { ContentProvider, useContent } from './context/ContentContext';
 import { auth, db } from './lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 
 function PresenceTracker() {
   useEffect(() => {
@@ -53,12 +53,13 @@ function PresenceTracker() {
             return;
           }
           try {
-            // Write directly using setDoc with merge: true to avoid getDoc reads and quota consumption.
+            // Write directly using updateDoc to avoid creating incomplete documents
+            // and violating security rules when the user document hasn't been created yet.
             // When offline, Firestore queues writes and does not throw offline errors for writes.
-            await setDoc(userRef, {
+            await updateDoc(userRef, {
               isOnline,
               lastSeen: serverTimestamp()
-            }, { merge: true });
+            });
           } catch (e: any) {
             const errorMessage = e?.message || e?.toString() || '';
             const errorCode = e?.code || '';
