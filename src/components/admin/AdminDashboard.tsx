@@ -4434,7 +4434,7 @@ export default function AdminDashboard() {
                               <option value="">Sem Cargo</option>
                               {availableRoles.map(r => <option key={r} value={r}>{r}</option>)}
                             </select>
-                            {(auth.currentUser?.email === 'lojaarcadaalianca34@gmail.com') && (
+                            {['lojaarcadaalianca34@gmail.com', 'sophiabohn@gmail.com'].includes(auth.currentUser?.email?.toLowerCase() || '') && (
                               <button 
                                 onClick={() => {
                                   const newRole = prompt('Digite o nome do novo cargo:');

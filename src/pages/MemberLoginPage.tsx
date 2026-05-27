@@ -30,7 +30,7 @@ export default function MemberLoginPage() {
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const isMaster = userCredential.user.email?.toLowerCase() === 'lojaarcadaalianca34@gmail.com';
+      const isMaster = ['lojaarcadaalianca34@gmail.com', 'sophiabohn@gmail.com'].includes(userCredential.user.email?.toLowerCase() || '');
       
       // Check if user exists in users collection
       const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
@@ -61,7 +61,7 @@ export default function MemberLoginPage() {
       // Check if user already exists as member
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       
-      const isMaster = user.email?.toLowerCase() === 'lojaarcadaalianca34@gmail.com';
+      const isMaster = ['lojaarcadaalianca34@gmail.com', 'sophiabohn@gmail.com'].includes(user.email?.toLowerCase() || '');
       
       if (!userDoc.exists()) {
         const adminDoc = await getDoc(doc(db, 'admins', user.uid));

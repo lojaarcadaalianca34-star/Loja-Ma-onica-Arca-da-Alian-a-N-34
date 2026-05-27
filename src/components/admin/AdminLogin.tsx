@@ -23,7 +23,7 @@ export default function AdminLogin() {
       
       // Check if user exists in admins collection
       const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-      const isMaster = user.email?.toLowerCase() === 'lojaarcadaalianca34@gmail.com';
+      const isMaster = ['lojaarcadaalianca34@gmail.com', 'sophiabohn@gmail.com'].includes(user.email?.toLowerCase() || '');
       
       if (!adminDoc.exists() && !isMaster) {
         setError('Acesso negado. Você não tem permissão de administrador.');
@@ -69,7 +69,7 @@ export default function AdminLogin() {
                 <p className="text-[10px] uppercase font-bold text-white/40 mb-1">Seu UID para autorização:</p>
                 <code className="bg-black/20 p-2 rounded block break-all text-white select-all">{debugUid}</code>
                 
-                {auth.currentUser?.email?.toLowerCase() === 'lojaarcadaalianca34@gmail.com' && (
+                {['lojaarcadaalianca34@gmail.com', 'sophiabohn@gmail.com'].includes(auth.currentUser?.email?.toLowerCase() || '') && (
                   <button 
                     onClick={async () => {
                       try {

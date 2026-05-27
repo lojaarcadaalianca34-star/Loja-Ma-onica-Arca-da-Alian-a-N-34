@@ -643,7 +643,7 @@ export default function MemberDashboard() {
                        {hasElevatedAccess && (
                          <div className="flex gap-2 w-full md:w-auto justify-center shrink-0">
                            <button onClick={() => { setSocialType('poll'); setShowSocialModal(true); }} className="flex-1 md:flex-none px-4 py-2.5 bg-white border border-[#0b1d3a]/10 text-[#0b1d3a] rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-white/80 transition-all">Nova Enquete</button>
-                           <button onClick={() => { setSocialType('poll'); setShowSocialModal(true); }} className="flex-1 md:flex-none px-4 py-2.5 bg-[#0b1d3a] text-[#f4efe2] border border-[#c5a059]/30 rounded-xl font-black uppercase text-[9px] tracking-widest shadow-xl hover:bg-[#c5a059]">Nova Filantropia</button>
+                           <button onClick={() => { setSocialType('philanthropy'); setShowSocialModal(true); }} className="flex-1 md:flex-none px-4 py-2.5 bg-[#0b1d3a] text-[#f4efe2] border border-[#c5a059]/30 rounded-xl font-black uppercase text-[9px] tracking-widest shadow-xl hover:bg-[#c5a059]">Nova Filantropia</button>
                          </div>
                        )}
                     </div>
