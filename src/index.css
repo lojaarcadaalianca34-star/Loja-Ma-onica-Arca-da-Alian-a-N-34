@@ -90,13 +90,58 @@ body > #root {
   isolation: isolate;
 }
 
-/* No mobile, desativa backdrop-filter que causa
-   o glitch de estática/tearing no Android Chrome */
-@media (max-width: 1023px) {
+/* =====================================================
+   CORREÇÃO DEFINITIVA DE TRAILING (MÚLTIPLAS CAMADAS)
+   E GLITCH DE PINTURA NO MOBILE / CHROME ANDROID
+   ===================================================== */
+
+/* Desativa backdrop-filter e efeitos 3D complexos que causam
+   o bug de "rastro de cartas" (paint trailing) no Chrome Mobile */
+@media (max-width: 1024px) {
   /* Remove backdrop-filter de todos os elementos no mobile */
   [class*="backdrop-blur"],
-  [class*="backdrop-filter"] {
+  [class*="backdrop-filter"],
+  .backdrop-blur-md,
+  .backdrop-blur-xl,
+  .backdrop-blur-sm,
+  .backdrop-blur {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+  }
+
+  /* Isola apenas imagens animadas de fundo pesado para prevenir flickers no Chrome
+     sem interferir em botões, links, tabelas, forms ou contêiners de layout */
+  .animate-kenburns,
+  [style*="background-image"],
+  [class*="bg-cover"] {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* Desativa shifts e efeitos de escala no hover em telas touch (evitas manter camadas presas na GPU) */
+  @media (pointer: coarse) {
+    [class*="hover:-translate-y-"],
+    [class*="hover:scale-"],
+    [class*="hover:-translate-x-"],
+    [class*="group-hover:translate-x-"],
+    [class*="group-hover:translate-y-"],
+    .hover\:-translate-y-1:hover,
+    .hover\:-translate-y-0.5:hover,
+    .hover\:-translate-y-px:hover,
+    .hover\:scale-101:hover,
+    .hover\:scale-\[1\.01\]:hover,
+    .group:hover .group-hover\:translate-x-1 {
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+
+  /* Desativa filtros de desfoque (blur) pesados no mobile para economizar camadas de GPU e evitar fantasmas e vazamentos de rota */
+  [class*="blur-"],
+  .blur-3xl,
+  .blur-2xl,
+  .blur-xl {
+    display: none !important;
+    opacity: 0 !important;
   }
 }

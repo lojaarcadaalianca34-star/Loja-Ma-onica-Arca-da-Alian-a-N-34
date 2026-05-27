@@ -154,14 +154,36 @@ export default function MemberDashboard() {
     updateDoc(userDocRef, { 
       isOnline: true, 
       lastSeen: serverTimestamp() 
-    }).catch(console.error);
+    }).catch(e => {
+      const errorMessage = e?.message || e?.toString() || '';
+      const errorCode = e?.code || '';
+      const isExpectedError = errorMessage.toLowerCase().includes('offline') || 
+                              errorMessage.toLowerCase().includes('permission') || 
+                              errorMessage.toLowerCase().includes('insufficient') ||
+                              errorCode === 'permission-denied' ||
+                              errorCode === 'unauthenticated';
+      if (!isExpectedError) {
+        console.error("Error updating presence:", e);
+      }
+    });
 
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
       if (doc.exists()) {
         const data = doc.data();
         setUserData(data);
         if (data.status === 'PENDING') {
-          updateDoc(userDocRef, { status: 'MEMBER' }).catch(console.error);
+          updateDoc(userDocRef, { status: 'MEMBER' }).catch(err => {
+            const errorMessage = err?.message || err?.toString() || '';
+            const errorCode = err?.code || '';
+            const isExpectedError = errorMessage.toLowerCase().includes('offline') || 
+                                    errorMessage.toLowerCase().includes('permission') || 
+                                    errorMessage.toLowerCase().includes('insufficient') ||
+                                    errorCode === 'permission-denied' ||
+                                    errorCode === 'unauthenticated';
+            if (!isExpectedError) {
+              console.error("Error activating member status:", err);
+            }
+          });
         }
       }
     });

@@ -36,7 +36,7 @@ import SocialActionsPage from './pages/SocialActionsPage';
 import { ContentProvider, useContent } from './context/ContentContext';
 import { auth, db } from './lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 function PresenceTracker() {
   useEffect(() => {
@@ -48,16 +48,36 @@ function PresenceTracker() {
         
         // Update presence on login/mount
         const updatePresence = async (isOnline: boolean) => {
+          if (typeof navigator !== 'undefined' && !navigator.onLine) {
+            console.info("Presence update deferred: client is offline.");
+            return;
+          }
           try {
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-              await updateDoc(userRef, {
-                isOnline,
-                lastSeen: serverTimestamp()
-              });
+            // Write directly using setDoc with merge: true to avoid getDoc reads and quota consumption.
+            // When offline, Firestore queues writes and does not throw offline errors for writes.
+            await setDoc(userRef, {
+              isOnline,
+              lastSeen: serverTimestamp()
+            }, { merge: true });
+          } catch (e: any) {
+            const errorMessage = e?.message || e?.toString() || '';
+            const errorCode = e?.code || '';
+
+            const isOfflineError = errorMessage.toLowerCase().includes('offline') || 
+                                  errorCode === 'unavailable';
+            
+            const isPermissionError = errorMessage.toLowerCase().includes('permission') || 
+                                      errorMessage.toLowerCase().includes('insufficient') || 
+                                      errorCode === 'permission-denied' || 
+                                      errorCode === 'unauthenticated';
+
+            if (isOfflineError) {
+              console.info("Presence update deferred: client is offline.");
+            } else if (isPermissionError) {
+              console.info("Presence update deferred: user does not have write permissions yet or is signed out.");
+            } else {
+              console.error("Error updating presence:", e);
             }
-          } catch (e) {
-            console.error("Error updating presence:", e);
           }
         };
 
