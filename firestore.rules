@@ -169,14 +169,12 @@ service cloud.firestore {
 
     // --- Users ---
     match /users/{uid} {
-      allow get: if isSignedIn() && (request.auth.uid == uid || isAdmin());
-      allow list: if isSignedIn() && (isAdmin() || (resource.data.isOnline == true));
+      allow get, list: if isSignedIn();
       allow create: if isSignedIn() && request.auth.uid == uid && isValidUser(incoming());
       allow update: if isSignedIn() && (
         (isMasterAdmin() && isValidUser(incoming())) ||
         (request.auth.uid == uid && 
-         !incoming().diff(existing()).affectedKeys().hasAny(['role', 'isAdmin', 'isMasterAdmin']) && 
-         isValidUser(incoming()))
+         !incoming().diff(existing()).affectedKeys().hasAny(['role', 'isAdmin', 'isMasterAdmin']))
       );
       allow delete: if isMasterAdmin();
     }

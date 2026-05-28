@@ -151,20 +151,28 @@ export default function MemberDashboard() {
     if (!auth.currentUser) return;
     const userDocRef = doc(db, 'users', auth.currentUser.uid);
     
-    updateDoc(userDocRef, { 
-      isOnline: true, 
-      lastSeen: serverTimestamp() 
-    }).catch(e => {
-      const errorMessage = e?.message || e?.toString() || '';
-      const errorCode = e?.code || '';
-      const isExpectedError = errorMessage.toLowerCase().includes('offline') || 
-                              errorMessage.toLowerCase().includes('permission') || 
-                              errorMessage.toLowerCase().includes('insufficient') ||
-                              errorCode === 'permission-denied' ||
-                              errorCode === 'unauthenticated';
-      if (!isExpectedError) {
-        console.error("Error updating presence:", e);
+    getDoc(userDocRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        updateDoc(userDocRef, { 
+          isOnline: true, 
+          lastSeen: serverTimestamp() 
+        }).catch(e => {
+          const errorMessage = e?.message || e?.toString() || '';
+          const errorCode = e?.code || '';
+          const isExpectedError = errorMessage.toLowerCase().includes('offline') || 
+                                  errorMessage.toLowerCase().includes('permission') || 
+                                  errorMessage.toLowerCase().includes('insufficient') ||
+                                  errorCode === 'permission-denied' ||
+                                  errorCode === 'unauthenticated';
+          if (!isExpectedError) {
+            console.error("Error updating presence:", e);
+          }
+        });
+      } else {
+        console.info("Presence update deferred: user document does not exist yet.");
       }
+    }).catch((err) => {
+      console.error("Error checking user existence for presence:", err);
     });
 
     const unsubscribe = onSnapshot(userDocRef, (doc) => {

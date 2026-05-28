@@ -53,13 +53,16 @@ function PresenceTracker() {
             return;
           }
           try {
-            // Write directly using updateDoc to avoid creating incomplete documents
-            // and violating security rules when the user document hasn't been created yet.
-            // When offline, Firestore queues writes and does not throw offline errors for writes.
-            await updateDoc(userRef, {
-              isOnline,
-              lastSeen: serverTimestamp()
-            });
+            // Check if document exists before attempting to update it (avoids permission errors on new accounts)
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+              await updateDoc(userRef, {
+                isOnline,
+                lastSeen: serverTimestamp()
+              });
+            } else {
+              console.info("Presence update deferred: user document does not exist yet.");
+            }
           } catch (e: any) {
             const errorMessage = e?.message || e?.toString() || '';
             const errorCode = e?.code || '';
