@@ -456,8 +456,8 @@ export default function MemberDashboard() {
             </div>
           </div>
 
-          {/* Navigation Grid - sem shadow, sem border-radius complexo no mobile */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '32px' }} className="md:flex md:flex-wrap">
+          {/* Navigation Grid - perfeitamente responsiva e fluida no mobile e desktop */}
+          <div className="grid grid-cols-3 gap-2 mb-8 md:flex md:flex-wrap">
              {[
                { id: 'welcome', label: 'Atividades', icon: LayoutDashboard },
                { id: 'library', label: 'Biblioteca', icon: BookMarked },
@@ -472,11 +472,8 @@ export default function MemberDashboard() {
                  <button
                    key={tab.id}
                    onClick={() => {
-                     navigate(`/area-restrita?tab=${tab.id}`); if (false) {
-                       navigate('/area-restrita?tab=profile');
-                     } else {
-                       setActiveTab(tab.id as any);
-                     }
+                     navigate(`/area-restrita?tab=${tab.id}`);
+                     setActiveTab(tab.id as any);
                    }}
                    style={{
                      display: 'flex',
@@ -535,9 +532,9 @@ export default function MemberDashboard() {
                       <h3 className="font-serif text-base md:text-xl font-bold text-[#0b1d3a] uppercase tracking-widest flex items-center gap-2">
                         <Handshake className="w-5 h-5 text-[#c5a059]" /> O Forja Profissional
                       </h3>
-                      <button onClick={() => setActiveTab('professional')} className="text-[10px] uppercase font-black tracking-widest text-[#c5a059] hover:underline">Ver Todos</button>
+                      <button onClick={() => navigate('/area-restrita?tab=professional')} className="text-[10px] uppercase font-black tracking-widest text-[#c5a059] hover:underline">Ver Todos</button>
                     </div>
-                    <RecentProfessionalFeed items={recentProfessional} onNavigate={() => setActiveTab('professional')} />
+                    <RecentProfessionalFeed items={recentProfessional} onNavigate={() => navigate('/area-restrita?tab=professional')} />
                   </div>
 
                   <div className="space-y-6 w-full">
@@ -545,9 +542,9 @@ export default function MemberDashboard() {
                       <h3 className="font-serif text-base md:text-xl font-bold text-[#0b1d3a] uppercase tracking-widest flex items-center gap-2">
                         <BookMarked className="w-5 h-5 text-[#c5a059]" /> Debates em Obra
                       </h3>
-                      <button onClick={() => setActiveTab('library')} className="text-[10px] uppercase font-black tracking-widest text-[#c5a059] hover:underline">Ir para Biblioteca</button>
+                      <button onClick={() => navigate('/area-restrita?tab=library')} className="text-[10px] uppercase font-black tracking-widest text-[#c5a059] hover:underline">Ir para Biblioteca</button>
                     </div>
-                    <LibraryDiscussionFeed items={discussedLibrary} onNavigate={() => setActiveTab('library')} onProfileClick={(uid) => navigate(`/area-restrita?uid=${uid}&tab=profile`)} />
+                    <LibraryDiscussionFeed items={discussedLibrary} onNavigate={() => navigate('/area-restrita?tab=library')} onProfileClick={(uid) => navigate(`/area-restrita?uid=${uid}&tab=profile`)} />
                   </div>
                 </div>
 
@@ -560,7 +557,7 @@ export default function MemberDashboard() {
                         <Heart className="w-8 h-8 text-[#c5a059]" />
                         <h3 className="font-cinzel text-xl md:text-2xl font-bold text-[#0b1d3a] uppercase tracking-widest">Painel de Decisões</h3>
                       </div>
-                      <button onClick={() => setActiveTab('social')} className="text-[10px] font-black uppercase tracking-widest text-[#c5a059] hover:underline">Ver Completo</button>
+                      <button onClick={() => navigate('/area-restrita?tab=social')} className="text-[10px] font-black uppercase tracking-widest text-[#c5a059] hover:underline">Ver Completo</button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                       {socialItems.slice(0, 2).map((action) => (
@@ -570,7 +567,7 @@ export default function MemberDashboard() {
                           </span>
                           <h4 className="font-serif font-bold text-[#0b1d3a] text-base md:text-lg mb-2">{action.title}</h4>
                           <p className="text-[11px] text-[#0b1d3a]/70 line-clamp-2 italic mb-6 leading-relaxed">"{action.description}"</p>
-                          <button onClick={() => setActiveTab('social')} className="text-[10px] font-black uppercase tracking-[0.2em] text-[#c5a059] flex items-center gap-2 group-hover:gap-4 transition-all">Participar agora <span>→</span></button>
+                          <button onClick={() => navigate('/area-restrita?tab=social')} className="text-[10px] font-black uppercase tracking-[0.2em] text-[#c5a059] flex items-center gap-2 group-hover:gap-4 transition-all">Participar agora <span>→</span></button>
                         </div>
                       ))}
                     </div>
@@ -583,7 +580,7 @@ export default function MemberDashboard() {
                         <h3 className="font-serif text-xl md:text-2xl font-bold text-[#0b1d3a] uppercase tracking-widest">Soberano Quadro de Obreiros</h3>
                         <p className="text-[#0b1d3a]/40 text-[10px] italic font-serif">"Irmãos que vivem em união"</p>
                       </div>
-                      <button onClick={() => setActiveTab('members')} className="w-fit px-6 py-2 border border-[#c5a059]/30 rounded-full text-[10px] font-black uppercase tracking-widest text-[#0b1d3a] hover:bg-[#c5a059] transition-all">Ver em Tela Cheia</button>
+                      <button onClick={() => navigate('/area-restrita?tab=members')} className="w-fit px-6 py-2 border border-[#c5a059]/30 rounded-full text-[10px] font-black uppercase tracking-widest text-[#0b1d3a] hover:bg-[#c5a059] transition-all">Ver em Tela Cheia</button>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 w-full">
                       {registeredUsers.filter(u => u.status !== 'PENDING').slice(0, 12).map((member) => (
@@ -1019,7 +1016,7 @@ export default function MemberDashboard() {
         {showAddModal && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowAddModal(false)} className="fixed inset-0 bg-[#0b1d3a]/95 text-white" />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-xl bg-[#f4efe2] rounded-[2.5rem] border border-[#c5a059]/30 shadow-2xl p-6 md:p-10">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-xl bg-[#f4efe2] rounded-[2.5rem] border border-[#c5a059]/30 shadow-2xl p-6 md:p-10 max-h-[90vh] overflow-y-auto">
                <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#0b1d3a] mb-6 uppercase tracking-widest text-center">Adicionar à <span className="text-[#c5a059]">Biblioteca</span></h2>
                <form className="space-y-4" onSubmit={(e) => {
                  e.preventDefault();
