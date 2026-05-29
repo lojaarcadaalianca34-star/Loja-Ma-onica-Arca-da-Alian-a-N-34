@@ -472,7 +472,7 @@ export default function MemberDashboard() {
                  <button
                    key={tab.id}
                    onClick={() => {
-                     if (tab.id === 'profile' && !targetUid) {
+                     navigate(`/area-restrita?tab=${tab.id}`); if (false) {
                        navigate('/area-restrita?tab=profile');
                      } else {
                        setActiveTab(tab.id as any);

@@ -162,6 +162,7 @@ function ScrollToTop() {
 function MemberRoute({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     return onAuthStateChanged(auth, (u) => {
@@ -171,7 +172,7 @@ function MemberRoute({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (loading) return null;
-  if (!user) return <Navigate to="/login-membro" />;
+  if (!user) return <Navigate to="/login-membro" state={{ from: location }} replace />;
 
   return <>{children}</>;
 }

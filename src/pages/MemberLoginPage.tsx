@@ -42,7 +42,12 @@ export default function MemberLoginPage() {
         return;
       }
 
-      const from = isMaster ? '/admin' : ((location.state as any)?.from?.pathname || '/biblioteca-restrita');
+      const fromObj = (location.state as any)?.from;
+      const from = isMaster ? '/admin' : (
+        fromObj 
+          ? (fromObj.pathname + (fromObj.search || '') + (fromObj.hash || ''))
+          : '/area-restrita'
+      );
       navigate(from, { replace: true });
     } catch (err: any) {
       console.error('Login error:', err);
@@ -105,7 +110,12 @@ export default function MemberLoginPage() {
         }
       }
 
-      const from = isMaster ? '/admin' : ((location.state as any)?.from?.pathname || '/biblioteca-restrita');
+      const fromObj = (location.state as any)?.from;
+      const from = isMaster ? '/admin' : (
+        fromObj 
+          ? (fromObj.pathname + (fromObj.search || '') + (fromObj.hash || ''))
+          : '/area-restrita'
+      );
       navigate(from, { replace: true });
     } catch (err: any) {
       console.error('Google login error:', err);

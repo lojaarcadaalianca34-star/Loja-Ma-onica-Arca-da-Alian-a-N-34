@@ -23,12 +23,12 @@ export default function Navbar() {
   const navigate = useNavigate();
   const isNavigatingRef = useRef(false);
 
-  // FECHA MENU IMEDIATAMENTE em qualquer mudança de rota
+  // FECHA MENU IMEDIATAMENTE em qualquer mudança de rota, pesquisa ou hash
   useEffect(() => {
     isNavigatingRef.current = false;
     setIsOpen(false);
     document.body.style.overflow = '';
-  }, [location.pathname, location.search]);
+  }, [location]);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -51,8 +51,11 @@ export default function Navbar() {
     isNavigatingRef.current = true;
     setIsOpen(false);
     document.body.style.overflow = '';
-    // Usa setTimeout 0 para garantir que o React processe o setIsOpen antes de navegar
-    setTimeout(() => navigate(href), 0);
+    // Usa setTimeout para garantir que o React processe o setIsOpen antes de navegar
+    setTimeout(() => {
+      navigate(href);
+      isNavigatingRef.current = false;
+    }, 100);
   };
 
   const handleLogout = async () => {
@@ -187,7 +190,7 @@ export default function Navbar() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '8px' }}>
             <button
-              onClick={() => goTo('/area-restrita')}
+              onClick={() => goTo('/area-restrita?tab=members')}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                 backgroundColor: '#c5a059',
